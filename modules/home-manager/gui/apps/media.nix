@@ -70,7 +70,6 @@ in
       picgo-wrapped
       picgo-clipboard-upload
       wl-clipboard
-      freetube
       clash-verge-rev # 代理软件（原 flclash 已被 nixpkgs 移除）
       bilibili
     ];

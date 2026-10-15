@@ -41,7 +41,6 @@ in
       "x-scheme-handler/unknown" = "brave-browser.desktop";
       "image/jpeg" = "com.interversehq.qView.desktop";
       "text/plain" = "org.gnome.TextEditor.desktop";
-      "x-scheme-handler/freetube" = "freetube.desktop";
       "x-scheme-handler/net.thunderbird" = "thunderbird.desktop";
       "image/webp" = "com.interversehq.qView.desktop";
       "x-scheme-handler/tg" = "org.telegram.desktop.desktop";
