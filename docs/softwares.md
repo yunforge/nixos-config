@@ -58,7 +58,8 @@
 | Freetube / gapless / parabolic | 视频 / 音乐 / 下载（yt-dlp 前端） |
 | mpv | 视频播放器，uosc「Cupertino」定制界面（配置整棵 vendored 在 `modules/home-manager/gui/apps/mpv/`，见该目录的 README.md / CUSTOMIZATION.md） |
 | OBS Studio | 录屏 / 直播 |
-| PicGo + snipaste | 截图与图床上传 |
+| babry | 全机唯一的截图工具（CV 智能选区 + 标注 + 贴图，Wayland 原生，`Mod+P` / `Mod+Ctrl+P`；nixpkgs 未收录，自维护见 `pkgs/babry`） |
+| PicGo | 剪贴板图片上传图床 |
 | Mission Center / btop / fastfetch | 系统监控 |
 | ddcutil（配合 Noctalia） | 显示器亮度控制 |
 | qView / Papers / Foliate / Wike | 看图 / PDF / 电子书 / Wiki |

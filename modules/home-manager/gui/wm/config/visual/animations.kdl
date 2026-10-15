@@ -149,6 +149,10 @@ animations {
     }
 
     // 截图界面的打开（淡入）动画
+    //
+    // 注意：niri 自带的 screenshot 动作已于 2026-10-15 停用（截图统一走 babry，
+    // 见 binds/system.kdl），所以这条**目前没有触发方**。留着只为万一再启用
+    // niri 截图时不必重新调参；确认不再启用后可以删掉。
     screenshot-ui-open {
         duration-ms 200
         curve "ease-out-expo"

@@ -20,7 +20,6 @@ Niri 配置分两半，`Mod` = `Super`（Windows 键）：
 | `Alt` + `I` | Pot 输入翻译 |
 | `Alt` + `X` | Pot 截屏翻译（OCR） |
 | `Mod` + `Alt` + `P` | PicGo 上传剪贴板图片 |
-| `Mod` + `Shift` + `S` | Snipaste 截图 |
 
 ## 工作区
 
@@ -66,11 +65,21 @@ Niri 配置分两半，`Mod` = `Super`（Windows 键）：
 
 ## 截图
 
+2026-10-15 起截图统一走 **babry**（Wayland 原生、CV 智能选区；nixpkgs 未收录，自维护见 `pkgs/babry`）。
+niri 自带的 `screenshot` / `screenshot-screen` / `screenshot-window` 三个动作不再绑定，
+也没有第二个截图软件 —— 编辑器要求全屏打开的窗口规则见 `config/windowrules.kdl`。
+
 | 快捷键 | 功能 |
 |--------|------|
-| `Mod` + `P` | 区域截图（存入 ~/Pictures/screenshots） |
-| `Mod` + `Ctrl` + `P` | 全屏截图 |
-| `Mod` + `Shift` + `P` | 窗口截图 |
+| `Mod` + `P` | 区域截图（悬停吸附到窗口/面板/控件，滚轮换层级，单击确认，拖动精修） |
+| `Mod` + `Ctrl` + `P` | 全屏截图（`babry --screen`，截完直接进编辑器） |
+
+编辑器内按键：`Ctrl+S` 存盘、`Ctrl+C` 复制到剪贴板、`Ctrl+Z` / `Ctrl+Shift+Z` 撤销重做、`Esc` 取消；
+工具栏图钉把选区钉成屏幕贴图。存盘位置由 babry 自己的对话框决定 —— niri 的 `screenshot-path`
+（`config.kdl`）已随 niri 自带截图动作一并删除。
+
+> 原来 `Mod` + `Shift` + `P` 的「窗口截图」不再单独占键：babry 的智能选区本就把窗口当成
+> 一个层级，滚轮即可切到窗口/全屏。
 
 ## 系统与会话
 

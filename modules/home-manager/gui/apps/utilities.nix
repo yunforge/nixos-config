@@ -44,6 +44,7 @@ in
       xunlei-uos # 迅雷
       qview # 图片查看
       disktree # 磁盘使用情况树状图
+      babry # 唯一的截图工具：CV 智能选区 + 标注（快捷键见 binds/system.kdl 的 Mod+P）
       nautilus
       logisim-evolution
       localsend

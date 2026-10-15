@@ -28,8 +28,9 @@ include "windowrules.kdl"
 // 隐藏客户端装饰
 prefer-no-csd
 
-// 截图保存位置
-screenshot-path "~/Pictures/screenshots/%Y-%m-%d_%H-%M-%S.png"
+// 截图保存位置：niri 自带的 screenshot 动作已不再绑定（截图统一走 babry，
+// 见 binds/system.kdl），这条路径没有消费方，故删除。babry 的存盘走它自己的
+// Ctrl+S 对话框，与 niri 无关。
 
 // xwayland-satellite 集成
 xwayland-satellite {

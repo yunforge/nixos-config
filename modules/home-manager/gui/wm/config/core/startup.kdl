@@ -8,8 +8,6 @@ spawn-at-startup "fcitx5"
 // XWayland 的 Xft.dpi：fcitx5 在 X11 客户端上只读该资源来决定候选窗缩放，
 // 缺失时 X11 候选窗会停在 1.0x（workaround，见 modules/nixos/desktop/niri/default.nix）
 spawn-at-startup "xwayland-xft-dpi"
-// Snipaste 截图工具（常驻以响应 CLI 的 snip 命令，供 binds/apps.kdl 快捷键调用）
-spawn-at-startup "snipaste"
 
 // niri 启动时不自动展示快捷键叠加层
 hotkey-overlay {

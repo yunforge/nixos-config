@@ -1,9 +1,14 @@
 // 系统级快捷键：截图、会话、快捷键查看器
 binds {
-    // 截图
-    Mod+P       hotkey-overlay-title="区域截图"         { screenshot; }
-    Mod+Ctrl+P  hotkey-overlay-title="全屏截图"         { screenshot-screen write-to-disk=false show-pointer=false; }
-    Mod+Shift+P hotkey-overlay-title="窗口截图"         { screenshot-window write-to-disk=false show-pointer=false; }
+    // 截图 —— 2026-10-15 起全部交给 babry（niri 自带的 screenshot / screenshot-screen /
+    // screenshot-window 三个动作不再绑定，也不再有别的截图软件）。
+    //
+    // 键位沿用原来的布局，只换工具：原「区域截图 / 全屏截图」两档保留。
+    // 原 Mod+Shift+P「窗口截图」删除 —— babry 的 CV 智能选区本来就把窗口当成
+    // 一个层级（悬停吸附、滚轮在控件/面板/窗口/全屏之间切换），单独一个「窗口」
+    // 键没有对应模式；上游 `--window` 现在也只是智能选区的别名，绑了等于重复。
+    Mod+P       hotkey-overlay-title="babry 截图"      { spawn "babry"; }
+    Mod+Ctrl+P  hotkey-overlay-title="babry 全屏截图"  { spawn "babry" "--screen"; }
 
     // 退出
     Mod+Shift+E hotkey-overlay-title="退出 niri"        { quit; }

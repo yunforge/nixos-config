@@ -35,8 +35,4 @@ binds {
 
     // PicGo 剪贴板图片上传（Wayland 下 Electron globalShortcut 不可用，通过 Server API 实现）
     Mod+Alt+P hotkey-overlay-title="上传剪贴板图片" { spawn-sh "picgo-clipboard-upload"; }
-
-    // Snipaste 截图（闭源 X11 应用，自身全局热键在 Wayland 后台不可用，
-    // 改用 CLI 命令 snip 触发，需在 startup.kdl 中自启常驻）
-    Mod+Shift+S hotkey-overlay-title="Snipaste 截图" { spawn "snipaste" "snip"; }
 }

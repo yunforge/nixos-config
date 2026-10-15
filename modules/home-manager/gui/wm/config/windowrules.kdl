@@ -90,6 +90,18 @@ window-rule {
     open-maximized true
 }
 
+// babry — 截图编辑器（GUI 智能选区 + 标注）
+//
+// 上游明确要求（README「niri 配置」）：编辑器要以全屏显示，未配置时按普通
+// 窗口平铺。这里给上「打开即全屏 + 夺取焦点」两条 —— babry 是「按快捷键后
+// 立刻悬停选点」的交互，窗口不起焦点就会选到上一次的焦点窗口。
+// app-id 就是 "babry"（上游未设 desktopName，取进程名）。
+window-rule {
+    match app-id=r#"^babry$"#
+    open-fullscreen true
+    open-focused true
+}
+
 
 // ═══════════════════════════════════════════════
 // 浮动窗口（统一尺寸，居中）

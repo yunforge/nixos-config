@@ -45,20 +45,6 @@ let
     fi
   '';
 
-  # themes/default.nix 经 home-manager qt 模块设置了全局 QT_STYLE_OVERRIDE=adwaita，
-  # 但 Snipaste 的 AppImage 自带 Qt6 且只在自带插件目录里放了 qt6ct-style，
-  # 不读取宿主机 QT_PLUGIN_PATH，于是每次启动都报
-  # "invalid style override 'adwaita'" 并回退默认样式。这里取消该环境变量，
-  # 让它用自带样式，告警即消失。
-  snipaste-wrapped = pkgs.symlinkJoin {
-    name = "snipaste-wrapped";
-    paths = [ pkgs.snipaste ];
-    buildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/snipaste --unset QT_STYLE_OVERRIDE
-    '';
-  };
-
   picgo-wrapped = pkgs.symlinkJoin {
     name = "picgo-wrapped";
     paths = [ pkgs.picgo ];
@@ -81,7 +67,6 @@ in
   config = lib.mkIf (cfg.enable && guiCfg.enable) {
     home.packages = with pkgs; [
       obs-studio
-      snipaste-wrapped
       picgo-wrapped
       picgo-clipboard-upload
       wl-clipboard

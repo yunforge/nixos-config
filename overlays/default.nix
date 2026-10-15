@@ -29,6 +29,12 @@ final: prev: {
   magpie = prev.callPackage ../pkgs/magpie { };
   magpie-cli = prev.callPackage ../pkgs/magpie { gui = false; };
 
+  # babry：懂边界的 Wayland 截图工具（上游 kregonia/babry，nixpkgs 未收录）。
+  # 全机唯一的截图工具（CV 智能选区 + 标注 + 贴图，键位 Mod+P / Mod+Ctrl+P），
+  # 取代此前的 Snipaste 与 niri 自带 screenshot 动作；运行时依赖
+  #（grim/wl-copy/notify-send）由包内 wrapProgram 钉进 PATH。
+  babry = prev.callPackage ../pkgs/babry { };
+
   # liquidbird：Thunderbird 的 Liquid Glass 主题（上游 StatIndet/liquidbird，
   # nixpkgs 未收录）。不是 add-on，是 profile 里的 userChrome/userContent 体系：
   # 包只摆好文件，落地见 modules/home-manager/gui/apps/productivity.nix。
