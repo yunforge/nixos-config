@@ -116,6 +116,39 @@ in
 
     # FHS 兼容
     programs.nix-ld.enable = true;
+    # 第三方二进制（如 ~/Downloads 里的 Tern）运行时要 dlopen 图形栈：X11
+    # （libxcb/libX11/libXi/…）、Wayland（libwayland-client/libxkbcommon）与
+    # Vulkan（libvulkan）。nix-ld 默认集里没有这些，裸二进制起来即 panic
+    # （failed to load libxcb: libxcb.so.1: cannot open shared object file），
+    # 表现为「启动器里点不开」。
+    # 注意 nix-ld 的库目录是 buildEnv 平铺软链、不建闭包，故被 dlopen 的库其
+    # 自身 DT_NEEDED 也要列全（libXcursor 带 libXfixes/libXrender，wayland 带
+    # libffi，libglvnd 带 libGLdispatch 同一包内），否则那一个库仍是加载失败。
+    # 详见 docs/quirks.md「第三方 GUI 二进制的图形栈 dlopen」条。
+    programs.nix-ld.libraries = lib.mkAfter (
+      with pkgs;
+      [
+        # X11
+        libxcb
+        libXau
+        libXdmcp
+        libX11
+        libXcursor
+        libXext
+        libXfixes
+        libXi
+        libXinerama
+        libXrandr
+        libXrender
+        # Wayland
+        libxkbcommon
+        wayland
+        libffi
+        # 显存/渲染
+        libglvnd
+        vulkan-loader
+      ]
+    );
 
     # 系统总线
     services.dbus = {
