@@ -51,6 +51,58 @@ in
       magpie # 各 AI agent 的模型选择器（托盘/窗口版；终端版见 hosts/wsl）
     ];
 
+    # magpie 的桌面文件。上游 internal/gui/scheme_linux.go 的 registerScheme()
+    # 首次运行时会往 ~/.local/share/applications/magpie.desktop 写一份，把当时
+    # 那个**绝对 store 路径**钉进 Exec=，用来抢占 magpie:// 协议；而它只在
+    # 「文件已指向我自己」时跳过后写，于是升级后没人再更新它，启动器与
+    # magpie:// 链接就一直拉起上一个版本（CLI 走 PATH，故不受影响）。
+    #
+    # 这里由 HM 托管同一路径、按当前版本重写 Exec=，每次 rebuild 都指向新版本；
+    # 写的是 ${pkgs.magpie} 的绝对路径，正好等于 magpie 自检用的 os.Executable()，
+    # 它的自写会命中「已指向我自己」而直接返回，不报错。
+    #
+    # 不能改用 xdg.desktopEntries：它写进 profile 的 share/applications
+    # （XDG_DATA_DIRS），而 GLib 解析桌面文件时 XDG_DATA_HOME(即 ~/.local/share)
+    # 优先，会被这份旧文件盖掉、修不好（已用 GLib 实测确认）。HM 首次接管时，
+    # 原文件会被备份成 magpie.desktop.hm-bak（后缀非 .desktop，不被当条目解析）。
+    xdg.dataFile."applications/magpie.desktop".text = ''
+      [Desktop Entry]
+      Type=Application
+      Name=magpie
+      Comment=Every agent's model. One place.
+      Exec=${pkgs.magpie}/bin/magpie %u
+      Icon=magpie
+      Categories=Development;Utility;
+      MimeType=x-scheme-handler/magpie;
+      Terminal=false
+    '';
+
+    # magpie 开机自启（托盘常驻：网关要在登录时就位，各 agent 才连得上）。
+    # 不用 magpie 自带的 `magpie autostart on`：它把 os.Executable() 的**绝对
+    # store 路径**写进 ~/.config/autostart/magpie.desktop，升级被 GC 后开机就
+    # 起不来（与上面桌面文件同一个坑）。照 clash-verge 的既有做法（media.nix）
+    # 由 HM 声明一条自制 autostart 条目，Exec 用稳定的命令名走 PATH，恒指向
+    # 当前版本；systemd 的 xdg-autostart-generator 会在登录时拉起它。
+    # 参数 `tray` 是上游自启的形态（只进托盘、不开窗，见 cli help）。
+    xdg.autostart = {
+      enable = true;
+      entries = [
+        (pkgs.writeTextFile {
+          name = "magpie.desktop";
+          text = ''
+            [Desktop Entry]
+            Type=Application
+            Name=magpie
+            Comment=Every agent's model. One place.
+            Exec=magpie tray
+            Icon=magpie
+            Terminal=false
+            X-GNOME-Autostart-enabled=true
+          '';
+        })
+      ];
+    };
+
     # === tmp.text 垃圾文件拦截 ===
     # ThunderHelper.node 里残留了一行调试代码 `df -h > tmp.text`，迅雷每次启动都
     # 会把磁盘信息写到进程工作目录（bwrap 沙箱 --chdir $HOME），导致家目录反复
