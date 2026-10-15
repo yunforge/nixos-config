@@ -39,7 +39,6 @@ in
     home.packages = with pkgs; [
       (wrapJb "clion" jetbrains.clion)
       github-desktop
-      cc-switch
       zed-editor
       qtcreator # QT
       heidisql # 数据库
