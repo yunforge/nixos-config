@@ -53,8 +53,9 @@ in
 
       # Homebrew 4.x 起 cask 已并入核心 tap，无需额外 tap homebrew/cask
       # GUI 应用
-      # ghostty 是本体终端（Linux 走 HM 的 programs.ghostty，macOS 侧这里装 cask）；
-      # 两者的配置同一份，见 modules/home-manager/gui/apps/ghostty.nix
+      # ghostty / vscode：用户配置由 HM 的 modules/home-manager/gui/apps/shared/
+      # 跨平台共享，程序本体在 macOS 侧由这里的 cask 安装（Linux 走 HM 装包）；
+      # 与「工具配置共享 ≠ 安装方式相同」的分层约定一致。
       casks = [
         "ghostty"
         "visual-studio-code"

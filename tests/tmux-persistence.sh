@@ -62,7 +62,7 @@ done
 }
 for bin in "$save_bin" "$start_bin" "$stop_bin"; do
   command -v "$bin" >/dev/null 2>&1 || {
-    echo "找不到 $bin（应来自 modules/home-manager/cli/tools/tmux.nix 的 home.packages）" >&2
+    echo "找不到 $bin（应来自 modules/home-manager/common/tools/tmux.nix 的 home.packages）" >&2
     exit 1
   }
 done

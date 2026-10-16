@@ -6,8 +6,11 @@
 # desktop 主机（Niri 桌面）
 sudo nixos-rebuild switch --flake ~/Projects/nixos-config#desktop
 
-# laptop 主机（GNOME 桌面）
+# laptop 主机（Niri 桌面）
 sudo nixos-rebuild switch --flake ~/Projects/nixos-config#laptop
+
+# server 主机（无桌面，首次部署前需在目标机器生成 hardware-configuration.nix，见 docs/architecture.md）
+sudo nixos-rebuild switch --flake ~/Projects/nixos-config#server
 
 # WSL
 sudo nixos-rebuild switch --flake ~/Projects/nixos-config#wsl

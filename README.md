@@ -17,6 +17,9 @@ sudo nixos-rebuild switch --flake ~/Projects/nixos-config#laptop
 # NixOS 主机
 sudo nixos-rebuild switch --flake ~/Projects/nixos-config#desktop
 
+# NixOS 服务器
+sudo nixos-rebuild switch --flake ~/Projects/nixos-config#server
+
 # WSL
 sudo nixos-rebuild switch --flake ~/Projects/nixos-config#wsl
 
@@ -42,6 +45,6 @@ nix store optimise
 
 ## 我的配置
 
-- 终端Shell：[Fish](https://github.com/fish-shell/fish-shell)
-- 终端编辑器：[Neovim](https://github.com/neovim/neovim)（Omarchy 的 LazyVim 配置）
-
+- Shell：[Fish](https://github.com/fish-shell/fish-shell)
+- 终端：[Ghostty](https://ghostty.org/)
+- 终端编辑器：[Neovim](https://github.com/neovim/neovim)

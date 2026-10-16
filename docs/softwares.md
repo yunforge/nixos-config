@@ -1,13 +1,15 @@
 # 软件方案
 
-所有应用由 Home Manager 统一管理（`modules/home-manager/gui/apps/`）。
+所有应用由 Home Manager 统一管理。本文只列 **Linux 工作站**（desktop / laptop）的 GUI 应用
+（`modules/home-manager/gui/apps/linux/` + `gui/apps/shared/`）；各设备的用户环境组合
+（工作站 / 服务器 / WSL / MacBook 各装什么）见 `docs/architecture.md` 的「角色组合」，
+CLI / TUI / 工具链见 `docs/environment.md`。
 
 ## 桌面环境
 
 | 组件 | 软件 |
 |------|------|
-| 窗口管理器（desktop） | [Niri](https://github.com/YaLTeR/niri) - Wayland 平铺合成器 |
-| 桌面环境（laptop 默认） | GNOME |
+| 窗口管理器（desktop / laptop） | [Niri](https://github.com/YaLTeR/niri) - Wayland 平铺合成器 |
 | Shell（桌面外壳） | [Noctalia](https://github.com/noctalia-dev/noctalia-shell) - 启动器 / 控制中心 / 壁纸 / 锁屏 |
 | 显示管理器 | GDM |
 | 输入法 | Fcitx5 + Rime（万象拼音） |
@@ -57,7 +59,7 @@
 |------|------|
 | gapless | 本地音乐播放器 |
 
-| mpv | 视频播放器，uosc「Cupertino」定制界面（配置整棵 vendored 在 `modules/home-manager/gui/apps/mpv/`，见该目录的 README.md / CUSTOMIZATION.md） |
+| mpv | 视频播放器，uosc「Cupertino」定制界面（配置整棵 vendored 在 `modules/home-manager/gui/apps/linux/mpv/`，见该目录的 README.md / CUSTOMIZATION.md） |
 | OBS Studio | 录屏 / 直播 |
 | babry | 全机唯一的截图工具（CV 智能选区 + 标注 + 贴图，Wayland 原生，`Mod+P` / `Mod+Ctrl+P`；nixpkgs 未收录，自维护见 `pkgs/babry`） |
 | PicGo | 剪贴板图片上传图床 |

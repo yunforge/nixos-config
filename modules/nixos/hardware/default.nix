@@ -19,5 +19,10 @@ in
     mySystem.hardware.network.enable = lib.mkDefault true;
     mySystem.hardware.mcu.enable = lib.mkDefault true;
     # nvidia 需要主机显式开启（WSL 不需要）
+
+    # 硬件加速（Mesa/Vulkan 用户态驱动）：曾在 core 里无条件开启，
+    # 但它是桌面/渲染相关的硬件能力而非系统基础——服务器不需要。
+    # 挪到硬件域（与音频/蓝牙同级），只随 mySystem.hardware.enable 启用。
+    hardware.graphics.enable = lib.mkDefault true;
   };
 }

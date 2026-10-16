@@ -23,7 +23,7 @@ in
   };
 
   # 显示器声明：主机数据，驱动 niri outputs.kdl 生成与 Noctalia 的 DDC 亮度
-  # （消费方见 modules/home-manager/gui/wm/）。共享模块只做生成器，
+  # （消费方见 modules/home-manager/gui/desktop/linux/niri/）。共享模块只做生成器，
   # 新增/换显示器只动 hosts/。
   options.mySystem.desktop.monitors = lib.mkOption {
     type = lib.types.listOf (
@@ -126,7 +126,7 @@ in
           kdePackages.fcitx5-configtool
           kdePackages.fcitx5-qt
           fcitx5-gtk
-          # 候选词窗主题不在此选择：见 modules/home-manager/gui/fcitx5.nix
+          # 候选词窗主题不在此选择：见 modules/home-manager/gui/desktop/linux/fcitx5.nix
           (fcitx5-rime.override {
             rimeDataPkgs = [ pkgs.rime-wanxiang ];
           })

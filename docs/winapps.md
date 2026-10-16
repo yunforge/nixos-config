@@ -59,7 +59,7 @@ winapps help         # 其余子命令
 | `modules/nixos/virtualization/default.nix` | libvirtd / qemu_kvm / swtpm / virtiofsd + 装机盘 `windowsVmMedia` |
 | `modules/nixos/networking/proxy-vm.nix` | 客户机上网：把宿主 Clash 转发到网桥 `virbr0`（`libvirt-proxy-forward.service`，见 §10.4） |
 | `pkgs/windows-vm-media/` | 装机盘 ISO 的构建：上游 virtio-win ISO + 上游 `oem/` + 本仓库的 `WINAPPS-SETUP.bat` / `winapps-fix-rdp.ps1` |
-| `modules/home-manager/gui/winapps.nix` | 接入层：包、`winapps.conf`、askpass 脚本、密码缺失提示、`RDP_SCALE` 派生 |
+| `modules/home-manager/gui/desktop/linux/winapps.nix` | 接入层：包、`winapps.conf`、askpass 脚本、密码缺失提示、`RDP_SCALE` 派生 |
 | `~/.config/winapps/winapps.conf` | 运行时配置，由 home-manager 生成（改配置改 Nix，勿手改） |
 | `~/.config/winapps/rdp-pass` | Windows 账户密码，**手动维护**（不进 nix store） |
 
@@ -441,7 +441,7 @@ curl.exe -x http://192.168.122.1:7897 -sI https://www.google.com
 
 ## 11. 配置项速查
 
-### 11.1 home-manager（`modules/home-manager/gui/winapps.nix`）
+### 11.1 home-manager（`modules/home-manager/gui/desktop/linux/winapps.nix`）
 
 | 选项 | 默认 | 说明 |
 | --- | --- | --- |

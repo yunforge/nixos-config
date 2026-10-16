@@ -1,6 +1,6 @@
 # Fish Shell
 
-配置位置：`modules/home-manager/cli/shell/fish.nix`。
+配置位置：`modules/home-manager/common/shell/fish.nix`。
 
 终端默认英文环境，`EDITOR=nvim`，`LC_ALL=en_US.UTF-8`。
 
@@ -17,7 +17,7 @@
 ## 文件与目录
 
 `ls` / `ll` / `la` / `lla` / `lt` 的参数（icons / colors / git / 排序）来自 `programs.eza`，
-配置在 `modules/home-manager/cli/shell/default.nix`。模块生成的别名体调 `eza`，参数挂在
+配置在 `modules/home-manager/common/shell/default.nix`。模块生成的别名体调 `eza`，参数挂在
 `eza` 这条别名上，所以改参数去那里，不要在 `fish.nix` 重写整条别名。
 
 | 别名 | 功能 |
@@ -28,7 +28,7 @@
 | `fd` | fd 带 `--hidden`（点文件默认可见，由 `programs.fd.hidden` 生成） |
 
 > `bat` / `cat` 不再设别名：bat 的行为统一由 `programs.bat.config` 决定（见
-> `modules/home-manager/cli/shell/default.nix`），`cat` 即系统 cat。
+> `modules/home-manager/common/shell/default.nix`），`cat` 即系统 cat。
 
 ## Git
 
@@ -63,7 +63,7 @@
 
 ## zoxide
 
-`programs.zoxide`（配置在 `modules/home-manager/cli/shell/default.nix`）负责装包并注入
+`programs.zoxide`（配置在 `modules/home-manager/common/shell/default.nix`）负责装包并注入
 shell 集成与补全，`home.packages` 里不再重复列。
 
 `options = [ "--cmd cd" ]` 让 zoxide **接管内置 `cd`**（不带该选项时才是 `z` / `zi`）：

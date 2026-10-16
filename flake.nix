@@ -71,8 +71,11 @@
       # NUR 与自定义包 overlay），overlay 与 allowUnfree 只在系统级维护一处。
       # 用户名不硬编码：取值方式由调用方给出，默认取 mySystem.primaryUser，
       # darwin 侧改取 nix-darwin 的 system.primaryUser。
+      # 角色由 profile 参数指定（modules/home-manager/profiles/）：各角色决定
+      # 导入哪些能力层（common / dev / gui apps / desktop 会话），主机不再自拼。
       mkHomeManager =
         {
+          profile,
           extraModules ? [ ],
           primaryUser ? (cfg: cfg.mySystem.primaryUser),
         }:
@@ -84,11 +87,12 @@
           home-manager.extraSpecialArgs = { inherit inputs myLib; };
           home-manager.users.${primaryUser config}.imports = [
             ./modules/home-manager
+            profile
           ]
           ++ extraModules;
         };
 
-      # 所有 NixOS 主机共享的核心模块
+      # 所有 NixOS 主机共享的核心模块（真正的系统基础，见 modules/nixos/core）
       nixosCore = [
         ./modules/nixos/core
         home-manager.nixosModules.home-manager
@@ -96,39 +100,61 @@
         # 否则 systemd-boot 菜单与 nixos-version --configuration-revision 只能显示 Unknown
         { system.configurationRevision = self.rev or "dirty"; }
       ];
+
+      # NixOS 角色模块（系统层）：决定某类设备启用哪些系统能力。
+      # 主机套用对应角色后再追加硬件差异，不再自己拼系统能力组合。
+      nixosProfiles = {
+        workstation = ./modules/nixos/profiles/workstation.nix;
+        server = ./modules/nixos/profiles/server.nix;
+        wsl = ./modules/nixos/profiles/wsl.nix;
+      };
     in
     {
       # ==========================================
       # NixOS 配置
       # ==========================================
       nixosConfigurations = {
-        # 台式机（Niri 桌面）
+        # 台式机（Niri 桌面）— workstation 角色
         desktop = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs myLib; };
           modules = nixosCore ++ [
+            nixosProfiles.workstation
             ./hosts/desktop
-            (mkHomeManager { extraModules = [ ./modules/home-manager/gui ]; })
+            (mkHomeManager { profile = ./modules/home-manager/profiles/workstation.nix; })
           ];
         };
 
-        # 笔记本（GNOME 桌面）
+        # 笔记本（Niri 桌面）— workstation 角色
         laptop = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs myLib; };
           modules = nixosCore ++ [
+            nixosProfiles.workstation
             ./hosts/laptop
-            (mkHomeManager { extraModules = [ ./modules/home-manager/gui ]; })
+            (mkHomeManager { profile = ./modules/home-manager/profiles/workstation.nix; })
           ];
         };
 
-        # WSL（仅 CLI/TUI）
+        # 服务器（无桌面）— server 角色
+        server = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs myLib; };
+          modules = nixosCore ++ [
+            nixosProfiles.server
+            ./hosts/server
+            (mkHomeManager { profile = ./modules/home-manager/profiles/server.nix; })
+          ];
+        };
+
+        # WSL（仅 CLI/TUI）— wsl 角色
         wsl = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = { inherit inputs myLib; };
           modules = nixosCore ++ [
+            nixosProfiles.wsl
             ./hosts/wsl
-            (mkHomeManager { })
+            (mkHomeManager { profile = ./modules/home-manager/profiles/wsl.nix; })
           ];
         };
 
@@ -138,6 +164,7 @@
       # macOS 配置
       # ==========================================
       darwinConfigurations = {
+        # MacBook — macbook 角色（HM 侧导入 common + dev + 跨平台 GUI 应用配置）
         macbook = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           specialArgs = { inherit inputs myLib; };
@@ -150,6 +177,7 @@
             home-manager.darwinModules.home-manager
             # 与 NixOS 侧共用同一份接线；darwin 的用户名来源是 system.primaryUser
             (mkHomeManager {
+              profile = ./modules/home-manager/profiles/macbook.nix;
               primaryUser = cfg: cfg.system.primaryUser;
             })
           ];
@@ -217,7 +245,7 @@
                 cp ${mkKdl "niri-colors/layout.kdl"}   "$HOME/.config/niri-colors/layout.kdl"
                 cp ${mkKdl "niri-colors/overview.kdl"} "$HOME/.config/niri-colors/overview.kdl"
                 cp ${mkKdl "niri-outputs/outputs.kdl"} "$HOME/.config/niri-outputs/outputs.kdl"
-                cp -r ${./modules/home-manager/gui/wm/config} conf
+                cp -r ${./modules/home-manager/gui/desktop/linux/niri/config} conf
                 chmod -R u+w conf
                 niri validate -c conf/config.kdl
                 touch "$out"

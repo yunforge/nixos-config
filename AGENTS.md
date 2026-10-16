@@ -18,19 +18,37 @@
 
 ## 深入文档在哪
 
-本文件只放总规则（命令边界、验证、风格、提交）。仓库结构、选项映射、主机清单与平台适配坑位都不在这里：
+本文件只放总规则（命令边界、验证、风格、提交）。仓库结构、选项映射、角色组合、主机清单与平台适配坑位都不在这里：
 
-- `docs/architecture.md` — 仓库结构、选项与 module 分层约定、主机差异（选项清单不在此维护，`rg mkEnableOption modules/` 才是权威）
+- `docs/architecture.md` — 仓库地图：结构、模块分层（原子模块 → 能力模块 → 角色 → 主机）、
+  选项约定（就近 `mkEnableOption` / 聚合 `mkDefault` / 主机只写例外）、角色组合、主机差异、
+  跨平台共享边界、overlay 与 HM 接线。**改任何模块结构前先读这篇。**
 - `docs/quirks.md` — 平台适配的坑与 workaround（改对应模块前必读）
 - `docs/README.md` — 全部文档索引；改某个子系统前先读对应那篇
+
+## 架构入口（改配置前必须知道的分层）
+
+配置按「职责」而非「设备」组织，五类设备（desktop / laptop / server / wsl / macbook）
+靠**角色 profile** 组合公共能力，主机文件只写真实差异：
+
+- 系统层角色：`modules/nixos/profiles/`（workstation / server / wsl）
+- 用户层角色：`modules/home-manager/profiles/`（workstation / server / wsl / macbook）
+- 公共能力：`modules/home-manager/common/`（shell / editors / tools，所有主机共享）、
+  `modules/home-manager/dev/languages/`（语言工具链）、
+  `modules/home-manager/gui/apps/shared/`（跨平台 GUI 应用配置）
+- 平台边界：GUI 应用「配置共享、安装方式分开」（Linux 走 HM 装包，macOS 走 Homebrew cask，
+  HM 侧 `package = null`）；`gui/apps/linux/` 与 `gui/desktop/linux/` 只给 Linux 工作站导入。
+- **禁止**在公共模块里散布设备名称判断；新增设备先看能不能靠新角色 profile 组合，不要复制配置。
+
+详细约定与各主机的组合方式见 `docs/architecture.md`。
 
 ## AI 工作流系统
 
 ### 快速入门路径（按序执行，覆盖大多数任务）
 
 1. **读本文** → 知道命令边界、验证、提交纪律。
-2. **读 `docs/architecture.md`** → 仓库地图：结构、选项约定（就近 `mkEnableOption` /
-   聚合 `mkDefault` / 主机只写例外）、主机差异、overlay 与 HM 接线。
+2. **读 `docs/architecture.md`** → 仓库地图：结构、模块分层、选项约定（就近 `mkEnableOption` /
+   聚合 `mkDefault` / 主机只写例外）、角色组合、主机差异、overlay 与 HM 接线。
 3. **改某个子系统** → 查 `docs/README.md` 索引表，先读对应那篇（如改 niri → `docs/niri.md`）。
 4. **遇到构建失败 / 注释掉的包 / 平台 hack** → 查 `docs/quirks.md`（是什么+根因+移除条件）。
 5. **动手前**：用下面的命令找现有选项与惯例；无先例的改动先与用户确认。
@@ -53,13 +71,14 @@ nix build --dry-run .#nixosConfigurations.<host>.config.system.build.toplevel
 ./tests/tmux-persistence.sh  # 改 tmux 时做（rebuild switch 后）
 ```
 
-主机名单（`flake.nix` 枚举）：`desktop` / `laptop` / `wsl`（NixOS）、`macbook`（darwin）。
+主机名单（`flake.nix` 枚举）：`desktop` / `laptop` / `server` / `wsl`（NixOS）、`macbook`（darwin）。
+各主机的角色组合见 `docs/architecture.md` 的「角色组合」。
 
 ### 构建失败 / 上游回归处置
 
 1. 先查 `docs/quirks.md` —— 已知坑位多数已记录（含根因与移除条件）。
-2. 活跃注释包参考：`modules/home-manager/cli/dev/cpp.nix:56` 的 `ltrace`、
-   `modules/home-manager/gui/apps/productivity.nix` 的 `zotero`（2026-10-04 起，均有上游 issue）。
+2. 活跃注释包参考：`modules/home-manager/dev/languages/cpp.nix` 的 `ltrace`、
+   `modules/home-manager/gui/apps/linux/productivity.nix` 的 `zotero`（2026-10-04 起，均有上游 issue）。
 3. 新发现的上游回归 → 照 ltrace 模式注释掉包，并在 `docs/quirks.md` 补一行。
 
 ### 记录纪律（改变仓库状态时的最低要求）
@@ -207,6 +226,7 @@ sudo nixos-rebuild switch
 ```bash
 sudo nixos-rebuild switch --flake ~/Projects/nixos-config#desktop
 sudo nixos-rebuild switch --flake ~/Projects/nixos-config#laptop
+sudo nixos-rebuild switch --flake ~/Projects/nixos-config#server
 sudo nixos-rebuild switch --flake ~/Projects/nixos-config#wsl
 ```
 

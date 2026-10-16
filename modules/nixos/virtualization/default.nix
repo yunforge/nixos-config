@@ -1,7 +1,7 @@
 # QEMU/KVM + libvirtd 虚拟化模块
 #
 # 消费者：virt-manager/virt-viewer 手动使用，以及 WinApps（Windows 应用独立窗口接入，
-# 见 modules/home-manager/gui/winapps.nix）。Windows 11 需要 swtpm（TPM 2.0）与
+# 见 modules/home-manager/gui/desktop/linux/winapps.nix）。Windows 11 需要 swtpm（TPM 2.0）与
 # nixpkgs 默认携带的 OVMF（Secure Boot），二者均已在此模块就位。
 {
   lib,

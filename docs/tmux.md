@@ -1,6 +1,6 @@
 # Tmux 终端复用器
 
-配置位置：`modules/home-manager/cli/tools/tmux.nix` + `tmux/tmux.conf`（按键布局取自 Omarchy；快照插件 tmux-resurrect / tmux-continuum 由 `tmux.nix` 的 `programs.tmux.plugins` 加载，不在 tmux.conf 里）。
+配置位置：`modules/home-manager/common/tools/tmux.nix` + `tmux/tmux.conf`（按键布局取自 Omarchy；快照插件 tmux-resurrect / tmux-continuum 由 `tmux.nix` 的 `programs.tmux.plugins` 加载，不在 tmux.conf 里）。
 
 前缀键：`Ctrl` + `b`。无前缀的 `Alt` / `Ctrl`+`Alt` 组合可直接操作窗口与面板，无需先按前缀。
 
@@ -61,7 +61,7 @@
 重启（或注销）后把会话原样带回来：会话 / 窗口 / 面板 / 精确布局 / 每个面板的 cwd /
 窗口名，可选连**面板滚动历史**和**白名单程序**（默认 `nvim` `vim` `ssh` `tio`）。
 
-开关与参数（定义在 `modules/home-manager/cli/tools/tmux.nix`，默认开启）：
+开关与参数（定义在 `modules/home-manager/common/tools/tmux.nix`，默认开启）：
 
 ```nix
 mengw.cli.tools.tmux.persistence = {

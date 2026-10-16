@@ -1,6 +1,6 @@
 # Fcitx5 中文输入法
 
-配置分两层：**system**（`modules/nixos/desktop/default.nix`）负责安装与环境变量；**home-manager**（`modules/home-manager/gui/fcitx5.nix`）负责 Rime 用户配置。
+配置分两层：**system**（`modules/nixos/desktop/default.nix`）负责安装与环境变量；**home-manager**（`modules/home-manager/gui/desktop/linux/fcitx5.nix`）负责 Rime 用户配置。
 
 ## system 配置
 
@@ -26,7 +26,7 @@ GLFW_IM_MODULE = "fcitx";
 
 ## 候选词窗外观
 
-home-manager 侧（`modules/home-manager/gui/fcitx5.nix`）**不再托管** `classicui.conf`：候选窗
+home-manager 侧（`modules/home-manager/gui/desktop/linux/fcitx5.nix`）**不再托管** `classicui.conf`：候选窗
 用 fcitx5 内置的 `default` 主题与内置默认偏好（字体 / DPI / 候选方向均为 fcitx5 默认值）。
 原先那套「候选窗用 Catppuccin、`Theme`/`DarkTheme` 两态由 `theme-apply` 翻软链」的接线，
 连同 `catppuccin-fcitx5` 主题包与状态栏自定义图标，已全部删除。
@@ -115,7 +115,7 @@ Rime 按 mtime 判断构建缓存是否过期，而 nix store 内文件 mtime �
 `rime-wanxiang` 的数据包路径发生变化时（例如更新 nixpkgs），Rime 会重建词典
 却沿用旧 schema，导致输入法**静默失效**：进程在、schema 在，却打不出候选词。
 
-该情况原先由 `modules/home-manager/gui/fcitx5.nix` 自动处理（以 rime 数据源路径作为指纹，
+该情况原先由 `modules/home-manager/gui/desktop/linux/fcitx5.nix` 自动处理（以 rime 数据源路径作为指纹，
 指纹变化时清理 `build/`）。**该自动处理已删除**：HM 侧现在只剩 rime 的
 `default.custom.yaml`，所以更新词库后需手动清理：
 

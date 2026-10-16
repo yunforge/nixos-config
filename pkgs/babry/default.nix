@@ -14,7 +14,7 @@
 #    它们写进 RPATH。libxkbcommon/fontconfig 则是直接链接的（DT_NEEDED 可见）。
 #
 # `--window` / `-w` 不再调用 `niri msg`：上游已换成自己的 CV 选区，niri 侧
-# 只剩「让编辑器全屏」的窗口规则（见 gui/wm/config/windowrules.kdl）。
+# 只剩「让编辑器全屏」的窗口规则（见 gui/desktop/linux/niri/config/windowrules.kdl）。
 #
 # 升级改 version + hash + cargoHash（都先填 lib.fakeHash，取报错里的 got:）。
 {

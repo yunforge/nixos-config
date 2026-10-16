@@ -111,10 +111,12 @@ in
       trusted-users = [ primaryUser ];
     };
 
-    # 硬件加速
-    hardware.graphics.enable = true;
+    # 硬件加速（Mesa/Vulkan 用户态驱动）。是「硬件能力」而非系统基础：
+    # 服务器（mySystem.hardware.enable 不开）不需要图形栈，放在 hardware 域
+    # 聚合（../hardware/default.nix）用 mkDefault 给默认值，core 本身不启用。
+    # 保留此处引用关系说明：desktop 域的 niri / 硬件域的 NVIDIA 都依赖它。
 
-    # FHS 兼容
+    # FHS 兼容：所有 NixOS 主机的系统基础（服务器也要跑闭源/预编译二进制）
     programs.nix-ld.enable = true;
     # 第三方二进制（如 ~/Downloads 里的 Tern）运行时要 dlopen 图形栈：X11
     # （libxcb/libX11/libXi/…）、Wayland（libwayland-client/libxkbcommon）与
@@ -125,29 +127,32 @@ in
     # 自身 DT_NEEDED 也要列全（libXcursor 带 libXfixes/libXrender，wayland 带
     # libffi，libglvnd 带 libGLdispatch 同一包内），否则那一个库仍是加载失败。
     # 详见 docs/quirks.md「第三方 GUI 二进制的图形栈 dlopen」条。
-    programs.nix-ld.libraries = lib.mkAfter (
-      with pkgs;
-      [
-        # X11
-        libxcb
-        libXau
-        libXdmcp
-        libX11
-        libXcursor
-        libXext
-        libXfixes
-        libXi
-        libXinerama
-        libXrandr
-        libXrender
-        # Wayland
-        libxkbcommon
-        wayland
-        libffi
-        # 显存/渲染
-        libglvnd
-        vulkan-loader
-      ]
+    # 门控：图形库只在桌面主机才有用（服务器跑不到 GUI 二进制），故挂 desktop 域。
+    programs.nix-ld.libraries = lib.mkIf config.mySystem.desktop.enable (
+      lib.mkAfter (
+        with pkgs;
+        [
+          # X11
+          libxcb
+          libXau
+          libXdmcp
+          libX11
+          libXcursor
+          libXext
+          libXfixes
+          libXi
+          libXinerama
+          libXrandr
+          libXrender
+          # Wayland
+          libxkbcommon
+          wayland
+          libffi
+          # 显存/渲染
+          libglvnd
+          vulkan-loader
+        ]
+      )
     );
 
     # 系统总线
@@ -180,12 +185,13 @@ in
       configDir
     ];
 
-    # SSH
+    # SSH（所有 NixOS 主机的基础：服务器也要远程管理）
     services.openssh = {
       enable = true;
       settings = {
         # 允许密码登录：有意为之——SSH 仅用于局域网登录，不暴露公网。
-        # 若某台主机日后需要暴露公网，应在该主机显式关闭此项并改用密钥认证。
+        # server 角色（modules/nixos/profiles/server.nix）面向不可信网络，
+        # 会用 mkForce 关掉密码认证改走密钥；其它角色沿用此默认。
         PasswordAuthentication = true;
         # 禁止root登录
         PermitRootLogin = "no";

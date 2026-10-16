@@ -1,6 +1,6 @@
 # 主题与外观
 
-配置位置：`modules/home-manager/gui/wm/noctalia.nix`（**Noctalia 调色板 + 模板声明，配色的唯一真源**）+ `modules/home-manager/gui/themes/noctalia-templates/`（eza / fish 模板）+ `modules/home-manager/gui/themes/variants.nix`（GTK/Qt/图标 的亮暗接线与 `theme-apply`）+ `modules/home-manager/gui/themes/default.nix`（Qt/GTK）+ `modules/home-manager/gui/wm/default.nix`（Niri 结构与非配色项）。
+配置位置：`modules/home-manager/gui/desktop/linux/niri/noctalia.nix`（**Noctalia 调色板 + 模板声明，配色的唯一真源**）+ `modules/home-manager/gui/desktop/linux/themes/noctalia-templates/`（eza / fish 模板）+ `modules/home-manager/gui/desktop/linux/themes/variants.nix`（GTK/Qt/图标 的亮暗接线与 `theme-apply`）+ `modules/home-manager/gui/desktop/linux/themes/default.nix`（Qt/GTK）+ `modules/home-manager/gui/desktop/linux/niri/default.nix`（Niri 结构与非配色项）。
 
 整个桌面有**两套外观**，真源是 Noctalia 的 theme mode（状态栏那个主题图标，`noctalia msg theme-mode-toggle`）：
 切一下，壳层（macOS 中性灰 + 单一强调色）与工作区（Catppuccin）各自在亮/暗两态之间换，而
@@ -15,7 +15,7 @@
 
 1. **Noctalia 自己**（`theme.templates`，见下一节）—— 换调色板 / 切亮暗时，它按当前调色板
    重新渲染所有跟随文件（ghostty 主题、btop 主题、niri 装饰、yazi flavor、eza、fish）。
-2. **`theme-apply`**（`modules/home-manager/gui/themes/variants.nix`）—— 只管 Noctalia 不接管的
+2. **`theme-apply`**（`modules/home-manager/gui/desktop/linux/themes/variants.nix`）—— 只管 Noctalia 不接管的
    那几个面：GTK3/GTK4/图标/Qt/Kvantum（保持 MacTahoe）与 niri 概览底色。做法是把两套变体都
    生成到 `~/.config/theme-variants/`，脚本把活文件软链指到当前模式、写 dconf
    （`color-scheme` / `gtk-theme` / `icon-theme` / 窗口按钮位置）；登录时跑一次，之后由 path 单元
@@ -47,7 +47,7 @@
 - **gtk3/gtk4/qt 三个 builtin 模板不启用** —— GTK/Qt 保持 MacTahoe 自打包完整主题，见「主题栈」。
 - **bat 不跟随 Noctalia（社区模板已失效）。** 上游 `bat` 社区模板往 `~/.config/bat/config`
   写 `--theme=noctalia` 并渲染 `themes/noctalia.tmTheme`，但那个文件现由 `programs.bat`
-  接管（`modules/home-manager/cli/shell/default.nix`），它的 `apply.sh` 开头
+  接管（`modules/home-manager/common/shell/default.nix`），它的 `apply.sh` 开头
   `touch "$config_file"` 打在 HM 只读软链上会以非 0 退出（实测 `Read-only file system`，
   Noctalia 只记日志、不损坏文件）。改为 HM 侧固定 `theme = "auto"` +
   `theme-dark = "Catppuccin Frappe"` / `theme-light = "Catppuccin Latte"`：bat 查终端背景色
@@ -60,7 +60,7 @@
 
 Noctalia 是配色的**唯一真源**：`customPalettes.mactahoe` 一份调色板含 `dark` / `light` 两个色块，
 切 mode 就是换生效的色块，Noctalia 随即把所有跟随文件重渲一遍。声明在
-`modules/home-manager/gui/wm/noctalia.nix` 的 `settings.theme.templates`：
+`modules/home-manager/gui/desktop/linux/niri/noctalia.nix` 的 `settings.theme.templates`：
 
 | 类别 | 启用项 | 产物 |
 |---|---|---|
@@ -68,7 +68,7 @@ Noctalia 是配色的**唯一真源**：`customPalettes.mactahoe` 一份调色�
 | `community_ids` | `yazi` | `~/.config/yazi/flavors/noctalia.yazi/` |
 | `user` | `eza` `fish` | 本仓库自带模板，见下 |
 
-**用户模板**（上游没有 eza / fish）放在 `modules/home-manager/gui/themes/noctalia-templates/`，
+**用户模板**（上游没有 eza / fish）放在 `modules/home-manager/gui/desktop/linux/themes/noctalia-templates/`，
 经 `xdg.configFile` 部署到 `~/.config/noctalia/templates/`，`input_path` 相对 `~/.config/noctalia/`
 解析。占位符 `{{ colors.terminal_*.default.* }}` 取自当前调色板的 `terminal` 16 色，与
 ghostty / btop / yazi 同源，所以 `ls`（eza）与 shell 语法高亮（fish）跟终端是同一套色。
@@ -149,7 +149,7 @@ Apple 在 WWDC 2025 的 *Build an AppKit app with the new design* 里把新设�
 对应数值：Tahoe 的标题栏型窗口默认为 **16**，带工具栏的用更大的半径；Sequoia（macOS 15）为 **10**（来源：`m4rkw/macos-corner-fix` 的对照表）。
 
 MacTahoe-Dark 在 `gtk-4.0/gtk.css` 里实现的正是这套阶梯，基准 **24**；逐行对照表在
-`modules/home-manager/gui/wm/config/windowrules.kdl`（表只此一份 —— 那里才是改的时候会打开的文件）。
+`modules/home-manager/gui/desktop/linux/niri/config/windowrules.kdl`（表只此一份 —— 那里才是改的时候会打开的文件）。
 
 **为何取主题的 24 而不是字面的 16**：内层元素是 18/19px，把窗口压到 16 会让内层比外层更圆，必须连带重写窗口 + 侧边栏 + notebook + tab 共 5 个选择器（via `gtk.gtk{3,4}.extraCss`），且主题更新后会静默失配。取 24 则**零主题覆盖**，而且 GTK 自绘（24）与不自绘圆角的应用（Electron / Chromium / X11：VSCode、Discord、QQ、Telegram、Zotero、Typora、Anki、Steam）终于一致——这才是这套圆角在修的事。macOS 的 24 属于"带工具栏窗口"那一档，与本机以工具栏密集型应用为主的实际场景相符。
 
@@ -169,7 +169,7 @@ shadow {
 }
 ```
 
-推导过程写在 `modules/home-manager/gui/wm/default.nix` 的注释里。三个要点：
+推导过程写在 `modules/home-manager/gui/desktop/linux/niri/default.nix` 的注释里。三个要点：
 
 - **不会叠成两层**。niri 文档：设了 `prefer-no-csd` 与/或 `geometry-corner-radius` 之后，*“These will also remove client-side shadows if the window draws any.”* 而且无论 GTK 是否响应 `prefer-no-csd`（保留 CSD / 放弃 CSD），结论都一致：要么自绘阴影被裁、合成器补上，要么本来就没有
 - `draw-behind-window` 保持默认 `false`——文档说只有"niri 不知道 CSD 圆角"时才需要 `true`；我们给了 `geometry-corner-radius`，niri 自己知道圆角，也就不会在半透明窗口（ghostty 0.85）里透出一圈暗影
@@ -198,10 +198,10 @@ shadow {
 > 用调色板的语义角色而不是写死的 MacTahoe 取色 —— 焦点环取 `mOutline`（中性发丝线）、
 > 非焦点面取 `mSurface`（中性面）、紧急取 `mError`（`#ED5F5D`）。上面那段“用中性色而非强调色”
 > 的结论不变，只是取值随之从“手挑 MacTahoe 灰”变成“调色板角色”，换主题时自动跟随。
-> Nix 侧（`modules/home-manager/gui/wm/default.nix`）只留结构项。下表的对比度算据是当初选
+> Nix 侧（`modules/home-manager/gui/desktop/linux/niri/default.nix`）只留结构项。下表的对比度算据是当初选
 > `#999999` 时算的，换成 `mOutline` 后量级相当。
 
-**宽度取 1**：niri 把逻辑像素按缩放取整到物理像素。宽度 1 在 desktop 的 1.5 倍下为 1.5 → 取整 2 物理；laptop 的 1.25 倍下为 1.25 → 取整 1 物理（更细，仍可见）。宽度 2 在 desktop 下是 3 物理像素，已明显粗于发丝线。取整表在 `modules/home-manager/gui/wm/default.nix` 的 `mkLayout`（表只此一份）。
+**宽度取 1**：niri 把逻辑像素按缩放取整到物理像素。宽度 1 在 desktop 的 1.5 倍下为 1.5 → 取整 2 物理；laptop 的 1.25 倍下为 1.25 → 取整 1 物理（更细，仍可见）。宽度 2 在 desktop 下是 3 物理像素，已明显粗于发丝线。取整表在 `modules/home-manager/gui/desktop/linux/niri/default.nix` 的 `mkLayout`（表只此一份）。
 
 **为何不靠降不透明度来减重**：焦点环画在 8px 缝隙上，背景就是壁纸，而降不透明度在亮壁纸下会让它消失：
 
@@ -268,7 +268,7 @@ shadow {
   逐行内嵌真彩色 ANSI，于是能用**半块字符**（`▀`/`▄`）一个字符塞两个像素：前景 = 上半
   像素、背景 = 下半像素，32×22 的像素图只占 32 列 × 11 行；腹部冰蓝、白色前鳍这些
   亮度差靠背景色画出来，纯前景色的 ASCII 画不出来。
-  文件：`assets/fastfetch/logo/deepseek_whale{,-light}.txt`，由 `cli/tools/default.nix`
+  文件：`assets/fastfetch/logo/deepseek_whale{,-light}.txt`，由 `common/tools/default.nix`
   部署（暗色 / 亮色两套调色板，浅底上原蓝会糊）。图形取自 @lhh010 的手绘像素材
   （`dsh-ui-whale`），经 MIT 许可的 `ccch1mneyyy/dsh-TUI` 转成半块像素图。
   ⚠️ 文件路径写错时 fastfetch **静默回退到内置 logo**（不报错）—— 量宽度时踩过一次，

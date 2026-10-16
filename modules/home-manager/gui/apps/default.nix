@@ -1,20 +1,15 @@
-# GUI 应用聚合模块
-# 所有 GUI 应用统一由 Home Manager 管理（home.packages）
-# 门控：目录导入即生效（mengw.gui.enable 控制整个 GUI 层），无中间层开关；
-# 单独关闭某个应用用该叶子自己的 enable 选项。
+# GUI 应用聚合入口
+#
+# apps/shared：跨平台 GUI 应用配置（Ghostty / VSCode）——macOS 也导入这层，
+#   只负责「用户配置」（程序本体在 Linux 走 HM 的 programs.<name>，在 macOS
+#   走 modules/darwin/gui.nix 的 Homebrew casks，两者在各自的平台层装）。
+# apps/linux：Linux 专属 GUI 应用——只有工作站导入。
+#
+# 门控：mengw.gui.enable 控制本层，目录导入即生效，无中间层开关。
 { ... }:
 {
   imports = [
-    ./ghostty.nix
-    ./browsers.nix
-    ./communication.nix
-    ./media.nix
-    ./mpv.nix
-    ./productivity.nix
-    ./steam.nix
-    ./development.nix
-    ./embedded.nix
-    ./utilities.nix
-    ./pot.nix
+    ./shared
+    ./linux
   ];
 }
