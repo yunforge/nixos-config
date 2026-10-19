@@ -41,6 +41,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # 水杉输入法（MSIME）的 Linux 宿主：Fcitx5 插件、命令行入口与 provider 用户单元。
+    # 插件被加载进 fcitx5 进程，必须与系统上的 Fcitx5 出自同一份 nixpkgs，
+    # 故经 overlay 接入（见 modules/nixos/core/default.nix）。
+    msime = {
+      url = "github:metasequoiaime/msime";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # zen 浏览器（not in nixpkgs）
     # 使用二次打包（固定输出模式下载程序+Firefox封装脚本）
     zen-browser = {

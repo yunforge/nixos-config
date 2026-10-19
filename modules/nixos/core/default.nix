@@ -138,6 +138,9 @@ in
     nixpkgs.overlays = [
       inputs.nur.overlays.default
       (import ../../../overlays { inherit inputs; })
+      # 水杉输入法的 Fcitx5 插件：插件加载进 fcitx5 进程，必须按本系统的
+      # nixpkgs 构建，才能与系统上的 Fcitx5 出自同一份（消费方见 ../desktop）
+      inputs.msime.overlays.default
     ];
 
     # nixos-upgrade.service 以 root 运行且 HOME=/root，读不到用户 ~/.gitconfig，

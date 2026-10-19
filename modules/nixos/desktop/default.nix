@@ -122,14 +122,14 @@ in
       fcitx5 = {
         waylandFrontend = true;
         addons = with pkgs; [
-          kdePackages.fcitx5-chinese-addons
           kdePackages.fcitx5-configtool
           kdePackages.fcitx5-qt
           fcitx5-gtk
-          # 候选词窗主题不在此选择：见 modules/home-manager/gui/desktop/linux/fcitx5.nix
-          (fcitx5-rime.override {
-            rimeDataPkgs = [ pkgs.rime-wanxiang ];
-          })
+          # 水杉输入法（msime-fcitx5）：插件本身 + msime-linux-setup 首次配置入口。
+          # 词库不随包，装后由每个用户跑一次 `msime-linux-setup --download`
+          # 或打开「水杉输入法」设置完成首次配置（见 docs/input.md）
+          msime-fcitx5
+          # 候选词窗主题不在此选择：仓库不托管 classicui.conf，用 fcitx5 内置默认
         ];
       };
     };
@@ -156,6 +156,8 @@ in
       gnome-themes-extra
       papirus-icon-theme
       bibata-cursors
+      # 首次配置入口 msime-linux-setup（词库不随包，装后每个用户跑一次）
+      msime-fcitx5
     ];
   };
 }

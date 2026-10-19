@@ -24,7 +24,7 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
 │     ├─ gui/
 │     │  ├─ apps/shared/    # 跨平台 GUI 应用配置（Ghostty / VSCode）
 │     │  ├─ apps/linux/     # Linux 专属 GUI 应用
-│     │  └─ desktop/linux/  # Linux 桌面会话（niri / themes / fcitx5 / mimeapps / winapps）
+│     │  └─ desktop/linux/  # Linux 桌面会话（niri / themes / mimeapps / winapps）
 │     ├─ platform/          # 平台专属适配（linux.nix / darwin.nix）
 │     └─ profiles/          # 角色配置（workstation / server / wsl / macbook）
 ├─ overlays/ + pkgs/        # 自维护包的单一注入点与包本体
@@ -79,7 +79,7 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
   - `apps/linux/`：Linux 专属 GUI 应用（浏览器 / 通讯 / 媒体 / mpv /
     生产力 / Steam / 开发 / 嵌入式 / 工具 / Pot）。
   - `desktop/linux/`：Linux 桌面会话（Niri / Noctalia / 主题与亮暗切换 /
-    fcitx5 / MIME 关联 / WinApps）。
+    MIME 关联 / WinApps）。输入法只在系统层接线（`modules/nixos/desktop`）。
 - **platform**（`modules/home-manager/platform/`）：平台专属用户级适配
   （Linux 的 XDG 用户目录等）。
 - **profiles**（`modules/home-manager/profiles/`）：角色的用户层组合。

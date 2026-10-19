@@ -8,7 +8,7 @@
 | 平台适配坑位 / workaround / 待上游修复项 | `docs/quirks.md` | 各文件头部注释 |
 | Fish、环境变量、PATH | `docs/fish.md` | `modules/home-manager/common/shell/fish.nix` |
 | Ghostty 终端 | `docs/ghostty.md` | `modules/home-manager/gui/apps/shared/ghostty.nix` |
-| 输入法（Rime、候选窗） | `docs/input.md` + `docs/themes.md` | `modules/home-manager/gui/desktop/linux/fcitx5.nix`、`modules/nixos/desktop/default.nix` |
+| 输入法（水杉、候选窗） | `docs/input.md` + `docs/themes.md` | `modules/nixos/desktop/default.nix`、`modules/nixos/core/default.nix`（msime overlay） |
 | 桌面主题 / GTK / Qt / 图标 / 壁纸 | `docs/themes.md` | `modules/home-manager/gui/desktop/linux/themes/default.nix`、`modules/home-manager/gui/desktop/linux/niri/noctalia.nix` |
 | Niri 快捷键、窗口与布局规则 | `docs/niri.md` | `modules/home-manager/gui/desktop/linux/niri/config/` + 生成 KDL 的 `gui/desktop/linux/niri/default.nix` |
 | 装了哪些应用 | `docs/softwares.md` | `modules/home-manager/gui/apps/linux/`（含嵌入式工具链） |
