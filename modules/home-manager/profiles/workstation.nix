@@ -30,6 +30,9 @@ in
     mengw.dev.enable = lib.mkDefault true;
     mengw.gui.enable = lib.mkDefault true;
     mengw.desktop.enable = lib.mkDefault true;
+    # 每日 AI 签到：systemd user timer 每天 09:07 跑 ~/checkin/run.sh。
+    # 数据目录 ~/checkin 由脚本侧管理，这里只管定时拉起。
+    mengw.cli.tools.daily-checkin.enable = lib.mkDefault true;
   };
 
   imports = [

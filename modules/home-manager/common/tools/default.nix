@@ -16,6 +16,7 @@ in
     ./tmux.nix
     ./distrobox.nix
     ./yt-dlp.nix
+    ./daily-checkin.nix
   ];
 
   config = lib.mkIf cliCfg.enable {
