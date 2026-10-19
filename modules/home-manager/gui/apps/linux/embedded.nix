@@ -12,11 +12,7 @@ let
   cfg = config.mengw.gui.apps.embedded;
   guiCfg = config.mengw.gui;
 
-  # CubeMX 固件包（HAL/LL/Cube 库，约 500MB）的下载位置。默认是 ~/STM32Cube/Repository，
-  # 收拢到 ~/Apps（与 xwechat_files、Zotero 等应用数据同放一处）。
-  cubemxRepository = "${config.home.homeDirectory}/Apps/STM32Cube/Repository/";
-
-  # STM32CubeMX2（1.1.x，nixpkgs 里只有旧版 stm32cubemx）是 ST 官方安装包手动装到
+  # STM32CubeMX2（1.1.x，nixpkgs 里没有对应包）是 ST 官方安装包手动装到
   # ~/Apps 的，其 bundle 管理 CLI `cube` 随安装包落在 <安装目录>/.bin。CubeMX2 的
   # Theia 扩展用 PATH 里的 `cube` 安装/解析固件包，官方安装器只把这行写进了
   # ~/.bashrc（本机用 fish，等于没写），故由 HM 声明，所有 shell 一致生效。
@@ -72,10 +68,6 @@ in
           # 而 NixOS 默认不带 usbutils。（usbutils 的 meta.platforms 仅 linux，
           # 故放这个 Linux 专属块而非上面的通用块。）
           usbutils
-          # STM32 引脚/外设图形化配置（unfree，仅 x86_64-linux）。
-          # HiDPI：AWT 的 uiScale 由全局 _JAVA_OPTIONS 按 mySystem.desktop.scale
-          # 向上取整给出（modules/nixos/desktop/env.nix），无需单独包装。
-          stm32cubemx
           android-tools
           # 原生 AVR 交叉编译工具链（avr-gcc 走 pkgsCross 从源码构建，仅 Linux 可用）
           pkgsCross.avr.buildPackages.gcc # avr-gcc 交叉编译器
@@ -98,28 +90,5 @@ in
     #  但 CubeMX2 的 Electron 主进程会自己把安装目录下的 .bin 前置进子进程
     #  PATH，从启动器拉起时仍能解析到同一个 cube，无需额外补。）
     home.sessionPath = [ cubemx2Bin ];
-
-    # === 固件仓库路径锚定 ===
-    # 该路径记在 ~/.stm32cubemx/plugins/updater/updater.ini 的 [Path] 段，但同一 ini 还
-    # 混着更新时间戳/窗口尺寸等可变状态，无法整体托管，故只在每次切换时钉住这一行。
-    # 数据本身不搬运——首次迁移需手动 mv（见 docs/quirks.md），之后
-    # CubeMX 下载新固件包即直接落到 cubemxRepository。
-    home.activation.stm32cubemxRepository = lib.hm.dag.entryAfter [ "writeBoundary" ] (
-      lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
-        ini="${config.home.homeDirectory}/.stm32cubemx/plugins/updater/updater.ini"
-        if [ ! -f "$ini" ]; then
-          verboseEcho "CubeMX 尚未运行过（$ini 不存在），跳过固件仓库路径锚定"
-        else
-          $DRY_RUN_CMD ${pkgs.coreutils}/bin/mkdir -p "${cubemxRepository}"
-          current=$(${pkgs.gnused}/bin/sed -n 's|^RepositoryPath=||p' "$ini")
-          if [ "$current" = "${cubemxRepository}" ]; then
-            verboseEcho "CubeMX 固件仓库路径已正确：${cubemxRepository}"
-          else
-            verboseEcho "CubeMX 固件仓库路径漂移（$current → ${cubemxRepository}），已修正"
-            $DRY_RUN_CMD ${pkgs.gnused}/bin/sed -i "s|^RepositoryPath=.*|RepositoryPath=${cubemxRepository}|" "$ini"
-          fi
-        fi
-      ''
-    );
   };
 }
