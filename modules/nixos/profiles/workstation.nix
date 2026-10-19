@@ -11,7 +11,7 @@
 #
 # 原先由各主机文件写的 mySystem.hardware.enable / desktop.enable，
 # 在这里是角色的默认开关（mkDefault），主机仍可用 mkForce 覆盖。
-{ ... }:
+{ lib, ... }:
 {
   mySystem.hardware.enable = true;
   mySystem.desktop.enable = true;
@@ -21,4 +21,8 @@
   # distrobox 的依赖，代理为 mihomo 客户机转发的前置条件）。
   # mySystem.desktop.enable 的聚合模块（modules/nixos/desktop/default.nix）
   # 已对这几项给出 mkDefault，此处不再重复声明，避免多层默认值互相覆盖。
+
+  # 工作站加入 tailnet（desktop / laptop 互相访问；服务器与 WSL 不导入
+  # 本角色，不会被启用）。首次使用需手动 sudo tailscale login 一次。
+  mySystem.tailscale.enable = lib.mkDefault true;
 }

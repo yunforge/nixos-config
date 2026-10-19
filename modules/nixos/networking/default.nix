@@ -4,5 +4,6 @@
   imports = [
     ./proxy.nix
     ./proxy-vm.nix
+    ./tailscale.nix
   ];
 }
