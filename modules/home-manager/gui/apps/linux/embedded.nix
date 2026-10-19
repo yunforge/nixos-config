@@ -19,6 +19,13 @@ let
   # 该目录只在装了 CubeMX2 的主机上存在；未安装时 PATH 里多一条不存在的目录，
   # 对命令解析无影响。
   cubemx2Bin = "${config.home.homeDirectory}/Apps/STM32CubeMX2/.bin";
+
+  # 一代 CubeMX（6.18.x）与 CubeMX2 并存：同样是 ST 官方安装包手动装到 ~/Apps，
+  # 但安装包本体依赖 NixOS 不暴露在 /lib 的 X11/GTK 库，故 <安装目录>/stm32cubemx
+  # 是一个补 LD_LIBRARY_PATH 的 wrapper（启动器自找的 ./jre 也已从安装包拷入）。
+  # 在 <安装目录>/.bin 里放同名软链指向该 wrapper，与 CubeMX2 的 `cube` 同一种暴露方式。
+  # 未安装时同样只是 PATH 里多一条不存在的目录。
+  cubemxBin = "${config.home.homeDirectory}/Apps/STM32CubeMX/.bin";
 in
 {
   options.mengw.gui.apps.embedded.enable = lib.mkOption {
@@ -85,10 +92,14 @@ in
     # sessionPath 会生成 `export PATH=...:${PATH:+:}$PATH`（前置），fish 侧由
     # babelfish 翻成等价语句，交互 shell 与 systemd user 会话都能拿到。
     # CubeMX2 的固件包安装/解析走 PATH 里的 `cube`，缺它 GUI 会报
-    # 「cube-wrapper binary folder does not exist」。
+    # 「cube-wrapper binary folder does not exist」；一代 CubeMX 的 wrapper 也靠
+    # 这里进 PATH（`stm32cubemx` 命令行 / 桌面条目共用同一份）。
     # （systemd user 的 environment.d 只收 sessionVariables 不收 sessionPath，
     #  但 CubeMX2 的 Electron 主进程会自己把安装目录下的 .bin 前置进子进程
     #  PATH，从启动器拉起时仍能解析到同一个 cube，无需额外补。）
-    home.sessionPath = [ cubemx2Bin ];
+    home.sessionPath = [
+      cubemx2Bin
+      cubemxBin
+    ];
   };
 }
