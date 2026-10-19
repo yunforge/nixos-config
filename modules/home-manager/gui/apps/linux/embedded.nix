@@ -15,6 +15,14 @@ let
   # CubeMX 固件包（HAL/LL/Cube 库，约 500MB）的下载位置。默认是 ~/STM32Cube/Repository，
   # 收拢到 ~/Apps（与 xwechat_files、Zotero 等应用数据同放一处）。
   cubemxRepository = "${config.home.homeDirectory}/Apps/STM32Cube/Repository/";
+
+  # STM32CubeMX2（1.1.x，nixpkgs 里只有旧版 stm32cubemx）是 ST 官方安装包手动装到
+  # ~/Apps 的，其 bundle 管理 CLI `cube` 随安装包落在 <安装目录>/.bin。CubeMX2 的
+  # Theia 扩展用 PATH 里的 `cube` 安装/解析固件包，官方安装器只把这行写进了
+  # ~/.bashrc（本机用 fish，等于没写），故由 HM 声明，所有 shell 一致生效。
+  # 该目录只在装了 CubeMX2 的主机上存在；未安装时 PATH 里多一条不存在的目录，
+  # 对命令解析无影响。
+  cubemx2Bin = "${config.home.homeDirectory}/Apps/STM32CubeMX2/.bin";
 in
 {
   options.mengw.gui.apps.embedded.enable = lib.mkOption {
@@ -81,6 +89,15 @@ in
           # buildInputs 引用 pkgsCross.avr.avrlibc。
         ]
       );
+
+    # sessionPath 会生成 `export PATH=...:${PATH:+:}$PATH`（前置），fish 侧由
+    # babelfish 翻成等价语句，交互 shell 与 systemd user 会话都能拿到。
+    # CubeMX2 的固件包安装/解析走 PATH 里的 `cube`，缺它 GUI 会报
+    # 「cube-wrapper binary folder does not exist」。
+    # （systemd user 的 environment.d 只收 sessionVariables 不收 sessionPath，
+    #  但 CubeMX2 的 Electron 主进程会自己把安装目录下的 .bin 前置进子进程
+    #  PATH，从启动器拉起时仍能解析到同一个 cube，无需额外补。）
+    home.sessionPath = [ cubemx2Bin ];
 
     # === 固件仓库路径锚定 ===
     # 该路径记在 ~/.stm32cubemx/plugins/updater/updater.ini 的 [Path] 段，但同一 ini 还
