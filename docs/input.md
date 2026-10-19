@@ -54,39 +54,28 @@ GLFW_IM_MODULE = "fcitx";
 要改候选窗的字体 / DPI / 方向，直接用 fcitx5 的 GUI 配置（`kdePackages.fcitx5-configtool`）
 —— 没有 HM 覆盖这些文件，改动会保留。
 
-## XWayland 候选窗缩放（workaround）
+## XWayland 候选窗缩放
 
 fcitx5 的候选窗按“输入上下文所属显示”选后端渲染：原生 Wayland 客户端走 WaylandUI
 （跟随合成器分数缩放），XWayland 客户端走 XCBUI，而 XCBUI 的缩放 = `DPI / 96`，
-DPI 只取自 X11 的 `Xft.dpi` 资源（RESOURCE_MANAGER）。xwayland-satellite 0.8.2
-只把缩放发布在 XSETTINGS 的 `Xft/DPI`（fcitx5 读 XSETTINGS 时只取
-`Net/IconThemeName`），且未给 Xwayland 传 `-dpi`，于是微信/QQ 等 XWayland 应用里
-候选词停在 1.0x，比 VSCode 等 Wayland 应用小 `scale` 倍。
+DPI 只取自 X11 的 `Xft.dpi` 资源（RESOURCE_MANAGER）。
 
-当前由 `modules/nixos/desktop/niri/default.nix` 的 `xwayland-xft-dpi` wrapper 把
-`Xft.dpi = 96 × scale` 写进 X11 资源库，并在 `startup.kdl` 中随 niri 自启；fcitx5
-监听 RESOURCE_MANAGER 变化后立即重读，无需重启输入法。各主机的实际值：
-
-| 主机 | `mySystem.desktop.scale` | 写入的 `Xft.dpi` |
-| --- | --- | --- |
-| desktop | 1.5（monitors 派生） | 144 |
-| laptop | 1.25（monitors 派生） | 120 |
-
-> 注：laptop 此前未声明 scale（默认 1），wrapper 在该机为空转，而 niri 实际按
-> 1.25 渲染——XWayland 候选词一直偏小。scale 改由 `mySystem.desktop.monitors`
-> 派生后两台主机一致，此表随之修正。
+xwayland-satellite **≥ 0.8.3** 会在启动及缩放变化时把 `Xft.dpi = 96 × scale`
+同步进 RESOURCE_MANAGER（上游 PR #477，2026-09-08 合并，v0.8.3 发布），fcitx5
+监听该资源后立即重读，无需重启输入法。本仓库原先的 `xwayland-xft-dpi` wrapper
+（`modules/nixos/desktop/niri/default.nix` + `startup.kdl` 自启项）已随上游修复删除。
 
 验证：
 
 ```bash
-xrdb -query                     # 应显示 Xft.dpi:<TAB>144
+xrdb -query                     # desktop 应显示 Xft.dpi:<TAB>144
 displays=$(fcitx5-diagnose | grep -c 'Group \[x11::0\]')   # 微信等 X11 客户端所在分组
 ```
 
-> [!TODO] 上游已修复
-> xwayland-satellite PR #477（`feat: sync Xft.dpi through RESOURCE_MANAGER`，
-> 2026-09-08 合并，关闭 issue #301）在 master 中做了同样的同步。待 nixpkgs 内的
-> xwayland-satellite 版本 > 0.8.2 后，删除该 workaround（wrapper + `startup.kdl` 自启项）。
+> [!NOTE]
+> 若 nixpkgs 里的 xwayland-satellite 回退到 0.8.2 或更早，X11 应用里的候选词会
+> 退回 1.0x——此时需要重新引入 wrapper（把 `96 × mySystem.desktop.scale`
+> 写进 `Xft.dpi` 并在 niri 启动时执行）。
 
 ## 输入法切换键
 
