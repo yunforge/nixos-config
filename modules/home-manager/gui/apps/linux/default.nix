@@ -14,6 +14,7 @@
     ./steam.nix
     ./development.nix
     ./embedded.nix
+    ./terminal.nix
     ./utilities.nix
     ./pot.nix
   ];

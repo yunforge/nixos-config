@@ -18,7 +18,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 
 | 组件 | 软件 |
 |------|------|
-| 终端模拟器 | Ghostty（Catppuccin Frappe/Latte，跟随桌面亮暗） |
+| 终端模拟器 | Ghostty（Catppuccin Frappe/Latte，跟随桌面亮暗）、Tern（手动装到 `~/Apps/Tern`，见 `docs/quirks.md`） |
 | Shell | Fish（含大量自定义别名） |
 | 终端复用器 | tmux（Omarchy 按键布局，见 `docs/tmux.md`） |
 | 终端文件管理器 | Yazi（`y`） |
