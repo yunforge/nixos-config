@@ -35,9 +35,7 @@ in
 
   config = lib.mkIf (cfg.enable && guiCfg.enable) {
     home.packages = with pkgs; [
-      # zotero
-      # ⚠️ 暂注释：nixpkgs 升到 zotero 10.0.4 后构建失败（firefox 版本错配），
-      # 上游 nixpkgs#568692 修复后取消注释。根因与移除条件见 docs/quirks.md。
+      zotero
       anki
       xmind
       siyuan # 笔记软件

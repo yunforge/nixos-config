@@ -90,9 +90,7 @@ nix build --dry-run .#nixosConfigurations.<host>.config.system.build.toplevel
 ### 构建失败 / 上游回归处置
 
 1. 先查 `docs/quirks.md` —— 已知坑位多数已记录（含根因与移除条件）。
-2. 活跃注释包参考：`modules/home-manager/dev/languages/cpp.nix` 的 `ltrace`、
-   `modules/home-manager/gui/apps/linux/productivity.nix` 的 `zotero`（2026-10-04 起，均有上游 issue）。
-3. 新发现的上游回归 → 照 ltrace 模式注释掉包，并在 `docs/quirks.md` 补一行。
+2. 新发现的上游回归 → 注释掉包，并在 `docs/quirks.md` 补一行；上游修复后恢复包并删除对应记录。
 
 ### 记录纪律（改变仓库状态时的最低要求）
 

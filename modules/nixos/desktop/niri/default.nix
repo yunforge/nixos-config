@@ -35,8 +35,6 @@ in
     # 也不会出现在 PATH 上，此处包一层同名 wrapper 供按名调用。
     # startup.kdl 是 git 仓库内的纯文本（symlink 进 ~/.config/niri），
     # 无法插入 store 路径，只能依赖 PATH 解析。
-    # 注：XWayland 的 Xft.dpi 由 xwayland-satellite ≥ 0.8.3 自己同步（上游 PR #477，
-    # 启动及缩放变化时写 RESOURCE_MANAGER），原先的 xwayland-xft-dpi wrapper 已删除。
     environment.systemPackages = [
       (pkgs.writeShellScriptBin "polkit-gnome-authentication-agent-1" ''exec ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1 "$@"'')
     ];

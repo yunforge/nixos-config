@@ -2,7 +2,7 @@
 # 提供跨模块共享的工具函数，避免重复代码
 { lib }:
 let
-  # 包装 Qt 应用以在 XWayland 下正确运行（带输入法；Xft.dpi 由 xwayland-satellite 同步）
+  # 包装 Qt 应用以在 XWayland 下正确运行（带输入法）
   # 许多国产 Qt 应用（微信、欧陆词典等）在 Wayland 原生模式下存在
   # 渲染异常或输入法无法调起的问题，因此统一走 XWayland 回退路径。
   #

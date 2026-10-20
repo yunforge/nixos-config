@@ -7,7 +7,7 @@
 #   ~/Apps/Tern/.bin/tern  指向 wrapper 的软链，由本模块加进 sessionPath
 #   ~/Apps/Tern/tern.png   从 Tern 自注册的 hicolor 图标里拷出的 512px 图标
 # 它启动时 dlopen X11/Wayland/Vulkan 图形栈，nix-ld 默认集没有这些库，裸跑会在
-# 出窗前 panic（failed to load libxcb）——与 CubeMX 一样由 wrapper 提供库路径。
+# 出窗前 panic（failed to load libxcb）——由 wrapper 提供库路径。
 {
   lib,
   config,
@@ -18,8 +18,6 @@ let
   cfg = config.mengw.gui.apps.terminal;
   guiCfg = config.mengw.gui;
 
-  # 与 embedded.nix 的 CubeMX 同一种暴露方式：<安装目录>/.bin 里放软链，
-  # 未安装时只是 PATH 里多一条不存在的目录。
   ternBin = "${config.home.homeDirectory}/Apps/Tern/.bin";
 in
 {

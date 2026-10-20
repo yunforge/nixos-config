@@ -47,7 +47,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 |------|------|
 | Obsidian / 思源笔记 | 笔记 |
 | Typora | Markdown 写作 |
-| Zotero | 文献管理（⚠️ 暂注释，上游 nixpkgs#568692 修复后恢复，见 `docs/quirks.md`） |
+| Zotero | 文献管理 |
 | Anki | 记忆卡片 |
 | XMind | 思维导图 |
 | Thunderbird | 邮件 |

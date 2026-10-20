@@ -129,7 +129,10 @@ in
     nixpkgs.config.allowUnfree = true;
 
     # 允许不安全的包（每条须写明被哪个包需要，并定期复核是否仍有效）
-    nixpkgs.config.permittedInsecurePackages = [ ];
+    nixpkgs.config.permittedInsecurePackages = [
+      # zotero 10 的运行时 Firefox ESR 140 已于 2026-10-13 EOL（nixpkgs 标记 insecure）
+      "firefox-esr-140-bin-unwrapped-140.17.0esr"
+    ];
 
     # NUR overlay（系统级字体 harmonyos-sans 等依赖）+ 自定义包 overlay
     # （主题 / mcpp / windows-vm-media，清单见 overlays/default.nix）。

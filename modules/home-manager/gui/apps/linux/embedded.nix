@@ -1,7 +1,7 @@
 # 嵌入式单片机开发环境（STM32 / ESP32 / AVR / RP2040）
 # 覆盖：交叉编译工具链 + 烧录/调试工具 + PlatformIO 统一构建框架
-# 归属 GUI 层：CubeMX 是图形化配置器，探针/串口也都在桌面场景下用，无图形环境的主机
-# （server/wsl）不需要，故由 gui/apps 聚合而非 cli/dev。
+# 归属 GUI 层：探针/串口都在桌面场景下用，无图形环境的主机（server/wsl）不需要，
+# 故由 gui/apps 聚合而非 cli/dev。
 {
   lib,
   config,
@@ -11,21 +11,6 @@
 let
   cfg = config.mengw.gui.apps.embedded;
   guiCfg = config.mengw.gui;
-
-  # STM32CubeMX2（1.1.x，nixpkgs 里没有对应包）是 ST 官方安装包手动装到
-  # ~/Apps 的，其 bundle 管理 CLI `cube` 随安装包落在 <安装目录>/.bin。CubeMX2 的
-  # Theia 扩展用 PATH 里的 `cube` 安装/解析固件包，官方安装器只把这行写进了
-  # ~/.bashrc（本机用 fish，等于没写），故由 HM 声明，所有 shell 一致生效。
-  # 该目录只在装了 CubeMX2 的主机上存在；未安装时 PATH 里多一条不存在的目录，
-  # 对命令解析无影响。
-  cubemx2Bin = "${config.home.homeDirectory}/Apps/STM32CubeMX2/.bin";
-
-  # 一代 CubeMX（6.18.x）与 CubeMX2 并存：同样是 ST 官方安装包手动装到 ~/Apps，
-  # 但安装包本体依赖 NixOS 不暴露在 /lib 的 X11/GTK 库，故 <安装目录>/stm32cubemx
-  # 是一个补 LD_LIBRARY_PATH 的 wrapper（启动器自找的 ./jre 也已从安装包拷入）。
-  # 在 <安装目录>/.bin 里放同名软链指向该 wrapper，与 CubeMX2 的 `cube` 同一种暴露方式。
-  # 未安装时同样只是 PATH 里多一条不存在的目录。
-  cubemxBin = "${config.home.homeDirectory}/Apps/STM32CubeMX/.bin";
 in
 {
   options.mengw.gui.apps.embedded.enable = lib.mkOption {
@@ -56,10 +41,7 @@ in
       ])
       # === AVR / Arduino ===
       ++ (with pkgs; [
-        # docSupport=true（Linux 默认）会为编文档拉整条 texlive→asymptote→pyqt5，
-        # 而 PyQt5 5.15.10 在 Python 3.14 上无法编译（sip ABI v12 不匹配），导致构建失败。
-        # 关闭文档构建：avrdude 本体功能不受影响。
-        (avrdude.override { docSupport = false; }) # AVR 烧录器（Arduino Uno/Nano/Mega、ATtiny 等）
+        avrdude # AVR 烧录器（Arduino Uno/Nano/Mega、ATtiny 等）
       ])
       # === RP2040 / RP2350（树莓派 Pico）===
       ++ (with pkgs; [
@@ -88,18 +70,5 @@ in
           # buildInputs 引用 pkgsCross.avr.avrlibc。
         ]
       );
-
-    # sessionPath 会生成 `export PATH=...:${PATH:+:}$PATH`（前置），fish 侧由
-    # babelfish 翻成等价语句，交互 shell 与 systemd user 会话都能拿到。
-    # CubeMX2 的固件包安装/解析走 PATH 里的 `cube`，缺它 GUI 会报
-    # 「cube-wrapper binary folder does not exist」；一代 CubeMX 的 wrapper 也靠
-    # 这里进 PATH（`stm32cubemx` 命令行 / 桌面条目共用同一份）。
-    # （systemd user 的 environment.d 只收 sessionVariables 不收 sessionPath，
-    #  但 CubeMX2 的 Electron 主进程会自己把安装目录下的 .bin 前置进子进程
-    #  PATH，从启动器拉起时仍能解析到同一个 cube，无需额外补。）
-    home.sessionPath = [
-      cubemx2Bin
-      cubemxBin
-    ];
   };
 }

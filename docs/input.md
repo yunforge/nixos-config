@@ -86,8 +86,7 @@ DPI 只取自 X11 的 `Xft.dpi` 资源（RESOURCE_MANAGER）。
 
 xwayland-satellite **≥ 0.8.3** 会在启动及缩放变化时把 `Xft.dpi = 96 × scale`
 同步进 RESOURCE_MANAGER（上游 PR #477，2026-09-08 合并，v0.8.3 发布），fcitx5
-监听该资源后立即重读，无需重启输入法。本仓库原先的 `xwayland-xft-dpi` wrapper
-（`modules/nixos/desktop/niri/default.nix` + `startup.kdl` 自启项）已随上游修复删除。
+监听该资源后立即重读，无需重启输入法。
 
 验证：
 
@@ -95,11 +94,6 @@ xwayland-satellite **≥ 0.8.3** 会在启动及缩放变化时把 `Xft.dpi = 96
 xrdb -query                     # desktop 应显示 Xft.dpi:<TAB>144
 displays=$(fcitx5-diagnose | grep -c 'Group \[x11::0\]')   # 微信等 X11 客户端所在分组
 ```
-
-> [!NOTE]
-> 若 nixpkgs 里的 xwayland-satellite 回退到 0.8.2 或更早，X11 应用里的候选词会
-> 退回 1.0x——此时需要重新引入 wrapper（把 `96 × mySystem.desktop.scale`
-> 写进 `Xft.dpi` 并在 niri 启动时执行）。
 
 ## 输入法切换键
 

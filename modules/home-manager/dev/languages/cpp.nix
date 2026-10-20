@@ -53,9 +53,7 @@ in
           # Linux 专属性能分析工具
           perf-tools # Linux 性能分析工具
           strace # 系统调用追踪
-          # ltrace # 库调用追踪
-          # ⚠️ 暂注释：nixpkgs 升到 GCC 16 后其测试套件误判失败（产物本身没问题），
-          # 上游 nixpkgs#569695 修复后取消注释。根因与移除条件见 docs/quirks.md。
+          ltrace # 库调用追踪
         ]
       );
   };
