@@ -114,6 +114,21 @@ let
     headerbar windowcontrols button.minimize:disabled {
       filter: none;
     }
+
+    /* MacTahoe 的两处测量告警（亮/暗两份都有，故放在文件末尾统一压过）。
+       1) `switch { font-size: 0 }`：GtkImage 用当前字号算基线，ascent+descent 为 0
+          时除法得 inf，转 int 成 G_MININT，GTK 报「baselines ... must be inside」。
+          改成 1px（视觉无差）后警告消失（实测）。
+       2) `tabbar tabbox { margin: 0 -3px }`：负边距把 min width 算成 -6，GTK 报
+          「reported min width -6, but sizes must be >= 0」。归零即消失，代价是
+          tabbar 左右各少 3px 出血。 */
+    switch {
+      font-size: 1px;
+    }
+
+    tabbar tabbox {
+      margin: 0;
+    }
     CSS
         } > $out
   '';
