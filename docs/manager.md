@@ -63,6 +63,9 @@ nix flake update          # 更新所有输入
 nix flake update nixpkgs  # 只更新单个输入
 ```
 
+> 自维护包（`pkgs/`，nixpkgs 未收录）的版本钉在仓库里，`nix flake update` **不会**带动它们。
+> 升级清单与步骤见 `docs/packages.md`；说「更新系统」时两件事都要做。
+
 ## 查看与清理历史数据
 
 ```bash

@@ -24,6 +24,8 @@
   选项约定（就近 `mkEnableOption` / 聚合 `mkDefault` / 主机只写例外）、角色组合、主机差异、
   跨平台共享边界、overlay 与 HM 接线。**改任何模块结构前先读这篇。**
 - `docs/quirks.md` — 平台适配的坑与 workaround（改对应模块前必读）
+- `docs/packages.md` — `pkgs/` 自维护包的版本清单、按钉法的升级步骤；
+  用户说「**更新系统**」时按这篇逐个把自维护包升到最新
 - `docs/README.md` — 全部文档索引；改某个子系统前先读对应那篇
 
 ## 架构入口（改配置前必须知道的分层）
@@ -52,6 +54,17 @@
 3. **改某个子系统** → 查 `docs/README.md` 索引表，先读对应那篇（如改 niri → `docs/niri.md`）。
 4. **遇到构建失败 / 注释掉的包 / 平台 hack** → 查 `docs/quirks.md`（是什么+根因+移除条件）。
 5. **动手前**：用下面的命令找现有选项与惯例；无先例的改动先与用户确认。
+
+### 「更新系统」的固定动作
+
+用户说「**更新系统**」时，除了刷 flake 输入，还要把 `pkgs/` 里的自维护包升到最新
+（它们的版本钉在仓库里，`nix flake update` 带不动）：
+
+1. `nix flake update` 刷新 nixpkgs / HM / noctalia / winapps 等输入；
+2. 打开 `docs/packages.md`，按清单逐个查上游最新版本，升级落后的包（钉法与取哈希命令都在那篇）；
+3. 验证：`nix fmt` → `nix flake check` → `nix build --dry-run .#<每个自维护包>` →
+   受影响主机的 toplevel dry-run；
+4. 自维护包升级单独提交（`feat(<scope>): 升级到 <版本>`），不与 flake 输入刷新混在一起。
 
 ### 选项/模块清单查询（唯一权威，不在文档维护清单）
 

@@ -162,6 +162,8 @@ virtualization / proxy）由角色与 `desktop.enable` 的聚合默认值给出�
 
 Home Manager 走 `useGlobalPkgs = true` 复用系统级实例，不单独注入 overlay。
 
+自维护包的版本、钉法与升级步骤见 `docs/packages.md`。
+
 ## Home Manager 接线
 
 `flake.nix` 的 `mkHomeManager` 是 NixOS 与 darwin **共用的唯一一份**接线：
