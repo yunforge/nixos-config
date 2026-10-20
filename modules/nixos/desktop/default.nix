@@ -158,6 +158,14 @@ in
       bibata-cursors
       # 首次配置入口 msime-linux-setup（词库不随包，装后每个用户跑一次）
       msime-fcitx5
+
+      # bubblewrap：Qoder IDE 终端沙箱的运行时依赖，与 distrobox/podman 同类。
+      # Qoder 按 PATH 探测 bwrap，探测不到即报「Bubblewrap 未安装」并关掉该功能；
+      # 而它自己那层 FHS 包装器（~/Apps/Qoder-IDE/qoder-ide-fhs.nix）用 store 绝对
+      # 路径调 bwrap，所以「IDE 起得来」并不等于「PATH 上有 bwrap」。
+      # 放系统 profile 而非 HM 的 common/tools：后者门控是 mengw.cli.enable，
+      # server / wsl / macbook 四个角色全都开，会把桌面专属依赖带到无 GUI 的主机上。
+      bubblewrap
     ];
   };
 }
