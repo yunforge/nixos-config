@@ -50,6 +50,14 @@ in
       magpie # 各 AI agent 的模型选择器（托盘/窗口版；终端版见 hosts/wsl）
     ];
 
+    # babry 的存盘目录。不写这份配置时 babry 按 XDG_PICTURES_DIR 回落，PNG 直接
+    # 堆在 ~/Pictures 根下；与 mpv（~/Pictures/mpv）同样单独占一层。目录不存在时
+    # 由 babry 在首次存盘/复制/贴图时自建。优先级：--save-dir > BABRY_SAVE_DIR >
+    # 本配置 > XDG_PICTURES_DIR，故这条声明就是覆盖回退路径的唯一开关。
+    xdg.configFile."babry/config.toml".text = ''
+      save_dir = "~/Pictures/screenshots"
+    '';
+
     # `note <文件>`：用 GNOME 文本编辑器打开；无参数时直接开一个空文档。
     # 只在本模块（Linux 桌面工作站）里定义，server / wsl / macbook 不会继承。
     home.shellAliases.note = "${pkgs.gnome-text-editor}/bin/gnome-text-editor";

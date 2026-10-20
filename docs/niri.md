@@ -75,8 +75,10 @@ niri 自带的 `screenshot` / `screenshot-screen` / `screenshot-window` 三个�
 | `Mod` + `Ctrl` + `P` | 全屏截图（`babry --screen`，截完直接进编辑器） |
 
 编辑器内按键：`Ctrl+S` 存盘、`Ctrl+C` 复制到剪贴板、`Ctrl+Z` / `Ctrl+Shift+Z` 撤销重做、`Esc` 取消；
-工具栏图钉把选区钉成屏幕贴图。存盘位置由 babry 自己的对话框决定 —— niri 的 `screenshot-path`
-（`config.kdl`）已随 niri 自带截图动作一并删除。
+工具栏图钉把选区钉成屏幕贴图。存盘目录由 `~/.config/babry/config.toml` 的 `save_dir`
+指定（声明在 `modules/home-manager/gui/apps/linux/utilities.nix`，当前为 `~/Pictures/screenshots`，
+不存在时由 babry 自建）—— 不写这份配置就会回落到 `XDG_PICTURES_DIR`，PNG 直接堆在 `~/Pictures` 根下。
+niri 的 `screenshot-path`（`config.kdl`）已随 niri 自带截图动作一并删除。
 
 > 原来 `Mod` + `Shift` + `P` 的「窗口截图」不再单独占键：babry 的智能选区本就把窗口当成
 > 一个层级，滚轮即可切到窗口/全屏。
