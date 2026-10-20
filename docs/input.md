@@ -27,7 +27,8 @@ msime-linux-setup --download
 或打开「水杉输入法」设置完成首次配置——它下载并校验词库，再把输入法加入当前的输入法列表。
 没有自动加入时，用 `fcitx5-configtool` 添加「水杉输入法」。
 
-升级后执行 `fcitx5 -r` 或重新登录即可用上新版本。
+升级后重启 fcitx5 用户服务（`systemctl --user restart app-org.fcitx.Fcitx5@autostart.service`）
+或重新登录即可用上新版本——别用 `fcitx5 -r`，那样拉起的进程会脱离 systemd 单元。
 
 > [!NOTE]
 > 上游提供 `programs.msime` NixOS 模块（会一并注册 online / voice / clipboard
@@ -48,11 +49,31 @@ GLFW_IM_MODULE = "fcitx";
 
 ## 候选词窗外观
 
-仓库**不托管** `classicui.conf`：候选窗用 fcitx5 内置的 `default` 主题与内置默认偏好
-（字体 / DPI / 候选方向均为 fcitx5 默认值）。
+主题**不由仓库托管**：本机用 `~/.local/share/fcitx5/themes/msime-fix/`——水杉 `msime` 主题的
+本地副本，背景换成自绘的九宫格 `background.png` / `background@2x.png`（R 角 + 柔和投影 + 描边），
+`~/.config/fcitx5/conf/classicui.conf` 的 `Theme` / `DarkTheme` 指向它。
+
+需要副本的原因：水杉插件**每次 fcitx5 启动都重新生成** `themes/msime/theme.conf`（切线位置与
+`shape-*.png` 由 `libmsime-fcitx5.so` 在运行时算出，store 里没有可 patch 的源文件），直接改那份会在
+下次重启被覆盖。
+
+关键几何约束（根因见 `docs/quirks.md`）：`[InputPanel/Background/Margin]` 与 `[InputPanel/ShadowMargin]`
+必须取 **4 的倍数**，并与 `pkgs/fcitx5/nine-slice-align.patch`（把候选窗尺寸向上对齐到 4 逻辑像素）
+配套，四条九宫格切线才全部落在整数设备像素上；改成奇数就重新出现 1px 灰线。
+
+高亮条同理但更容易踩坑：`FullWidthHighlight=True` 时它画在
+`[ContentMargin] + [TextMargin] − [Highlight/Margin]` 的位置、宽
+`窗口宽 − ContentMargin − TextMargin + Highlight/Margin 左右之和`。水杉原主题的
+`Highlight/Margin = 10/12` 配的是**无投影带**的平背景，换成带投影的自绘背景后高亮条会盖住投影带、
+探出卡片边缘（视觉越界）。本机改为自绘 `highlight.png` / `highlight@2x.png`（半径 4 = margin，
+半透明 `#b7d1eb`）并把 margin 取 4/4/4/4，让高亮条落在卡片白区内缩 3 逻辑像素处。
 
 要改候选窗的字体 / DPI / 方向，直接用 fcitx5 的 GUI 配置（`kdePackages.fcitx5-configtool`）
-—— 没有 HM 覆盖这些文件，改动会保留。
+—— 没有 HM 覆盖这些文件，改动会保留。改完主题后重载：
+
+```bash
+systemctl --user restart app-org.fcitx.Fcitx5@autostart.service
+```
 
 ## XWayland 候选窗缩放
 

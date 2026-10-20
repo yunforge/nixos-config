@@ -12,6 +12,18 @@
 #   overlay 本身拿不到 flake inputs，只能由调用方注入。
 { inputs }:
 final: prev: {
+  # fcitx5：候选窗面板尺寸对齐补丁。classicui 的九宫格背景在「面板宽 −
+  # marginRight」这条远端切线上取半设备像素（niri scale 1.5 时面板尺寸为奇数即
+  # 触发），cairo 于是沿每条切线画出一条 1px 半透明线——亮色候选窗压在暗色终端
+  # 上尤其显眼。补丁只给 sizeHint() 的宽高向上对齐到 4 逻辑像素（不新增符号、
+  # ABI 不变），因此 inputs.msime 那份插件 overlay 仍与系统 Fcitx5 同源可用。
+  # 根因与移除条件见 docs/quirks.md。
+  fcitx5 = prev.fcitx5.overrideAttrs (
+    finalAttrs: previousAttrs: {
+      patches = (previousAttrs.patches or [ ]) ++ [ ../pkgs/fcitx5/nine-slice-align.patch ];
+    }
+  );
+
   # 自打包主题（nixpkgs 未收录）：MacTahoe GTK / 图标主题 / Kvantum(Qt) 主题
   mactahoe-gtk-theme = prev.callPackage ../pkgs/mactahoe-gtk-theme { };
   mactahoe-icon-theme = prev.callPackage ../pkgs/mactahoe-icon-theme { };
