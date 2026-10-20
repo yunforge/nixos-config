@@ -57,9 +57,12 @@ GLFW_IM_MODULE = "fcitx";
 `shape-*.png` 由 `libmsime-fcitx5.so` 在运行时算出，store 里没有可 patch 的源文件），直接改那份会在
 下次重启被覆盖。
 
-关键几何约束（根因见 `docs/quirks.md`）：`[InputPanel/Background/Margin]` 与 `[InputPanel/ShadowMargin]`
-必须取 **4 的倍数**，并与 `pkgs/fcitx5/nine-slice-align.patch`（把候选窗尺寸向上对齐到 4 逻辑像素）
-配套，四条九宫格切线才全部落在整数设备像素上；改成奇数就重新出现 1px 灰线。
+关键几何约束：九宫格切线画在 `margin × 缩放` 的设备像素位置，1.5x 下**奇数 margin 必然落在半设备像素上**
+（`11 × 1.5 = 16.5`），所以 `[InputPanel/Background/Margin]` 取 **4 的倍数**（1.25x / 1.5x / 2x 都安全）。
+`[InputPanel/ShadowMargin]` 只有 `xcbinputwindow.cpp` 读，Wayland 下**完全不生效**，写不写都行。
+`pkgs/fcitx5/nine-slice-align.patch`（把候选窗尺寸向上对齐到 4 逻辑像素）目前仍在，但它到底消除了哪条线
+还没隔离出来 —— 按上面的算式，光靠偶数 margin 就该让四条外框切线对齐；已连同算式一起报给上游
+（[fcitx5#1712](https://github.com/fcitx/fcitx5/issues/1712)），等结论再决定留还是删。
 
 高亮条同理但更容易踩坑：`FullWidthHighlight=True` 时它画在
 `[ContentMargin] + [TextMargin] − [Highlight/Margin]` 的位置、宽

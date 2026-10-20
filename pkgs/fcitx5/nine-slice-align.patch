@@ -1,16 +1,21 @@
 --- a/src/ui/classic/inputwindow.cpp
 +++ b/src/ui/classic/inputwindow.cpp
-@@ -511,6 +511,16 @@
+@@ -511,6 +511,21 @@
  
      auto width = static_cast<unsigned int>(yogaWidth);
      auto height = static_cast<unsigned int>(yogaHeight);
 +
-+    // The nine-slice background is cut at (width - marginRight) and
-+    // (height - marginBottom). Those far cuts land on half device pixels
-+    // whenever the window size is odd under a fractional buffer scale, and
-+    // cairo then blends a translucent column into every cut line. Aligning the
-+    // window to 4 logical pixels keeps all cuts (and the buffer size at 1.5x
-+    // and 2x) on whole device pixels.
++    // A nine-slice cut at logical offset m is drawn at device position
++    // m * scale, so under a fractional scale (niri here: 1.5) an odd margin
++    // puts that cut on a half device pixel and any hard edge in the art shows
++    // a 1px line there. The far cuts are (width - marginRight) and
++    // (height - marginBottom), and window->resize() rounds logical -> device
++    // while repaint() divides back, so an odd window size also makes the
++    // painted area non-integral in logical units (133 -> 200 -> 133.3333).
++    // Aligning to 4 logical pixels keeps the size round trip exact and, with
++    // theme margins also multiples of 4, keeps every cut on whole device
++    // pixels at 1.5x and 2x. See https://github.com/fcitx/fcitx5/issues/1712
++    // for the open question of how much of this the alignment actually fixes.
 +    constexpr unsigned int kSizeAlign = 4;
 +    width = (width + kSizeAlign - 1) & ~(kSizeAlign - 1);
 +    height = (height + kSizeAlign - 1) & ~(kSizeAlign - 1);
