@@ -80,6 +80,18 @@ in
       recursive = false;
     };
 
+    # `default` 主题别名：微信（XWayland 上的 Qt 5）窗口内光标退回原始箭头的原因。
+    # xwayland-satellite 的 XSETTINGS 只写 3 个整型键、没有 `Gtk/CursorThemeName`，
+    # Qt5 的 QXcbCursor 于是把**空字符串**交给 XcursorSetTheme()，这条 X 连接的主题名
+    # 被清空，libXcursor 回落到字面量 `default`；XCURSOR_PATH 里没有目录提供 default/
+    # → 全部 ENOENT → Qt 用 X 核心字体光标（10×16 单色）。XCURSOR_THEME 对它无效
+    # （那条路径只认 XSETTINGS / Xcursor.theme / default 三档）。
+    # 整目录软链成 default 即可闭合这条链；根因与实测见 docs/quirks.md。
+    xdg.dataFile."icons/default" = {
+      source = "${pkgs.bibata-cursors}/share/icons/Bibata-Modern-Classic";
+      recursive = false;
+    };
+
     qt = {
       enable = true;
       # 保持不变：Wayland 下 Qt 的窗口装饰由平台主题提供，与控件样式是两回事。
