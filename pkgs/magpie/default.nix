@@ -34,13 +34,13 @@
 
 buildGoModule rec {
   pname = if gui then "magpie" else "magpie-cli";
-  version = "0.1.1285";
+  version = "0.1.1296";
 
   src = fetchFromGitHub {
     owner = "yetone";
     repo = "magpie";
     rev = "v${version}";
-    hash = "sha256-WF4kQx48zW+eWbleefd7TNNhdAaIJBSPhK9azvJrH3Q=";
+    hash = "sha256-mauCE69gf3nzW58sQfTtDVtPAjZ4X7qnkDVbAB6ANEQ=";
   };
 
   vendorHash = "sha256-pBk3sQZ9/1sVdz2ZteBGgQrI49fDfgsQ8ur7pzM477A=";

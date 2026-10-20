@@ -16,13 +16,13 @@
 
 stdenv.mkDerivation {
   pname = "mactahoe-gtk-theme";
-  version = "2026-08-07";
+  version = "2026-09-10";
 
   src = fetchFromGitHub {
     owner = "vinceliuice";
     repo = "MacTahoe-gtk-theme";
-    rev = "a626e946f79886703abe72a178f1223a986885f1";
-    hash = "sha256-UEJZFXCVox3KCTZqSeOILumKCbUIeDTzcbLjimtotEI=";
+    rev = "0aa2a2ba1e07277a49dae9a3b90881c899d2afbe";
+    hash = "sha256-P4zevOTHd7KKLj3a9wkaY96tMFMg7iZEpz3NkbdyTwM=";
   };
 
   nativeBuildInputs = [
@@ -43,8 +43,11 @@ stdenv.mkDerivation {
       patchShebangs "$file"
     done
 
-    # 构建环境无 sudo，install 脚本只用于装到 $out，无需提权
-    substituteInPlace libs/lib-core.sh --replace-fail '$(which sudo)' false
+    # 构建环境无 sudo，install 脚本只用于装到 $out，无需提权。
+    # 2026-09-10 起上游把 $(which sudo) 换成 SUDO_BIN="$(command -v sudo)"，
+    # 未安装 sudo 时该变量为空，脚本里 ''${SUDO_BIN} ... 会退化成直接执行
+    # （也正是我们要的）；显式置 false 只是让失败更响亮。
+    substituteInPlace libs/lib-core.sh --replace-fail 'SUDO_BIN="$(command -v sudo)"' 'SUDO_BIN=false'
 
     # 提供假 home 目录，避免读取真实用户信息
     substituteInPlace libs/lib-core.sh --replace-fail 'MY_HOME=$(getent passwd "''${MY_USERNAME}" | cut -d: -f6)' 'MY_HOME=/tmp'
@@ -54,6 +57,13 @@ stdenv.mkDerivation {
 
   installPhase = ''
     runHook preInstall
+
+    # 2026-09-10 起上游新增 install_app：把配套的 gnome-theme-switcher
+    # 装到 $HOME/.local/{bin,share/applications}。构建沙箱的 HOME 是
+    # /homeless-shelter（不可写），cp 失败即 exit 1；而本机主题切换由
+    # theme-apply（themes/variants.nix）负责，不需要这个应用。
+    # 给一个临时 HOME 让它把文件丢在那里，不污染 $out。
+    export HOME=$(mktemp -d)
 
     mkdir -p $out/share/themes
 

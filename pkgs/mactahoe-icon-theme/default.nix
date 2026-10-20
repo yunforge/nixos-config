@@ -9,13 +9,13 @@
 
 stdenv.mkDerivation {
   pname = "mactahoe-icon-theme";
-  version = "2026-07-28";
+  version = "2026-09-10";
 
   src = fetchFromGitHub {
     owner = "vinceliuice";
     repo = "MacTahoe-icon-theme";
-    rev = "b85923bb87f50578268abcff5698947a3ff24695";
-    hash = "sha256-Ho71thvHpgQICfC0c67ClKRONdDeNVfg0bGU6ZjM3S8=";
+    rev = "839848b9a8a38a92a6936e30c4abe35cc6f2546d";
+    hash = "sha256-NAahlBOYub0QlqkYStamoCbyWh+H5JG/iFm4Ws9EU3A=";
   };
 
   nativeBuildInputs = [

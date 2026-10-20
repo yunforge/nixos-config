@@ -8,16 +8,16 @@
 
 ## 清单
 
-版本核对于 2026-10-20。
+版本核对于 2026-10-20（当日全部升到上游最新）。
 
 | 属性名 | 上游 | 钉法 | 当前钉住 | 上游最新 | 状态 |
 |--------|------|------|----------|----------|------|
 | `babry` | [kregonia/babry](https://github.com/kregonia/babry) | tag | `v0.1.4` | `v0.1.4` | 最新 |
-| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.1285` | `v0.1.1296` | 落后 |
-| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.10.11.1` | `2026.10.19.1` | 落后 |
+| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.1296` | `v0.1.1296` | 最新 |
+| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.10.19.1` | `2026.10.19.1` | 最新 |
 | `liquidbird` | [StatIndet/liquidbird](https://github.com/StatIndet/liquidbird) | commit（main） | `0f8148d` | 同一 commit | 最新 |
-| `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `a626e94`（tag `2026-08-08`） | tag `2026-09-10` / main 更新 | 落后 |
-| `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit | `b85923b`（`2026-07-28`） | tag `2026-09-10` | 落后 |
+| `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
+| `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit（tag 指向） | `839848b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-kvantum` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde) | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 最新 |
 | `windows-vm-media` | virtio-win（nixpkgs）+ WinApps `oem/` | 跟随 flake 输入 | — | — | 不手工升级 |
 
@@ -130,11 +130,8 @@ git log -1 --format=%ci <rev>   # 取日期填 version
 ```
 
 - `mactahoe-gtk-theme` / `mactahoe-icon-theme` 有日期 tag：`rev` 填 **tag 指向的 commit**
-  （`git ls-remote --tags --refs` 直接给出 rev），`version` 填该 commit 的提交日期。
-  注意两点：① `mactahoe-gtk-theme` 现在 `version = "2026-08-07"` 而对应 tag 叫 `2026-08-08` ——
-  提交日期与打 tag 日期差一天，不是笔误，保持「version = 提交日期」即可；
-  ② `mactahoe-icon-theme` 当前钉的 `b85923b`（2026-07-28）**不是** tag 提交，
-  它落在 tag `2026-07-07` 之后、`2026-09-10` 之前，下次升级直接跳到 `2026-09-10`。
+  （`git ls-remote --tags --refs` 直接给出 rev），`version` 填该 tag 名（两者现在一致）。
+  早期曾出现 `version = "2026-08-07"` 而 tag 叫 `2026-08-08` 的一天偏差，现在按 tag 名写即可。
 - `mactahoe-kvantum` 上游没有 tag，跟 main HEAD。
 - `liquidbird` 上游尚未为 Linux 侧打 tag（`v0.1.0` 只有 macOS），继续跟 main commit。
 
@@ -159,6 +156,15 @@ nix store prefetch-file --json \
   桌面文件与自启由 HM 托管，见 `docs/quirks.md` 的「magpie 升级后 GUI 仍起来旧版本」。
 - **主题升级要看 `docs/themes.md`**：GTK/Qt/图标三套必须同源，niri 装饰色与 Noctalia
   调色板都取自 MacTahoe 的具体色值，换主题版本可能让 `customPalettes.mactahoe` 的取值失配。
+  2026-09-10 版实测配色未变（`#242424` / `#dedede` / `#333333` / `#0088FF`），
+  图标变体目录仍是 `MacTahoe-dark` / `MacTahoe-light`（与 `variants.nix` 引用一致）。
+- **`mactahoe-gtk-theme` 的 `installPhase` 要给临时 `HOME`**：上游 2026-09-10 起新增
+  `install_app`，会把 `gnome-theme-switcher` 装到 `$HOME/.local/`；构建沙箱的
+  `HOME=/homeless-shelter` 不可写 → `cp` 失败、`set -Eeo pipefail` 直接 exit 1。
+  包内 `export HOME=$(mktemp -d)` 把文件丢在临时目录（本机切换由 `theme-apply` 负责）。
+- **上游脚本把 stderr 重定向到临时文件**：`libs/lib-core.sh` 里 `exec 2> $MACTAHOE_TMP_DIR/error_log.txt`，
+  构建失败时 `nix log` 只看得到截断的 stdout。排查时把 `installPhase` 临时改成
+  `HOME=/nix/store ./install.sh ...` 手工跑一遍，再看 `/tmp/MacTahoe.lock/error_log.txt`。
 - **升级后必须跑 `nix flake check`**：它会逐一评估 `packages.*`，哈希失配与依赖 API 变更
   在这一步就暴露，不必等到主机 dry-build。
 
