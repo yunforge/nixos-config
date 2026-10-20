@@ -32,10 +32,22 @@ function TopBar:init()
 		end
 	end
 
-	local close = {icon = 'close', hover_bg = '2311e8', hover_fg = 'ffffff', command = function() mp.command('quit') end}
-	local max = {icon = 'crop_square', command = maximized_command}
-	local min = {icon = 'minimize', command = function() mp.command('cycle window-minimized') end}
-	self.buttons = options.top_bar_controls == 'left' and {close, min, max} or {min, max, close}
+	-- 红黄绿三灯的颜色（ASS 是 BGR 序，故字面量看起来是反的），跟着**按钮**走而不是
+	-- 跟着位置走 —— 顺序一旦调整，按位置取色就会把红灯换成黄灯。
+	local close = {
+		icon = 'close',
+		ring = '434ecb',
+		fill = '5462fe',
+		hover_bg = '2311e8',
+		hover_fg = 'ffffff',
+		command = function() mp.command('quit') end,
+	}
+	local max = {icon = 'crop_square', ring = '32a920', fill = '3fd328', command = maximized_command}
+	local min = {icon = 'minimize', ring = '24a1ca', fill = '2dc9fd', command = function() mp.command('cycle window-minimized') end}
+	-- 顺序与位置全桌面统一：最小化 → 最大化 → 关闭（关闭在最右），与 dconf
+	-- button-layout ":minimize,maximize,close" 一致（见 gui/desktop/linux/themes/variants.nix）。
+	-- 位置由 top_bar_controls 决定（uosc.conf 里是 right）。
+	self.buttons = {min, max, close}
 
 	self:register_observers()
 	self:decide_enabled()
@@ -229,16 +241,21 @@ function TopBar:render()
 	if visibility <= 0 then return end
 	local ass = assdraw.ass_new()
 	local scale, cy = state.scale, self.ay + self.size / 2
-	-- Geometry and colors from MacTahoe titlebutton-{close,minimize,maximize}.svg.
-	local colors = {{'434ecb', '5462fe'}, {'24a1ca', '2dc9fd'}, {'32a920', '3fd328'}}
+	-- 圆钮的几何与双色取自 MacTahoe 的 titlebutton-*.svg（红黄绿三灯）；
+	-- 颜色现在挂在按钮上（见 init），这里只按位置画。
 	if options.top_bar_controls then
+		local is_right = options.top_bar_controls == 'right'
+		local count = #self.buttons
 		for i, button in ipairs(self.buttons) do
-			local x = self.ax + (17 + (i - 1) * 23) * scale
+			-- 右侧时从右往左排：第 1 个（最小化）最靠左，关闭贴右缘，与 GTK/Qt 一致
+			local slot = is_right and (count - i + 1) or i
+			local x = is_right and (self.bx - (17 + (slot - 1) * 23) * scale)
+				or (self.ax + (17 + (slot - 1) * 23) * scale)
 			local rect = {ax = x-11*scale, ay = self.ay, bx = x+11*scale, by = self.ay+self.size}
 			cursor:zone('primary_click', rect, button.command)
 			for layer = 1, 2 do
 				local r = (layer == 1 and 7 or 6.5) * scale
-				ass:rect(x-r, cy-r, x+r, cy+r, {color = colors[i][layer], radius = r, opacity = visibility})
+				ass:rect(x-r, cy-r, x+r, cy+r, {color = layer == 1 and button.ring or button.fill, radius = r, opacity = visibility})
 			end
 			if get_point_to_rectangle_proximity(cursor, rect) <= 0 then
 				ass:icon(x, cy, 10*scale, button.icon, {color = '263025', opacity = visibility})

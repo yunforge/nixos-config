@@ -237,7 +237,37 @@ shadow {
 
 **`platformTheme` 保持 `adwaita` 不动**：Wayland 下 Qt 的窗口装饰由平台主题提供，与控件样式是两回事；换掉它会让自绘标题栏消失（`env.nix` 里就是为此才恢复 Qt 自绘）。所以现状是“控件 = Kvantum/MacTahoe，标题栏 = QAdwaitaDecorations”。
 
+> 后续实测修正：niri 开了 `prefer-no-csd` 之后 Qt 6 根本不画标题栏（Qt 显式请求 server-side decoration，
+> 见下面「窗口按钮布局」一节），所以 QAdwaitaDecorations 在这台机器上其实没有被用到。
+
 **未验证的一点**：MacTahoeDark 的底色 / 文字本来就与 MacTahoe-Dark 的 GTK 值一致（`window.color=#242424`、`text.color=#dedede`、`tooltip.base.color=#333333`，可直接 grep 自打包产物复核），但 Kvantum 的实际渲染要打开 VLC 或 Telegram 看一眼才算数。
+
+## 窗口按钮布局：为什么红绿灯不能全局
+
+按钮布局只有一个真源：`variants.nix` 的 `buttonLayout = ":minimize,maximize,close"`。它被
+写成 dconf 的 `org.gnome.desktop.wm.preferences button-layout`（GTK3/GTK4 ini、`theme-apply`
+的 `gsettings` 都跟着它走），是左侧留空、三个按钮全在右侧、**关闭在最右**。
+
+**红绿灯（macOS 三色圆钮）无法全局化**——这是实测结论，不是取舍：
+
+| 框架 | 按钮由谁画 | 能否红绿灯 |
+|---|---|---|
+| GTK3 / GTK4 / libadwaita | GTK 主题的 CSD（`button.titlebutton`） | ✅ MacTahoe 直接给 PNG 三色灯 |
+| Thunderbird（LiquidBird） | 主题自带 PNG | ✅ 已按同一顺序重排（见 `productivity.nix`） |
+| mpv | uosc 自绘（`TopBar.lua`） | ✅ 按 MacTahoe SVG 的颜色/几何画圆 |
+| Chromium / Brave / Electron | 各自的 `views` 绘制 | ❌ 只有单色符号（`– □ ×`），顺序跟随 dlopen 的 GTK 布局 |
+| Qt6（Telegram / qView / VLC…） | Qt 自己 | ❌ **在 niri + `prefer-no-csd` 下根本不画标题栏** |
+
+Qt 那条是硬伤：`QWaylandXdgSurface::Toplevel::requestWindowFlags` 会显式调用
+`requestMode(mode_server_side)`，而 niri 永远不画 SSD、客户端又据此抑制 CSD，结果就是无边框。
+Qt 侧唯一的红绿灯方案是第三方 `whitesur-qt-decoration` 插件（未打包、私有 Qt ABI，Qt 升级即静默失效），
+故不采用；Qt 自带装饰插件（`libbradient`、`libqadwaitadecorations`）也只画单色符号。
+
+**因此全局统一的基准取“位置 + 顺序”，而不是“画法”**：右侧、左起 最小化 → 最大化 → 关闭。
+GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 渲染成 `– □ ×`——位置和顺序一致，
+视觉风格随框架。若哪天要“看起来更像 macOS”，唯一的全局办法是把 GTK 那三个 PNG 换成单色符号
+（已验证可用 CSS 覆盖成平面 `– □ ×`），代价是失去红绿灯。
+
 
 ## 双层配色模型
 

@@ -89,6 +89,14 @@ in
         :root[customtitlebar] #unifiedToolbarContainer {
           flex-direction: row !important;
         }
+
+        /* 同一份 titlebuttons.css 还把按钮顺序钉成 close→min→max。桌面统一约定是
+           最小化→最大化→关闭（dconf button-layout = ":minimize,maximize,close"，
+           见 gui/desktop/linux/themes/variants.nix），这里按同一顺序重排：
+           顺序只在 CSS 里写，改顺序要改这一处 + 那里一处。 */
+        :root[customtitlebar] .titlebar-min { order: 0 !important; }
+        :root[customtitlebar] :is(.titlebar-max, .titlebar-restore) { order: 1 !important; }
+        :root[customtitlebar] .titlebar-close { order: 2 !important; }
       '';
 
       # 主题开关。写 user.js 而不是 prefs.js：后者是 TB 自己维护的文件（它随时

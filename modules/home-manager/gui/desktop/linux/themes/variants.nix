@@ -46,17 +46,19 @@ let
     };
   };
 
-  # 窗口按钮在右侧、macOS 顺序（左起 红-黄-绿，与 Thunderbird/LiquidBird 一致）。
+  # 窗口按钮在右侧，**左起 最小化 → 最大化 → 关闭**（关闭在最右）。
   # 语法是 `左侧:右侧`（GNOME 约定）；前导冒号表示左侧留空、三个按钮全在右侧。
-  # GTK 把右侧列表**从左到右**铺开，故要得到 红黄绿 视觉效果，列表须写成
-  # close,minimize,maximize（close=红、minimize=黄、maximize=绿，实测）。
-  # 真源是 dconf 的 org.gnome.desktop.wm.preferences button-layout —— GNOME Tweaks
-  # 改的也是它；写 settings.ini 的 gtk-decoration-layout 对 libadwaita 无效。
+  # GTK 把右侧列表**按书写顺序从左到右**铺开，故列表即视觉顺序本身。
   #
-  # 为何不放左侧：这条键是**全局**的，除 GTK 外还驱动 Qt（qadwaitadecorations 读
-  # 同一键）与跟随的其它框架。只有 GTK 能渲染 macOS 红黄绿灯；Qt/Electron/X11
-  # 画的是各自原生装饰，把按钮摆到左边只会显得错位。故统一回右侧。
-  buttonLayout = ":close,minimize,maximize";
+  # 这条键是全局的唯一入口：除 GTK 外，Chromium / Electron 通过 GTK 的
+  # `gtk-decoration-layout` 跟随，Qt（qadwaitadecorations）经 XDG 设置门户读同一个键。
+  # 真源是 dconf 的 org.gnome.desktop.wm.preferences button-layout —— GNOME Tweaks 改的
+  # 也是它；settings.ini 的同名键会被设置门户盖掉（实测），故不作为真源。
+  #
+  # 为何按这个顺序：只有 GTK 的 CSD 主题会画 macOS 红黄绿灯，Chromium / Electron / Qt
+  # 画的是各自原生符号按钮 —— **位置与顺序是三种框架唯一都能一致表达的东西**，故拿它做
+  # 全局对齐的基准。红绿灯下的视觉顺序因此是 黄-绿-红（黄=最小化、绿=最大化、红=关闭）。
+  buttonLayout = ":minimize,maximize,close";
 
   # 与 HM 的 gtk 模块对同一模式写出的内容保持一致（modules/misc/gtk/lib.nix）：
   # gtk-application-prefer-dark-theme 只在暗色出现，gtk-interface-color-scheme 只 GTK4 有。
