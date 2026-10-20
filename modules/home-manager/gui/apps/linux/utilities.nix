@@ -50,6 +50,10 @@ in
       magpie # 各 AI agent 的模型选择器（托盘/窗口版；终端版见 hosts/wsl）
     ];
 
+    # `note <文件>`：用 GNOME 文本编辑器打开；无参数时直接开一个空文档。
+    # 只在本模块（Linux 桌面工作站）里定义，server / wsl / macbook 不会继承。
+    home.shellAliases.note = "${pkgs.gnome-text-editor}/bin/gnome-text-editor";
+
     # magpie 的桌面文件。上游 internal/gui/scheme_linux.go 的 registerScheme()
     # 首次运行时会往 ~/.local/share/applications/magpie.desktop 写一份，把当时
     # 那个**绝对 store 路径**钉进 Exec=，用来抢占 magpie:// 协议；而它只在
