@@ -50,19 +50,26 @@ GLFW_IM_MODULE = "fcitx";
 ## 候选词窗外观
 
 主题**不由仓库托管**：本机用 `~/.local/share/fcitx5/themes/msime-fix/`——水杉 `msime` 主题的
-本地副本，背景换成自绘的九宫格 `background.png` / `background@2x.png`（R 角 + 柔和投影 + 描边），
+本地副本，背景换成自绘的九宫格 `background.png` / `background@2x.png`（R 角 + 柔和投影，**无描边**），
 `~/.config/fcitx5/conf/classicui.conf` 的 `Theme` / `DarkTheme` 指向它。
 
 需要副本的原因：水杉插件**每次 fcitx5 启动都重新生成** `themes/msime/theme.conf`（切线位置与
 `shape-*.png` 由 `libmsime-fcitx5.so` 在运行时算出，store 里没有可 patch 的源文件），直接改那份会在
 下次重启被覆盖。
 
-关键几何约束：九宫格切线画在 `margin × 缩放` 的设备像素位置，1.5x 下**奇数 margin 必然落在半设备像素上**
-（`11 × 1.5 = 16.5`），所以 `[InputPanel/Background/Margin]` 取 **4 的倍数**（1.25x / 1.5x / 2x 都安全）。
+关键几何约束（2026-10-22 已定位并修复）：候选窗右侧竖切线上的那根 1px 线**不在 classicui 的
+瓦片绘制里**——GTK4 应用（ghostty 等）在 `GTK_IM_MODULE=fcitx` 下由**应用进程自己**用 GTK im module
+（`fcitx5-gtk` 的 `gtk3/fcitxtheme.cpp::Theme::paint`）拼九宫格画候选窗，classicui 只提供候选数据。
+**根因**：GTK 先把整块 paint 录制进 cairo recording surface（`gtk_snapshot_append_cairo`），1.5 倍缩放
+发生在回放阶段，录制上下文里 CTM 是单位阵、`device_scale=1.0` ⇒ 在 `paint` 里读缩放再按设备像素量化
+切线是**拿不到真值**的（该方案已实现并真机实测无效）。**修复**：`pkgs/fcitx5-gtk/nine-slice-overlap.patch`
+（经 `overlays/default.nix` 的 `fcitx5-gtk` override 生效）让相邻瓦片沿共享切线重叠 1 逻辑像素 +
+`CAIRO_EXTEND_PAD`，不依赖读取缩放；真机 A/B（10 组输入里 `D mod 3 == 1` 的 6 组）未打补丁 6/6 出缝、打补丁 0/6。
+`[InputPanel/Background/Margin]` 仍取 **4 的倍数**（与切线位置无关，纯审美）。
+另有 `pkgs/fcitx5/nine-slice-align.patch`（classicui `sizeHint()` 向上对齐 4 逻辑像素）：它**不是 GTK im
+module 那根线的修复**，但让 classicui 路径（原生 Wayland IM，非 GTK 应用）的面板逻辑宽恒为 4 的倍数 ⇒
+设备宽恒为 3 的倍数，恰好避开同一显隐律（实测 7/7 组无缝），因此保留；两处细节见 `docs/quirks.md`。
 `[InputPanel/ShadowMargin]` 只有 `xcbinputwindow.cpp` 读，Wayland 下**完全不生效**，写不写都行。
-`pkgs/fcitx5/nine-slice-align.patch`（把候选窗尺寸向上对齐到 4 逻辑像素）目前仍在，但它到底消除了哪条线
-还没隔离出来 —— 按上面的算式，光靠偶数 margin 就该让四条外框切线对齐；已连同算式一起报给上游
-（[fcitx5#1712](https://github.com/fcitx/fcitx5/issues/1712)），等结论再决定留还是删。
 
 高亮条同理但更容易踩坑：`FullWidthHighlight=True` 时它画在
 `[ContentMargin] + [TextMargin] − [Highlight/Margin]` 的位置、宽

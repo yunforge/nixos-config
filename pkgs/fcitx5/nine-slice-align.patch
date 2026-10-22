@@ -5,17 +5,17 @@
      auto width = static_cast<unsigned int>(yogaWidth);
      auto height = static_cast<unsigned int>(yogaHeight);
 +
-+    // A nine-slice cut at logical offset m is drawn at device position
-+    // m * scale, so under a fractional scale (niri here: 1.5) an odd margin
-+    // puts that cut on a half device pixel and any hard edge in the art shows
-+    // a 1px line there. The far cuts are (width - marginRight) and
-+    // (height - marginBottom), and window->resize() rounds logical -> device
-+    // while repaint() divides back, so an odd window size also makes the
-+    // painted area non-integral in logical units (133 -> 200 -> 133.3333).
-+    // Aligning to 4 logical pixels keeps the size round trip exact and, with
-+    // theme margins also multiples of 4, keeps every cut on whole device
-+    // pixels at 1.5x and 2x. See https://github.com/fcitx/fcitx5/issues/1712
-+    // for the open question of how much of this the alignment actually fixes.
++    // There is a known 1-device-pixel transparent slot along the *vertical*
++    // nine-slice cut of the input panel background under fractional scaling
++    // (niri at 1.5x: card white measures 217, that column 177-181 because it
++    // shows the window behind the panel; the horizontal cut is clean).
++    // paintTile() already snaps every grid line to whole device pixels, and a
++    // standalone cairo replica of make_tiles/paintRegion/paintTile with the
++    // real theme art paints that column solid white -> the cause is NOT
++    // margin or size parity, and this alignment is therefore NOT a proven
++    // fix. It does keep the size round trip exact (resize() rounds
++    // logical -> device while repaint() divides back: 133 -> 200 -> 133.3333),
++    // which is worth keeping; open question tracked in fcitx5 issue 1712.
 +    constexpr unsigned int kSizeAlign = 4;
 +    width = (width + kSizeAlign - 1) & ~(kSizeAlign - 1);
 +    height = (height + kSizeAlign - 1) & ~(kSizeAlign - 1);
