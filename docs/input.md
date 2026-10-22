@@ -64,7 +64,9 @@ GLFW_IM_MODULE = "fcitx";
 发生在回放阶段，录制上下文里 CTM 是单位阵、`device_scale=1.0` ⇒ 在 `paint` 里读缩放再按设备像素量化
 切线是**拿不到真值**的（该方案已实现并真机实测无效）。**修复**：`pkgs/fcitx5-gtk/nine-slice-overlap.patch`
 （经 `overlays/default.nix` 的 `fcitx5-gtk` override 生效）让相邻瓦片沿共享切线重叠 1 逻辑像素 +
-`CAIRO_EXTEND_PAD`，不依赖读取缩放；真机 A/B（10 组输入里 `D mod 3 == 1` 的 6 组）未打补丁 6/6 出缝、打补丁 0/6。
+`CAIRO_EXTEND_PAD`，不依赖读取缩放；九片改在 `cairo_push_group` 内用 `CAIRO_OPERATOR_SOURCE` 绘制、
+`alpha` 最后整体应用一次（否则半透明的高亮美术在重叠处叠两次 alpha，切口会出现 3 列亮带）。
+真机 A/B（同一批 10 组输入、仓库自建产物）未打补丁 7/7 出缝、打补丁 0/8，且高亮行切口列回到与邻列同值。
 `[InputPanel/Background/Margin]` 仍取 **4 的倍数**（与切线位置无关，纯审美）。
 另有 `pkgs/fcitx5/nine-slice-align.patch`（classicui `sizeHint()` 向上对齐 4 逻辑像素）：它**不是 GTK im
 module 那根线的修复**，但让 classicui 路径（原生 Wayland IM，非 GTK 应用）的面板逻辑宽恒为 4 的倍数 ⇒

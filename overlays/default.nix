@@ -30,8 +30,10 @@ final: prev: {
   # gtk3/fcitxtheme.cpp 的 Theme::paint 里拼，GTK 先把整块录制进 recording
   # surface、回放时才乘 1.5，所以「按设备像素量化切线」在录制上下文里拿不到
   # 缩放（已真机实测无效）。现补丁改为让相邻瓦片沿共享切线重叠 1 逻辑像素 +
-  # CAIRO_EXTEND_PAD，不依赖读取缩放。真机 A/B：未打补丁 4/4 组出缝，打补丁
-  # 4/4 组无缝。上游未接受前保留；根因与移除条件见 docs/quirks.md。
+  # CAIRO_EXTEND_PAD，不依赖读取缩放；九片在 group 内用 CAIRO_OPERATOR_SOURCE
+  # 绘制、alpha 最后整体应用一次，避免半透明美术（高亮条）在重叠处叠两次而出现
+  # 亮带。真机 A/B：未打补丁 7/7 组出缝，打补丁 0/8 组无缝且无亮带。上游未接受
+  # 前保留；根因与移除条件见 docs/quirks.md。
   fcitx5-gtk = prev.fcitx5-gtk.overrideAttrs (
     finalAttrs: previousAttrs: {
       patches = (previousAttrs.patches or [ ]) ++ [ ../pkgs/fcitx5-gtk/nine-slice-overlap.patch ];
