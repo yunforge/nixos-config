@@ -27,7 +27,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 
 | 类别 | 软件 |
 |------|------|
-| 浏览器 | Zen Browser（默认）、Brave |
+| 浏览器 | Brave（默认）、Zen Browser |
 | 通讯 | Discord、Telegram、微信（XWayland 适配）、QQ |
 
 ## 开发工具

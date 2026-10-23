@@ -47,13 +47,13 @@ in
       "x-scheme-handler/tonsite" = "org.telegram.desktop.desktop";
       "application/x-zerosize" = "typora.desktop";
       "x-scheme-handler/jetbrains" = "jetbrainsd.desktop";
-      "x-scheme-handler/chrome" = "zen-beta.desktop";
-      "application/x-extension-htm" = "zen-beta.desktop";
-      "application/x-extension-html" = "zen-beta.desktop";
-      "application/x-extension-shtml" = "zen-beta.desktop";
+      "x-scheme-handler/chrome" = "brave-browser.desktop";
+      "application/x-extension-htm" = "brave-browser.desktop";
+      "application/x-extension-html" = "brave-browser.desktop";
+      "application/x-extension-shtml" = "brave-browser.desktop";
       "application/xhtml+xml" = "brave-browser.desktop";
-      "application/x-extension-xhtml" = "zen-beta.desktop";
-      "application/x-extension-xht" = "zen-beta.desktop";
+      "application/x-extension-xhtml" = "brave-browser.desktop";
+      "application/x-extension-xht" = "brave-browser.desktop";
       "x-scheme-handler/x-github-client" = "github-desktop.desktop";
       "x-scheme-handler/x-github-desktop-dev-auth" = "github-desktop.desktop";
       "application/epub+zip" = "com.github.johnfactotum.Foliate.desktop";
@@ -125,12 +125,12 @@ in
       "application/x-zerosize" = [ "typora.desktop" ];
       "application/epub+zip" = [ "com.github.johnfactotum.Foliate.desktop" ];
       "x-scheme-handler/http" = [
-        "zen-beta.desktop"
         "brave-browser.desktop"
+        "zen-beta.desktop"
       ];
       "x-scheme-handler/https" = [
-        "zen-beta.desktop"
         "brave-browser.desktop"
+        "zen-beta.desktop"
       ];
       "video/mp4" = [ "zen-beta.desktop" ];
       "image/png" = [ "com.interversehq.qView.desktop" ];
@@ -184,7 +184,7 @@ in
       "audio/x-xm" = [ "com.github.neithern.g4music.desktop" ];
       "audio/x-mpegurl" = [ "com.github.neithern.g4music.desktop" ];
       "audio/x-scpls" = [ "com.github.neithern.g4music.desktop" ];
-      "x-scheme-handler/chrome" = [ "zen-beta.desktop" ];
+      "x-scheme-handler/chrome" = [ "brave-browser.desktop" ];
       "image/x-nikon-nef" = [ "com.interversehq.qView.desktop" ];
       "text/x-c++src" = [ "org.gnome.TextEditor.desktop" ];
     };
