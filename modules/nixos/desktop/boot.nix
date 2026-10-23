@@ -12,7 +12,6 @@ in
   config = lib.mkIf cfg.enable {
     boot = {
       consoleLogLevel = 3;
-      initrd.verbose = false;
       kernelParams = [
         "fbcon=nodefer"
         "nvidia_drm.fbdev=1"
