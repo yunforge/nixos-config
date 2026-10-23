@@ -111,6 +111,14 @@ in
         window-decoration = "auto";
         gtk-titlebar = false;
         term = "xterm-ghostty";
+      }
+      // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+        # 异步 IO 后端改用 epoll（Linux 默认 auto → io_uring；macOS 只有 kqueue，不能设）。
+        # 根因见 docs/quirks.md：io_uring 的 io_cqring_wait 把等 timer/poll 的线程记成
+        # in_iowait，于是 /proc/stat 的 iowait、procs_blocked 与 PSI io.pressure 被整体
+        # 虚高（实测本机 io.pressure 常年 60%+，而设备 %util=0、该 cgroup io.stat 为空）。
+        # 后端只换事件循环实现，ghostty 官方文档称两者性能无统计差异。
+        async-backend = "epoll";
       };
     };
 
