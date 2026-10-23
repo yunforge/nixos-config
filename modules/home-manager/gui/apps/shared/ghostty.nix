@@ -53,6 +53,20 @@ in
         # 行间距：+2 像素
         adjust-cell-height = 2;
 
+        # Ghostty 用自己的 FreeType 加载标志，**不读 fontconfig 的 hinting 设置**
+        # （实测：系统侧 hintstyle=none 时终端字形仍被 hint）。默认值是
+        # `hinting,no-force-autohint,no-monochrome,autohint,light`，即 hinting 开、
+        # autohint 也开。
+        #
+        # 这与字体选型直接矛盾：fonts.packages 里的 Maple Mono 特意选了
+        # **-unhinted** 构建（见 modules/nixos/core/locale.nix 的注释），而 autohint
+        # 正是「对没有自带 hinting 的字体生效」的开关 —— 等于把那份刻意不 hinting
+        # 的轮廓重新对齐一遍。这里全部关掉，与桌面其余部分的灰度 + 不 hinting 对齐。
+        #
+        # 只影响 Linux：macOS 构建走 CoreText，ghostty 文档明确该键对 macOS 无效，
+        # 故不按平台分支（写了也无副作用）。
+        freetype-load-flags = "no-hinting,no-force-autohint,no-monochrome,no-autohint,no-light";
+
         # 背景保持不透明（1.0）：半透明与模糊都交给 niri 的 window-rule，见
         # wm/config/visual/frosted-glass.kdl 那条规则的注释（含对比度算据）。
         #

@@ -22,8 +22,10 @@
 # （与菜单/OSD 文字一致，它们本来就走 mpv 的 --osd-font 默认值 sans-serif）。
 # 实测 fc-match：`sans-serif` 与 `Noto Sans` 在本机落到**同一个文件**
 # HarmonyOS_Sans_SC_Regular.ttf，故这是「把运气改成显式」，视觉不变。
-# ⚠️ 别写成 `'HarmonyOS Sans SC'`：modules/nixos/core/locale.nix 的 localConf 对该
-# 家族名做了 `prepend binding="strong"` → 实际拿到 Noto Sans CJK SC，与本意相反。
+# ⚠️ 别写成 `'HarmonyOS Sans SC'`：该家族名在 locale.nix 的 localConf 里只追加了
+# Noto Sans CJK SC 作缺字兜底（append，不是 prepend），直接写家族名会跳过
+# defaultFonts.sansSerif 的首项排序，字号/字重变体也未必命中同一支；`sans-serif`
+# 才是确定命中 HarmonyOS Sans SC 的写法。
 #
 # 字体：uosc 被改造成用 ASS 字体 CupertinoIcons（名字写死在 scripts/uosc/lib/ass.lua，
 # 不是 mpv.conf 选项）—— 全部图标（播放/暂停、音量、菜单、buffering spinner、顶栏
