@@ -84,13 +84,14 @@ in
         cursor-style = "block";
         cursor-style-blink = true;
         cursor-opacity = 0.8;
-        # 自定义着色器（光标拖尾彩虹 + 粒子），文件在下方 xdg.configFile 里部署
+        # 自定义着色器（光标拖尾彩虹 + 粒子），文件在下方 xdg.configFile 里部署。
+        # 动画循环保持默认 true（只动画焦点终端）：always 会让每个 surface 空闲时
+        # 也按屏幕刷新率持续跑着色器（desktop 4K@150Hz 实测 3 窗口常驻 ~6% 单核 + GPU），
+        # 详见 docs/quirks.md。
         custom-shader = [
           "~/.config/ghostty/shader/cursor_smear_rainbow.glsl"
           "~/.config/ghostty/shader/party_sparks.glsl"
         ];
-        # 让着色器能跑动画循环（否则只在重绘时步进）
-        custom-shader-animation = "always";
 
         # === 下拉终端（quick terminal）===
         quick-terminal-position = "top";
