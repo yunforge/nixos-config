@@ -1,0 +1,24 @@
+From: meng.wang
+Subject: [PATCH] platforms/linux: 把 rime-wanxiang 的许可证补进 MSIME_NOTICE_SOURCES
+
+#9248 给 MSIME_NOTICE_NAMES 加了 rime-wanxiang-CC-BY-4.0.txt，却漏了给
+MSIME_NOTICE_SOURCES 加对应条目（文件本身在 resources/licenses/ 里）。
+两表长度差 1（17/18），装后检查的 foreach(... IN ZIP_LISTS ...) 从第 12
+对起整体错位一格：rime-wanxiang 及之后的许可证全部装到错位的名字下，最
+后一份 source（frontend-npm-NOTICES.txt）被配给 rust-crates-NOTICES.txt
+的名字，frontend-npm-NOTICES.txt 因此没有被创建，msime-fcitx5 的
+installCheckPhase 断言 `[[ -s .../frontend-npm-NOTICES.txt ]]` 失败。
+
+在 SOURCES 里按 NAMES 的顺序把缺失的 source 行补回，恢复两表对齐。
+移除条件：上游修复（或升级到已修复的 msime 版本）后删除本补丁。
+
+--- a/platforms/linux/CMakeLists.txt
++++ b/platforms/linux/CMakeLists.txt
+@@ -1267,6 +1267,7 @@
+   "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/licenses/Zinnia-LICENSE.txt"
+   "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/licenses/Administrative-divisions-of-China-WTFPL.txt"
+   "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/licenses/libhangul-hanja-BSD-3-Clause.txt"
++  "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/licenses/rime-wanxiang-CC-BY-4.0.txt"
+   "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/licenses/librime-octagram-BSD-3-Clause.txt"
+   "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/licenses/kfcd-chaizi-CC-BY-3.0.txt"
+   "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/licenses/Unicode-License-V3.txt"

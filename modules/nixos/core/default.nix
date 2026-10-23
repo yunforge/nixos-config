@@ -142,8 +142,18 @@ in
       inputs.nur.overlays.default
       (import ../../../overlays { inherit inputs; })
       # 水杉输入法的 Fcitx5 插件：插件加载进 fcitx5 进程，必须按本系统的
-      # nixpkgs 构建，才能与系统上的 Fcitx5 出自同一份（消费方见 ../desktop）
-      inputs.msime.overlays.default
+      # nixpkgs 构建，才能与系统上的 Fcitx5 出自同一份（消费方见 ../desktop）。
+      # fixNoticeLists 补上游 notice 两表错位（frontend-npm-NOTICES.txt 装不出
+      # 来 → installCheckPhase 失败），见 pkgs/msime-fcitx5 补丁头与 docs/quirks.md。
+      (final: prev: {
+        msime-fcitx5 =
+          (inputs.msime.overlays.default final prev).msime-fcitx5.overrideAttrs
+            (previousAttrs: {
+              patches = (previousAttrs.patches or [ ]) ++ [
+                ../../../pkgs/msime-fcitx5/notice-lists-alignment.patch
+              ];
+            });
+      })
     ];
 
     # nixos-upgrade.service 以 root 运行且 HOME=/root，读不到用户 ~/.gitconfig，
