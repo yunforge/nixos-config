@@ -98,6 +98,14 @@
 
   swapDevices = [ { device = "/dev/disk/by-uuid/3ab23e06-e327-4a55-80e3-1a85e0901274"; } ];
 
+  # 压缩内存层：换页先走 zram（zstd，内存内压缩，无盘 I/O；默认上限 memoryPercent=50
+  # ≈ 16 GB 未压缩等量，实际 RAM 占用约为其 1/3），上面的 NVMe 分区退为溢出兜底。
+  # priority 必须高于分区的 -1，否则换页仍直写盘。
+  zramSwap = {
+    enable = true;
+    priority = 100;
+  };
+
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
