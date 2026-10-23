@@ -284,7 +284,7 @@ winapps cleanrdp                    # 清理孤儿进程跟踪文件
 | --- | --- |
 | 剪贴板 | 文本双向直接可用；**文件**也支持（FreeRDP 剪贴板文件通道默认开）：Linux 文件管理器 `Ctrl+C` → Windows `Ctrl+V` |
 | `\\tsclient\home` | 整个宿主 `~` 映射进 Windows（`RDP_FLAGS` 里的 `+home-drive`） |
-| `\\tsclient\proj` | 额外共享盘（`RDP_FLAGS` 里的 `/drive:proj,/home/mengw/Projects`，可用 `mengw.gui.winapps.extraDrives` 增删） |
+| `\\tsclient\proj` | 额外共享盘（`RDP_FLAGS` 里的 `/drive:proj,/home/yunforge/Projects`，可用 `mengw.gui.winapps.extraDrives` 增删） |
 | 拖拽文件 | ❌ RDP 协议不支持（SPICE 侧也是实验性），别指望 |
 
 ### 8.2 高 DPI 与缩放
@@ -455,11 +455,11 @@ curl.exe -x http://192.168.122.1:7897 -sI https://www.google.com
 
 ```conf
 RDP_USER="mengw"
-RDP_ASKPASS="/home/mengw/.local/bin/winapps-askpass"
+RDP_ASKPASS="/home/yunforge/.local/bin/winapps-askpass"
 WAFLAVOR="libvirt"
 VM_NAME="RDPWindows"
 RDP_SCALE="140"
-RDP_FLAGS="/cert:tofu /sound /microphone +home-drive /drive:proj,/home/mengw/Projects"
+RDP_FLAGS="/cert:tofu /sound /microphone +home-drive /drive:proj,/home/yunforge/Projects"
 DEBUG="true"
 ```
 

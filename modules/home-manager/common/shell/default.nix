@@ -231,7 +231,7 @@ in
     programs.git = {
       enable = true;
       settings = {
-        user.name = "meng.wang";
+        user.name = "yunforge";
         user.email = "meng.w1016@outlook.com";
         init.defaultBranch = "main";
         core.editor = "nvim";

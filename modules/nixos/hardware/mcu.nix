@@ -1,5 +1,5 @@
 # 单片机烧录/调试器 USB 访问（udev 规则）
-# 直接授权到 users 组（mengw 主组）并设 MODE=0660，无需加入 dialout 组或以 sudo 运行。
+# 直接授权到 users 组（主用户所在组）并设 MODE=0660，无需加入 dialout 组或以 sudo 运行。
 # 曾用 uaccess 标签方案（logind 按活跃会话自动下发 ACL），实测不生效：节点保持 root:root 664、
 # 无 ACL 条目，st-info/openocd 用 libusb 直连 /dev/bus/usb 时写权限被拒（access error），
 # 故改为确定性 group/mode 授权（工具见 modules/home-manager/gui/apps/linux/embedded.nix）。

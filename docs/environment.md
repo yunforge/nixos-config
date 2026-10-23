@@ -105,5 +105,5 @@ distrobox-export --app <app>                 # 之前导出到宿主菜单的重
 ```
 
 注意隔离的是“默认写入位置”，不是权限边界：宿主 `$HOME` 仍以同一 UID 挂载在容器里
-（`/home/mengw`，进程可用 `$DISTROBOX_HOST_HOME` 拿到），`~/Projects` 照旧能访问。
+（`/home/yunforge`，进程可用 `$DISTROBOX_HOST_HOME` 拿到），`~/Projects` 照旧能访问。
 真要互不干扰，就别在容器里用 `--user` / `-g` 装东西。

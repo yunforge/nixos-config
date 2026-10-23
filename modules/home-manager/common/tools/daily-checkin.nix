@@ -50,7 +50,7 @@ in
       Service = {
         Type = "oneshot";
         # 不用 run.sh 的 shebang，显式指 bash：Exec* 是直接 execve，NixOS 无 /usr/bin
-        ExecStart = "${pkgs.bash}/bin/bash /home/mengw/Projects/checkin/run.sh";
+        ExecStart = "${pkgs.bash}/bin/bash ${config.home.homeDirectory}/Projects/checkin/run.sh";
         # 单站最多 5 分钟，两个站加上浏览器启停，10 分钟足够；超时即判失败
         TimeoutStartSec = "10m";
         StandardOutput = "journal";
