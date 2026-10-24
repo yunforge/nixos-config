@@ -16,7 +16,6 @@
   };
 
   imports = [
-    ../common
     ../dev
     ../platform/linux.nix
   ];

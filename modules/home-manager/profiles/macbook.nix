@@ -25,7 +25,6 @@
   };
 
   imports = [
-    ../common
     ../dev
     ../gui/apps/shared
     ../platform/darwin.nix

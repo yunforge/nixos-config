@@ -36,7 +36,6 @@ in
   };
 
   imports = [
-    ../common
     ../dev
     ../gui/apps/shared
     ../gui/apps/linux
