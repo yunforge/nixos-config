@@ -24,10 +24,8 @@ in
       XDG_SESSION_TYPE = "wayland";
       GDK_BACKEND = "wayland";
       QT_QPA_PLATFORM = "wayland";
-      # QT_QPA_PLATFORMTHEME_QT6 = "gnome";
-      # 注释：恢复 Qt 客户端自绘标题栏
-      # 原为 GNOME SSD 而设，Niri 的 SSD 极简会导致标题栏消失
-      # QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
+      # 两个 Qt 变量曾在 GNOME 时代启用、迁到 Niri 后注释（QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+      # 会让 Qt 自绘标题栏消失，勿在 Niri 下恢复），历史见 docs/themes.md 与本文件 git log。
       ELECTRON_OZONE_PLATFORM_HINT = "auto";
       _JAVA_AWT_WM_NONREPARENTING = "1";
       _JAVA_OPTIONS = "-Dawt.useSystemAAFontSettings=true -Dswing.aatext=true -Dsun.java2d.uiScale=${toString javaUiScale}";

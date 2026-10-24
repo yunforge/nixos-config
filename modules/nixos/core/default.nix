@@ -177,7 +177,6 @@ in
 
     # 系统级包
     environment.systemPackages = with pkgs; [
-      iwd
       wget
     ];
 

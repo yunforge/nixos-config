@@ -60,8 +60,7 @@ in
 
     # 注意：XDG_CURRENT_DESKTOP 由 niri-session 在会话启动时自动设置，不要在此处
     # 全局写死（本仓库只装 Niri 一个会话，但 XWayland 应用也读这个变量）。
-
-    # RDP 远程桌面端口
-    networking.firewall.allowedTCPPorts = [ 3389 ];
+    # 远程桌面：不预放行 3389——仓库不启用任何 RDP 服务端（gnome-remote-desktop
+    # 有意不开，WinApps 是出站连接），需要时随服务一并开。
   };
 }
