@@ -8,6 +8,7 @@
   lib,
   config,
   osConfig,
+  myLib,
   ...
 }:
 let
@@ -74,7 +75,7 @@ in
       # 实测被运行时覆盖的键见 docs/themes.md 的"Noctalia"一节。
       settings = {
         shell = {
-          font_family = lib.mkForce "HarmonyOS Sans SC";
+          font_family = lib.mkForce myLib.theme.fontSans;
         };
         theme = {
           mode = "dark";

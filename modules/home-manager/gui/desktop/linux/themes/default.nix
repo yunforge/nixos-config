@@ -3,6 +3,7 @@
   lib,
   config,
   pkgs,
+  myLib,
   ...
 }:
 let
@@ -36,7 +37,7 @@ in
       };
       cursorTheme = {
         package = pkgs.bibata-cursors;
-        name = "Bibata-Modern-Classic";
+        name = myLib.theme.cursor;
         # 24：Bibata 的箭头比 macOS 原版更撑满画布。切回 1.5 倍缩放前的取值
         # （2 倍缩放下曾降到 20）。改这一个数不够 —— 光标的尺寸是**多处各写一份**
         # （niri 的 cursor.kdl、GTK 的 variants.nix、XWayland 的 env.nix、GDM 的 gdm.nix），
@@ -44,7 +45,7 @@ in
         size = 24;
       };
       font = {
-        name = "HarmonyOS Sans SC";
+        name = myLib.theme.fontSans;
         size = 12;
       };
 
@@ -75,8 +76,8 @@ in
     # gtk.cursorTheme 只写 gsettings、不落地主题文件到该路径，
     # 导致 libXcursor（xwayland-satellite）加载不到 Bibata、回退默认光标。
     # 这里将主题目录软链到搜索路径上（recursive=false 即目录软链）。
-    xdg.dataFile."icons/Bibata-Modern-Classic" = {
-      source = "${pkgs.bibata-cursors}/share/icons/Bibata-Modern-Classic";
+    xdg.dataFile."icons/${myLib.theme.cursor}" = {
+      source = "${pkgs.bibata-cursors}/share/icons/${myLib.theme.cursor}";
       recursive = false;
     };
 
@@ -88,7 +89,7 @@ in
     # （那条路径只认 XSETTINGS / Xcursor.theme / default 三档）。
     # 整目录软链成 default 即可闭合这条链；根因与实测见 docs/quirks.md。
     xdg.dataFile."icons/default" = {
-      source = "${pkgs.bibata-cursors}/share/icons/Bibata-Modern-Classic";
+      source = "${pkgs.bibata-cursors}/share/icons/${myLib.theme.cursor}";
       recursive = false;
     };
 

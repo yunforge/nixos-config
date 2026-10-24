@@ -19,6 +19,7 @@
   lib,
   config,
   pkgs,
+  myLib,
   ...
 }:
 let
@@ -71,10 +72,10 @@ let
       [Settings]
       ${
         lib.optionalString (mode == "dark") "gtk-application-prefer-dark-theme=true\n"
-      }gtk-cursor-theme-name=Bibata-Modern-Classic
+      }gtk-cursor-theme-name=${myLib.theme.cursor}
       gtk-cursor-theme-size=24
       gtk-decoration-layout=${buttonLayout}
-      gtk-font-name=HarmonyOS Sans SC 12
+      gtk-font-name=${myLib.theme.fontSans} 12
       gtk-icon-theme-name=${m.icons}
       ${lib.optionalString (version == 4) "gtk-interface-color-scheme=${mode}\n"}gtk-theme-name=${m.gtk}
     '';

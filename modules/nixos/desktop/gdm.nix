@@ -7,6 +7,7 @@
   lib,
   config,
   pkgs,
+  myLib,
   ...
 }:
 let
@@ -26,9 +27,9 @@ let
   greeterDatabases = [
     {
       settings."org/gnome/desktop/interface" = {
-        font-name = "HarmonyOS Sans SC 12";
+        font-name = "${myLib.theme.fontSans} 12";
         icon-theme = "MacTahoe-dark";
-        cursor-theme = "Bibata-Modern-Classic";
+        cursor-theme = myLib.theme.cursor;
         cursor-size = lib.gvariant.mkInt32 24;
       };
     }

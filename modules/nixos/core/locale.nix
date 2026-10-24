@@ -1,5 +1,10 @@
 # NixOS 本地化配置
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  myLib,
+  ...
+}:
 {
   # 时区
   time.timeZone = "Asia/Shanghai";
@@ -63,7 +68,7 @@
   # Noto，而不是楷体风格的文楷；常见中文家族名的逐名兜底见下方 localConf。
   fonts.fontconfig.defaultFonts = {
     sansSerif = [
-      "HarmonyOS Sans SC"
+      myLib.theme.fontSans
       "Noto Sans CJK SC"
     ];
     # 宋体对位 macOS 的 Songti SC；Noto Serif CJK 的拉丁字形本就是
@@ -89,7 +94,7 @@
            但无谚文，缺字时由 Noto 接住） -->
       <match target="pattern">
         <test qual="any" name="family">
-          <string>HarmonyOS Sans SC</string>
+          <string>${myLib.theme.fontSans}</string>
         </test>
         <edit name="family" mode="append" binding="weak">
           <string>Noto Sans CJK SC</string>

@@ -72,6 +72,16 @@ in
 {
   inherit wrapQtXWayland;
 
+  # 外观主题的家族名常量：同一批字体/光标主题被系统层（fontconfig 回退链、
+  # GDM greeter、XWayland 的 XCURSOR_*）与用户层（GTK settings.ini、Qt、
+  # niri、Noctalia）按名解析，名字改这里一处即全局同步。
+  # 注意：niri 的 cursor.kdl 是 git 内静态文件（mkOutOfStoreSymlink 直连工作树），
+  # 无法吃 Nix 插值，改名时它需要手动同步。
+  theme = {
+    cursor = "Bibata-Modern-Classic";
+    fontSans = "HarmonyOS Sans SC";
+  };
+
   # 为所有支持的平台生成属性集
   # 用法: forAllSystems (system: pkgs: ...)
   forAllSystems = lib.genAttrs [

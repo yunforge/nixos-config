@@ -1,5 +1,10 @@
 # Wayland/GNOME 通用环境变量
-{ lib, config, ... }:
+{
+  lib,
+  config,
+  myLib,
+  ...
+}:
 let
   cfg = config.mySystem.desktop;
   # AWT 的 sun.java2d.uiScale 只接受整数，分数值（如 1.5）会被静默忽略，
@@ -30,7 +35,7 @@ in
       # XWayland 应用（Steam 及其游戏）光标主题/大小：
       # Niri 自身从 config.kdl 读取光标配置，但 XWayland 走 XCURSOR_* 环境变量；
       # 缺失时 libXcursor 回退默认光标（Steam 里出现小且方向异常的箭头）。
-      XCURSOR_THEME = "Bibata-Modern-Classic";
+      XCURSOR_THEME = myLib.theme.cursor;
       XCURSOR_SIZE = toString xcursorSize;
     };
   };
