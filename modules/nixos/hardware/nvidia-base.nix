@@ -31,8 +31,9 @@ in
     (lib.mkIf (cfg.enable && cfg.nvidia.enable) {
       services.xserver.videoDrivers = [ "nvidia" ];
 
+      # nvidia-drm.modeset=1 不手写：下方 modesetting.enable = true 会让
+      # nixpkgs 的 NVIDIA 模块注入同一参数
       boot.kernelParams = [
-        "nvidia-drm.modeset=1"
         "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
         "nvidia.NVreg_TemporaryFilePath=/var/tmp"
         "nvidia.NVreg_UseKernelSuspendNotifiers=1"
@@ -65,8 +66,9 @@ in
           powerManagement.enable = true;
           modesetting.enable = true;
         };
+        # graphics.enable 不在此声明：hardware 域聚合（../default.nix）已随
+        # mySystem.hardware.enable 给出 mkDefault true（上方 assertion 保证其开启）
         graphics = {
-          enable = true;
           enable32Bit = true;
           extraPackages = with pkgs; [
             nvidia-vaapi-driver

@@ -1,9 +1,9 @@
 # NVIDIA 驱动 — RTX 3060Ti
+# 公共基础在 modules/nixos/hardware/nvidia-base.nix（经 hardware 域聚合进入
+# 所有主机），本文件只写这台主机的差异。
 { config, ... }:
 
 {
-  imports = [ ../../modules/nixos/hardware/nvidia-base.nix ];
-
   # 不覆盖自定义 EDID 固件（drm.edid_firmware）：固件 EDID 会在显示器断电、
   # 真实 EDID 读取失败时顶上，连接器始终显示 connected，驱动从不登记断开 →
   # 上电后不自动重训练 DP 链路 → 黑屏。不覆盖即可恢复正常的断开/重连流程，
@@ -24,16 +24,13 @@
     "consoleblank=0"
   ];
 
-  # 桌面平台专属: G-Sync / VRR
+  # 桌面平台专属: G-Sync（VRR 的 __GL_VRR_ALLOWED=1 由 nvidia-base 统一设置）
   environment.variables = {
     __GL_GSYNC_ALLOWED = "1";
-    __GL_VRR_ALLOWED = "1";
   };
 
   hardware.nvidia = {
-    # 当前架构可用的最新版本 - 稳定分支
+    # 当前架构可用的最新版本 - 稳定分支（电源管理 base 已开）
     package = config.boot.kernelPackages.nvidiaPackages.stable;
-    # 桌面显卡电源管理
-    powerManagement.enable = true;
   };
 }
