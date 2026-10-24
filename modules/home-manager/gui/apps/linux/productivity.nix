@@ -15,6 +15,28 @@ let
   # 自己对上（`grep '^Path=' ~/.thunderbird/profiles.ini`）。
   tbProfile = ".thunderbird/${cfg.thunderbirdProfileDir}";
   lbChrome = "${pkgs.liquidbird}/share/liquidbird/chrome";
+
+  # Obsidian 关闭内置更新器：它会把新版 asar 下到 ~/.config/obsidian/ 并优先
+  # 加载，绕过 nixpkgs 的打包改动（上游 asar 没有 nixpkgs 修 PDF 阅读器的
+  # corsEnabled 补丁）；2026-10-24 该外来 bundle 与用户目录里累积的 V8 code
+  # cache 混用，渲染进程 `webFrame is not a function` 直接黑屏（删 Code Cache
+  # 即恢复，已 A/B 复现）。三处改动：`disable` 初值与赋值都给真值（设置项
+  # 也翻不回来），再关掉启动时「优先加载已下载 asar」的分支。升级改走 nixpkgs。
+  # 根因与移除条件见 docs/quirks.md。
+  obsidianNoUpdater = pkgs.obsidian.overrideAttrs (
+    finalAttrs: previousAttrs: {
+      postInstall = (previousAttrs.postInstall or "") + ''
+        rm -rf obsidian-app
+        asar extract $out/share/obsidian/app.asar obsidian-app
+        substituteInPlace obsidian-app/main.js \
+          --replace-fail "let disable = false;" "let disable = true;" \
+          --replace-fail "disable = arg;" "disable = true;" \
+          --replace-fail "if (version && (isV2MoreRecent(appVersion, version) || appVersion === version)) {" "if (false) {"
+        rm -f $out/share/obsidian/app.asar
+        asar pack obsidian-app $out/share/obsidian/app.asar
+      '';
+    }
+  );
 in
 {
   options.myHome.gui.apps.productivity.enable = lib.mkOption {
@@ -39,7 +61,7 @@ in
       anki
       xmind
       siyuan # 笔记软件
-      obsidian # 笔记软件
+      obsidianNoUpdater # 笔记软件（pkgs.obsidian 关掉内置更新器，见上方 let 块）
       typora # markdown 编辑器
       thunderbird # 邮件管理
       wpsoffice-cn # 微软办公套件（中文）
