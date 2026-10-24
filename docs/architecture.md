@@ -17,6 +17,7 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
 │  │  ├─ networking/        # 代理（本机 / 客户机转发）
 │  │  ├─ virtualization/    # QEMU/KVM 虚拟化
 │  │  └─ profiles/          # 角色配置（workstation / server / wsl）
+│  ├─ shared/               # NixOS / nix-darwin 共享的 nix 设置与 overlay 注入（单一真源）
 │  ├─ darwin/               # macOS 系统层：base / users / gui（Homebrew casks + 系统设置）
 │  └─ home-manager/         # 用户层（跨平台共享）
 │     ├─ common/            # 公共用户环境：shell / editors / tools（所有主机）
@@ -55,8 +56,11 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
 
 - **core**：真正通用的系统基础——引导、Nix 设置、用户、SSH、locale 与字体、GC、
   自动升级、FHS 兼容（nix-ld）。所有 NixOS 主机（含服务器）共享，不含桌面/硬件能力。
-  core **只**定义三个顶层域开关（`mySystem.hardware/desktop/virtualization.enable`）
-  与 `mySystem.primaryUser`，其余选项都在各自功能模块里。
+  core **只**定义三个顶层域开关（`mySystem.hardware/desktop/virtualization.enable`）、
+  `mySystem.primaryUser` 与 `mySystem.configDir`（本机 flake 仓库路径），
+  其余选项都在各自功能模块里。
+  Nix 设置（experimental-features / 镜像源 / 公钥 / allowUnfree）与 overlay 注入
+  在 `modules/shared/nix.nix`，NixOS core 与 darwin base 共享同一份。
 - **能力域**（hardware / desktop / networking / virtualization）：由各自
   `default.nix` 用 `mkDefault` 给出域内默认开关，主机只写例外（关单项用 `lib.mkForce`）。
 - **角色**（`modules/nixos/profiles/`）：决定某类设备启用哪些系统能力，
@@ -158,8 +162,8 @@ virtualization / proxy）由角色与 `desktop.enable` 的聚合默认值给出�
 
 `overlays/default.nix` 是 `pkgs/` 自维护包的单一注入点，三处消费同一份清单：
 
-- NixOS 系统级：`modules/nixos/core` 的 `nixpkgs.overlays`
-- macOS 系统级：`modules/darwin/base` 的 `nixpkgs.overlays`
+- NixOS 系统级：`modules/shared/nix.nix`（经 core 与 darwin base 共同导入）
+- macOS 系统级：同上（同一份单一真源，不再两边各注一份）
 - flake 输出：`overlays.default` 与 `packages.*`（`nix flake check` 会逐一评估，
   nixpkgs 滚动带来的包级回归在 CI 即暴露）
 

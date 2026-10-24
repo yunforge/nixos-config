@@ -8,11 +8,9 @@
   ...
 }:
 let
-  # 主用户名（选项定义在 users.nix）：configDir、trusted-users、autoUpgrade
-  # 提交身份等均由此派生，避免用户名散落硬编码
+  # 主用户名（选项定义在 users.nix）：trusted-users、autoUpgrade 提交身份等
+  # 均由此派生，避免用户名散落硬编码
   primaryUser = config.mySystem.primaryUser;
-  # 本机 flake 仓库路径（所有 NixOS 主机统一放在用户 Projects 目录下）
-  configDir = "${config.users.users.${primaryUser}.home}/Projects/nixos-config";
 in
 {
   # mySystem 选项命名空间 — 各主机通过设置这些选项来声明启用的功能
@@ -20,11 +18,21 @@ in
     hardware.enable = lib.mkEnableOption "硬件支持（蓝牙、音频、网络）";
     desktop.enable = lib.mkEnableOption "桌面环境（GDM、Niri、GNOME）";
     virtualization.enable = lib.mkEnableOption "QEMU/KVM 虚拟化";
+    # 本机 flake 仓库路径（autoUpgrade / git safe.directory 用）。默认假设仓库
+    # 在主用户 Projects 目录下（所有主机的既有布局）；机器布局不同时覆盖此项，
+    # 不必改共享模块。
+    configDir = lib.mkOption {
+      type = lib.types.str;
+      default = "${config.users.users.${primaryUser}.home}/Projects/nixos-config";
+      description = "本机 flake 仓库路径（autoUpgrade 与 nixos-upgrade 提交 flake.lock 的目标）";
+    };
   };
 
   imports = [
     ./users.nix
     ./locale.nix
+    # Nix 设置 / 镜像源 / overlay 注入的平台无关部分（与 darwin 共享）
+    ../../shared/nix.nix
     ../hardware
     ../desktop
     ../virtualization
@@ -54,7 +62,7 @@ in
     system.autoUpgrade = {
       enable = true;
       allowReboot = false;
-      flake = "${configDir}#${config.networking.hostName}";
+      flake = "${config.mySystem.configDir}#${config.networking.hostName}";
       # 显式钉死 --refresh：nixpkgs 默认 flags 已含此项，此处重复声明仅为
       # 防止上游变更默认值后退化为只构建 flake.lock 锁定的旧 nixpkgs
       flags = [ "--refresh" ];
@@ -67,7 +75,7 @@ in
     # 复用用户身份提交（与上面 safe.directory 同一根源）。
     systemd.services.nixos-upgrade.postStop = ''
       [ "$SERVICE_RESULT" = "success" ] || exit 0
-      repo="${configDir}"
+      repo="${config.mySystem.configDir}"
       ${pkgs.git}/bin/git -C "$repo" diff --quiet -- flake.lock && exit 0
       ${pkgs.util-linux}/bin/runuser -u ${primaryUser} -- \
         ${pkgs.git}/bin/git -C "$repo" commit -m "chore(autoUpgrade): 刷新 flake.lock" -- flake.lock
@@ -80,33 +88,18 @@ in
       options = "--delete-older-than 7d";
     };
 
-    # Nix 配置
+    # experimental-features / 镜像源 / 公钥 / allowUnfree / overlay 注入：
+    # 平台无关部分在共享模块 ../../shared/nix.nix（darwin 同源），此处只留
+    # NixOS 专属增量（trusted-users、GC）。nixpkgs 的 config/nix.nix 会 mkAfter
+    # 追加官方源并无条件提供 root 用户，故共享模块不写 cache.nixos.org。
     nix.settings = {
-      experimental-features = [
-        "flakes"
-        "nix-command"
-      ];
       connect-timeout = 5;
       # 充分利用多核 CPU 加速构建
       max-jobs = "auto";
       cores = 0;
-      # 自动存储优化
-      auto-optimise-store = true;
       # 保留 derivations 和 outputs 的依赖关系，避免重复构建
       keep-outputs = true;
       keep-derivations = true;
-      # 镜像在前（国内加速）。nixpkgs 的 config/nix.nix 会 mkAfter 追加官方源
-      # https://cache.nixos.org/、并无条件提供 root 用户与 cache.nixos.org 公钥，
-      # 故此处只声明增量，避免合并后出现重复项；与 darwin 侧
-      # （modules/darwin/base.nix）的镜像顺序保持一致
-      substituters = [
-        "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
-        "https://mirrors.ustc.edu.cn/nix-channels/store"
-        "https://nix-community.cachix.org"
-      ];
-      trusted-public-keys = [
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkj5bg+wLbWLCTCfOj2Wc="
-      ];
       # root 由 nixpkgs 提供，此处只加主用户
       trusted-users = [ primaryUser ];
     };
@@ -134,17 +127,13 @@ in
       "firefox-esr-140-bin-unwrapped-140.17.0esr"
     ];
 
-    # NUR overlay（系统级字体 harmonyos-sans 等依赖）+ 自定义包 overlay
-    # （主题 / mcpp / windows-vm-media，清单见 overlays/default.nix）。
-    # useGlobalPkgs = true 后 Home Manager 直接复用这份系统级实例，
-    # overlay 只需在此注入一次，HM 侧不再重复维护。
+    # NUR overlay 与自定义包 overlay 由共享模块 ../../shared/nix.nix 统一注入
+    # （与 darwin 同源）。此处只加水杉输入法的 Fcitx5 插件：插件加载进 fcitx5
+    # 进程，必须按本系统的 nixpkgs 构建，才能与系统上的 Fcitx5 出自同一份
+    # （消费方见 ../desktop）。fixNoticeLists 补上游 notice 两表错位
+    # （frontend-npm-NOTICES.txt 装不出来 → installCheckPhase 失败），
+    # 见 pkgs/msime-fcitx5 补丁头与 docs/quirks.md。
     nixpkgs.overlays = [
-      inputs.nur.overlays.default
-      (import ../../../overlays { inherit inputs; })
-      # 水杉输入法的 Fcitx5 插件：插件加载进 fcitx5 进程，必须按本系统的
-      # nixpkgs 构建，才能与系统上的 Fcitx5 出自同一份（消费方见 ../desktop）。
-      # fixNoticeLists 补上游 notice 两表错位（frontend-npm-NOTICES.txt 装不出
-      # 来 → installCheckPhase 失败），见 pkgs/msime-fcitx5 补丁头与 docs/quirks.md。
       (final: prev: {
         msime-fcitx5 =
           (inputs.msime.overlays.default final prev).msime-fcitx5.overrideAttrs
@@ -162,7 +151,7 @@ in
     # programs.git.enable 默认为 false：不开启则 /etc/gitconfig 根本不会生成。
     programs.git.enable = true;
     programs.git.config.safe.directory = [
-      configDir
+      config.mySystem.configDir
     ];
 
     # SSH（所有 NixOS 主机的基础：服务器也要远程管理）

@@ -8,29 +8,10 @@
 }:
 
 {
-  # Nix 配置
-  nix.settings = {
-    # 启用 Flakes 特性以及配套的新 nix 命令行工具
-    experimental-features = [
-      "nix-command"
-      "flakes"
-    ];
-    # 自动存储优化，定期优化存储以节省空间
-    auto-optimise-store = true;
-    substituters = [
-      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
-      "https://mirrors.ustc.edu.cn/nix-channels/store"
-      "https://nix-community.cachix.org"
-      "https://cache.nixos.org"
-    ];
-    trusted-public-keys = [
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkj5bg+wLbWLCTCfOj2Wc="
-      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-    ];
-  };
-
-  # 允许非自由软件
-  nixpkgs.config.allowUnfree = true;
+  imports = [
+    # Nix 设置 / 镜像源 / overlay 注入的平台无关部分（与 NixOS core 共享单一真源）
+    ../shared/nix.nix
+  ];
 
   # valgrind 在 darwin 上被标记为 broken（见 nixpkgs pkgs/by-name/va/valgrind），
   # 但 cpp.nix 开发环境无条件引入它，放行以允许 darwin 求值
@@ -38,13 +19,6 @@
 
   # 放行 Linux-only 包的评估（flakehub-push 会评估所有平台，但 darwin 不需要这些包）
   nixpkgs.config.allowUnsupportedSystem = true;
-
-  # NUR overlay + 自定义包 overlay（主题 / mcpp 等，清单见 overlays/default.nix）。
-  # home-manager useGlobalPkgs=true 复用这份系统级实例，HM 侧无需重复注入。
-  nixpkgs.overlays = [
-    inputs.nur.overlays.default
-    (import ../../overlays { inherit inputs; })
-  ];
 
   # 系统级包
   environment.systemPackages = with pkgs; [
