@@ -11,7 +11,9 @@
 # 代际无法回溯 commit（见 AGENTS.md「滚动升级的可追溯性」）。
 result
 
-# ~/.config/niri 是指向本仓库 gui/wm/config 的 mkOutOfStoreSymlink，
+# ~/.config/niri 是指向本仓库 niri/config 的 mkOutOfStoreSymlink，
 # noctalia 的 niri 模板会在运行时往这里写 noctalia.kdl（窗口装饰颜色）。
 # 它是运行时产物、不属于仓库状态，忽略掉以免 git 树变脏。
-modules/home-manager/gui/wm/config/noctalia.kdl
+# ⚠️ 文件一旦被 git 追踪，gitignore 就失效：不要把它提交进仓库
+# （07f63ed 曾误提交过，2026-10 已 git rm --cached 移除索引）。
+modules/home-manager/gui/desktop/linux/niri/config/noctalia.kdl
