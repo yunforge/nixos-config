@@ -41,6 +41,12 @@ jobs:
       - name: "刷新 nixpkgs 到 master HEAD（仅滚动通道）"
         if: github.event_name != 'push' && github.event_name != 'pull_request'
         run: nix flake update nixpkgs
+      # 格式检查：跑一遍 nix fmt（formatter = nixfmt-tree）再看工作树是否被改动，
+      # 有 diff 即说明存在未格式化的文件。放在 flake check 前快速失败。
+      - name: "格式检查（nix fmt，产生 diff 即失败）"
+        run: |
+          nix fmt
+          git diff --exit-code
       - name: "nix flake check"
         run: nix flake check --no-write-lock-file
 
