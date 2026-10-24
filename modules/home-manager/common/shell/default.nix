@@ -5,10 +5,22 @@
   lib,
   config,
   pkgs,
+  osConfig,
   ...
 }:
 let
   cliCfg = config.myHome.cli;
+
+  # git user.name 从宿主的 primaryUser 派生（用户名单点声明约定，见
+  # docs/architecture.md「选项约定」）：NixOS 取 mySystem.primaryUser，
+  # darwin 取 system.primaryUser。HM 只会在这两种宿主里求值。
+  gitUserName =
+    if osConfig ? mySystem && osConfig.mySystem ? primaryUser then
+      osConfig.mySystem.primaryUser
+    else if osConfig ? system && osConfig.system ? primaryUser then
+      osConfig.system.primaryUser
+    else
+      throw "common/shell: osConfig 未声明 primaryUser，无法派生 git user.name";
 in
 {
   imports = [
@@ -231,7 +243,7 @@ in
     programs.git = {
       enable = true;
       settings = {
-        user.name = "yunforge";
+        user.name = gitUserName;
         user.email = "meng.w1016@outlook.com";
         init.defaultBranch = "main";
         core.editor = "nvim";
