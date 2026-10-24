@@ -4,15 +4,12 @@
 let
   cfg = config.mySystem.proxy;
   proxyUrl = "http://127.0.0.1:${toString cfg.port}";
-  noProxyList = lib.concatStringsSep "," (
-    [
-      "localhost"
-      "127.0.0.1"
-      "local.domain"
-      "192.168.0.0/16"
-    ]
-    ++ cfg.extraNoProxy
-  );
+  noProxyList = lib.concatStringsSep "," [
+    "localhost"
+    "127.0.0.1"
+    "local.domain"
+    "192.168.0.0/16"
+  ];
   proxyEnv = {
     http_proxy = proxyUrl;
     https_proxy = proxyUrl;
@@ -27,11 +24,6 @@ in
       type = lib.types.int;
       default = 7897;
       description = "代理端口（本机 Clash Verge 默认 7897）";
-    };
-    extraNoProxy = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      description = "额外的 no_proxy 域名/IP";
     };
   };
 

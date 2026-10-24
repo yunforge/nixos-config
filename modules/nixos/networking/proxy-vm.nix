@@ -81,11 +81,11 @@ in
         # 网段由 libvirt 网络定义决定，改了定义这里应跟着走
         addr=$(ip -4 -o addr show dev "$bridge" 2>/dev/null | awk '{ split($4, a, "/"); print a[1]; exit }')
         if [ -z "$addr" ]; then
-          echo "[DEBUG] $(date '+%F %T') libvirt-proxy-forward: 网桥 $bridge 无 IPv4 地址（libvirt 默认网络未就绪），${toString retrySec}s 后重试" >&2
+          echo "$(date '+%F %T') libvirt-proxy-forward: 网桥 $bridge 无 IPv4 地址（libvirt 默认网络未就绪），${toString retrySec}s 后重试" >&2
           exit 1
         fi
 
-        echo "[DEBUG] $(date '+%F %T') libvirt-proxy-forward: $bridge $addr:$port -> $target:$port（监听仅限本网桥）"
+        echo "$(date '+%F %T') libvirt-proxy-forward: $bridge $addr:$port -> $target:$port（监听仅限本网桥）"
         # fork：每个客户机连接一个子进程；TCP 直通，HTTP CONNECT 等语义由客户机与代理自行协商
         exec ${pkgs.socat}/bin/socat "TCP-LISTEN:$port,bind=$addr,fork,reuseaddr" "TCP:$target:$port"
       '';
