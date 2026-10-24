@@ -11,7 +11,7 @@
 #   profiles/ 角色配置：决定某类设备需要哪些能力
 #             （workstation / server / wsl / macbook，由各主机经 flake.nix 导入）
 #
-# 本文件只做两件事：定义公共选项（mengw.cli / mengw.gui / 主题切换登记表），
+# 本文件只做两件事：定义公共选项（myHome.cli / myHome.gui / 主题切换登记表），
 # 以及导入所有主机共享的 common 层。dev 与 gui 层由各角色 profile 组合，
 # 不在这里无条件导入——服务器/WSL 不应被动继承工作站能力。
 {
@@ -20,31 +20,31 @@
   ...
 }:
 {
-  options.mengw.cli.enable = lib.mkOption {
+  options.myHome.cli.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 CLI/TUI 用户环境（shell、编辑器、CLI 工具）";
   };
 
-  options.mengw.dev.enable = lib.mkOption {
+  options.myHome.dev.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用语言工具链（Go / Node / Rust / Python / C++ 等）";
   };
 
-  options.mengw.gui.enable = lib.mkOption {
+  options.myHome.gui.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 GUI 用户配置（跨平台 GUI 应用与平台专属应用）";
   };
 
-  options.mengw.desktop.enable = lib.mkOption {
+  options.myHome.desktop.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Linux 桌面会话（Niri / Noctalia / 主题 / 输入法）";
   };
 
-  options.mengw.appearance.switchTargets = lib.mkOption {
+  options.myHome.appearance.switchTargets = lib.mkOption {
     type = lib.types.listOf (
       lib.types.submodule {
         options = {

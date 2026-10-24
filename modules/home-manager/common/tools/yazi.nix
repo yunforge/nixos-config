@@ -7,11 +7,11 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.tools.yazi;
-  cliCfg = config.mengw.cli;
+  cfg = config.myHome.cli.tools.yazi;
+  cliCfg = config.myHome.cli;
 in
 {
-  options.mengw.cli.tools.yazi.enable = lib.mkOption {
+  options.myHome.cli.tools.yazi.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Yazi 终端文件管理器";

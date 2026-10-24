@@ -5,11 +5,11 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.dev.go;
-  devCfg = config.mengw.dev;
+  cfg = config.myHome.cli.dev.go;
+  devCfg = config.myHome.dev;
 in
 {
-  options.mengw.cli.dev.go.enable = lib.mkOption {
+  options.myHome.cli.dev.go.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Go 开发环境";

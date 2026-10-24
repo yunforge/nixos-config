@@ -1,5 +1,5 @@
 # CLI 工具配置
-# 门控：目录导入即生效（mengw.cli.enable 控制整个 CLI 层），无中间层开关；
+# 门控：目录导入即生效（myHome.cli.enable 控制整个 CLI 层），无中间层开关；
 # 单独关闭某个叶子（如 tmux）用该叶子自己的 enable 选项。
 {
   lib,
@@ -8,7 +8,7 @@
   ...
 }:
 let
-  cliCfg = config.mengw.cli;
+  cliCfg = config.myHome.cli;
 in
 {
   imports = [
@@ -120,7 +120,7 @@ in
       # 会判成外来文件而整份激活失败）。主题文件交给 Noctalia。
     };
 
-    mengw.appearance.switchTargets = [
+    myHome.appearance.switchTargets = [
       {
         live = ".config/fastfetch/config.jsonc";
         dark = ".config/theme-variants/fastfetch/dark.jsonc";

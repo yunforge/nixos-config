@@ -15,7 +15,7 @@
   ...
 }:
 let
-  inherit (config.mengw)
+  inherit (config.myHome)
     cli
     dev
     gui
@@ -26,13 +26,13 @@ in
   # 工作站默认全开：CLI/TUI、完整语言工具链、GUI 应用与 Linux 桌面会话。
   # 主机可用 mkForce 关单项（如某台暂时不装桌面）。
   config = {
-    mengw.cli.enable = lib.mkDefault true;
-    mengw.dev.enable = lib.mkDefault true;
-    mengw.gui.enable = lib.mkDefault true;
-    mengw.desktop.enable = lib.mkDefault true;
+    myHome.cli.enable = lib.mkDefault true;
+    myHome.dev.enable = lib.mkDefault true;
+    myHome.gui.enable = lib.mkDefault true;
+    myHome.desktop.enable = lib.mkDefault true;
     # 每日 AI 签到：systemd user timer 每天 09:07 跑 ~/checkin/run.sh。
     # 数据目录 ~/checkin 由脚本侧管理，这里只管定时拉起。
-    mengw.cli.tools.daily-checkin.enable = lib.mkDefault true;
+    myHome.cli.tools.daily-checkin.enable = lib.mkDefault true;
   };
 
   imports = [

@@ -6,11 +6,11 @@
   ...
 }:
 let
-  cfg = config.mengw.darwin.gui;
-  darwinCfg = config.mengw.darwin;
+  cfg = config.mySystem.darwin.gui;
+  darwinCfg = config.mySystem.darwin;
 in
 {
-  options.mengw.darwin.gui.enable = lib.mkOption {
+  options.mySystem.darwin.gui.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 macOS GUI 配置（系统默认值 + Homebrew 应用）";

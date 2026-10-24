@@ -5,11 +5,11 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.dev.rust;
-  devCfg = config.mengw.dev;
+  cfg = config.myHome.cli.dev.rust;
+  devCfg = config.myHome.dev;
 in
 {
-  options.mengw.cli.dev.rust.enable = lib.mkOption {
+  options.myHome.cli.dev.rust.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Rust 开发环境";

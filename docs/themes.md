@@ -33,7 +33,7 @@
 | btop | Noctalia builtin `btop` 模板写 `themes/noctalia.theme` | 下次启动生效 |
 | yazi | Noctalia community `yazi` 模板写 `flavors/noctalia.yazi/*` | — |
 | eza / fish | 本仓库用户模板（见下节） | fish 新开 shell 生效 |
-| fastfetch（config + logo） | 登记进 `mengw.appearance.switchTargets`，翻软链 | 下次启动生效 |
+| fastfetch（config + logo） | 登记进 `myHome.appearance.switchTargets`，翻软链 | 下次启动生效 |
 | nvim | 翻一份 `mode.lua`，`theme.lua` 据此设 `vim.o.background`，catppuccin `flavour="auto"` | 要重进（或 `:colorscheme catppuccin`） |
 | tmux | 颜色全用 ANSI 名称，配色由终端提供 | 随终端自动跟 |
 

@@ -7,8 +7,8 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.utilities;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.utilities;
+  guiCfg = config.myHome.gui;
 
   eudic-fixed = myLib.wrapQtXWayland {
     inherit pkgs;
@@ -24,7 +24,7 @@ let
   };
 in
 {
-  options.mengw.gui.apps.utilities.enable = lib.mkOption {
+  options.myHome.gui.apps.utilities.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用系统工具和实用程序";

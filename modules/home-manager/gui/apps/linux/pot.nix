@@ -6,8 +6,8 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.pot;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.pot;
+  guiCfg = config.myHome.gui;
 
   pot-icon = pkgs.fetchurl {
     url = "https://raw.githubusercontent.com/pot-app/pot-desktop/master/public/icon.svg";
@@ -113,7 +113,7 @@ let
   '';
 in
 {
-  options.mengw.gui.apps.pot.enable = lib.mkOption {
+  options.myHome.gui.apps.pot.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Pot 划词翻译";

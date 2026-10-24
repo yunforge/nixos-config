@@ -6,8 +6,8 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.productivity;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.productivity;
+  guiCfg = config.myHome.gui;
 
   # Thunderbird 的 profile 目录：前缀是 TB 首次启动时自己生成的随机串，除了
   # ~/.thunderbird/profiles.ini 的 Path= 之外没有稳定来源（HM 读不到那个文件，
@@ -17,13 +17,13 @@ let
   lbChrome = "${pkgs.liquidbird}/share/liquidbird/chrome";
 in
 {
-  options.mengw.gui.apps.productivity.enable = lib.mkOption {
+  options.myHome.gui.apps.productivity.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用生产力应用（笔记、文献管理等）";
   };
 
-  options.mengw.gui.apps.productivity.thunderbirdProfileDir = lib.mkOption {
+  options.myHome.gui.apps.productivity.thunderbirdProfileDir = lib.mkOption {
     type = lib.types.str;
     default = "g0uk404f.default";
     description = ''

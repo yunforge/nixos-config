@@ -64,7 +64,7 @@
 开关与参数（定义在 `modules/home-manager/common/tools/tmux.nix`，默认开启）：
 
 ```nix
-mengw.cli.tools.tmux.persistence = {
+myHome.cli.tools.tmux.persistence = {
   enable = true;                 # 总开关
   autoRestore = true;            # 手工启动 server 时也让 continuum 尽力恢复
   restoreProcesses = [ "~nvim->nvim *" ];   # 额外要重启的程序（写法见下）

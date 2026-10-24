@@ -5,7 +5,7 @@
 #   走 modules/darwin/gui.nix 的 Homebrew casks，两者在各自的平台层装）。
 # apps/linux：Linux 专属 GUI 应用——只有工作站导入。
 #
-# 门控：mengw.gui.enable 控制本层，目录导入即生效，无中间层开关。
+# 门控：myHome.gui.enable 控制本层，目录导入即生效，无中间层开关。
 { ... }:
 {
   imports = [

@@ -13,11 +13,11 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.tools.distrobox;
-  cliCfg = config.mengw.cli;
+  cfg = config.myHome.cli.tools.distrobox;
+  cliCfg = config.myHome.cli;
 in
 {
-  options.mengw.cli.tools.distrobox.enable = lib.mkOption {
+  options.myHome.cli.tools.distrobox.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Distrobox 用户级配置（容器 home 与宿主隔离）";

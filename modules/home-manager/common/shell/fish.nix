@@ -5,11 +5,11 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.shell.fish;
-  cliCfg = config.mengw.cli;
+  cfg = config.myHome.cli.shell.fish;
+  cliCfg = config.myHome.cli;
 in
 {
-  options.mengw.cli.shell.fish.enable = lib.mkOption {
+  options.myHome.cli.shell.fish.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Fish Shell 配置";

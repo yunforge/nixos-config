@@ -16,12 +16,12 @@
 }:
 {
   config = {
-    mengw.cli.enable = lib.mkDefault true;
-    mengw.dev.enable = lib.mkDefault true;
+    myHome.cli.enable = lib.mkDefault true;
+    myHome.dev.enable = lib.mkDefault true;
     # 启用「跨平台 GUI 应用配置」这层（ghostty 配置、vscode），
     # 但不启用 Linux 专属 GUI 应用与 Linux 桌面会话
-    mengw.gui.enable = lib.mkDefault true;
-    mengw.desktop.enable = lib.mkDefault false;
+    myHome.gui.enable = lib.mkDefault true;
+    myHome.desktop.enable = lib.mkDefault false;
   };
 
   imports = [

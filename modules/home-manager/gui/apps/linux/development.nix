@@ -6,8 +6,8 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.development;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.development;
+  guiCfg = config.myHome.gui;
 
   # skiko 渲染层依赖的运行时库。nixpkgs master 的 jetbrains 包装器把
   # LD_LIBRARY_PATH 清空，导致 libskiko-linux-x64.so 加载不到 libGL.so.1，
@@ -29,7 +29,7 @@ let
     });
 in
 {
-  options.mengw.gui.apps.development.enable = lib.mkOption {
+  options.myHome.gui.apps.development.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用开发工具应用";

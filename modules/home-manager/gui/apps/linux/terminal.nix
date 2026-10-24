@@ -15,13 +15,13 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.terminal;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.terminal;
+  guiCfg = config.myHome.gui;
 
   ternBin = "${config.home.homeDirectory}/Apps/Tern/.bin";
 in
 {
-  options.mengw.gui.apps.terminal.enable = lib.mkOption {
+  options.myHome.gui.apps.terminal.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Tern 终端（手动安装到 ~/Apps/Tern）";

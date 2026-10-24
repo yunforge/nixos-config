@@ -5,7 +5,7 @@
 # 输入法只在系统层接线（modules/nixos/desktop），HM 侧不托管文件。
 # 仅工作站（desktop/laptop）导入；macOS / server / wsl 均不导入。
 #
-# 门控：mengw.desktop.enable 控制本层，目录导入即生效，无中间层开关。
+# 门控：myHome.desktop.enable 控制本层，目录导入即生效，无中间层开关。
 { ... }:
 {
   imports = [

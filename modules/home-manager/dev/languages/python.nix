@@ -5,11 +5,11 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.dev.python;
-  devCfg = config.mengw.dev;
+  cfg = config.myHome.cli.dev.python;
+  devCfg = config.myHome.dev;
 in
 {
-  options.mengw.cli.dev.python.enable = lib.mkOption {
+  options.myHome.cli.dev.python.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Python 开发环境";

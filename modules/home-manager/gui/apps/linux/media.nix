@@ -6,8 +6,8 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.media;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.media;
+  guiCfg = config.myHome.gui;
 
   picgo-clipboard-upload = pkgs.writeShellScriptBin "picgo-clipboard-upload" ''
     set -euo pipefail
@@ -58,7 +58,7 @@ let
   };
 in
 {
-  options.mengw.gui.apps.media.enable = lib.mkOption {
+  options.myHome.gui.apps.media.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用媒体和录屏应用";

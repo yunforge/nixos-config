@@ -18,11 +18,11 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.tools.daily-checkin;
-  cliCfg = config.mengw.cli;
+  cfg = config.myHome.cli.tools.daily-checkin;
+  cliCfg = config.myHome.cli;
 in
 {
-  options.mengw.cli.tools.daily-checkin = {
+  options.myHome.cli.tools.daily-checkin = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = false;

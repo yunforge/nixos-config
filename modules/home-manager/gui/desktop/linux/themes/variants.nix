@@ -22,8 +22,8 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.themes;
-  desktopCfg = config.mengw.desktop;
+  cfg = config.myHome.gui.themes;
+  desktopCfg = config.myHome.desktop;
 
   home = config.home.homeDirectory;
   variantDir = "theme-variants";
@@ -196,7 +196,7 @@ let
                 icons="${modes.dark.icons}"
       ${lib.concatMapStringsSep "\n" (
         t: "          link \"$HOME/${t.live}\" \"$HOME/${t.dark}\""
-      ) config.mengw.appearance.switchTargets}
+      ) config.myHome.appearance.switchTargets}
                 ;;
               light)
                 scheme=prefer-light
@@ -204,7 +204,7 @@ let
                 icons="${modes.light.icons}"
       ${lib.concatMapStringsSep "\n" (
         t: "          link \"$HOME/${t.live}\" \"$HOME/${t.light}\""
-      ) config.mengw.appearance.switchTargets}
+      ) config.myHome.appearance.switchTargets}
                 ;;
             esac
 
@@ -249,9 +249,9 @@ in
 {
   config = lib.mkIf (cfg.enable && desktopCfg.enable) {
     # 本模块自己那五个活文件也走同一张表（见 modules/home-manager/default.nix 的
-    # mengw.appearance.switchTargets）：theme-apply 只做「指软链」，不认具体应用。
+    # myHome.appearance.switchTargets）：theme-apply 只做「指软链」，不认具体应用。
     # gtk.css 不在表里：它是模式无关的单一文件（见上面 gtk4UserCss）。
-    mengw.appearance.switchTargets = [
+    myHome.appearance.switchTargets = [
       {
         live = ".config/gtk-3.0/settings.ini";
         dark = ".config/${variantDir}/gtk-3.0/dark.ini";

@@ -16,7 +16,7 @@
   ...
 }:
 let
-  cfg = config.mengw.desktop;
+  cfg = config.myHome.desktop;
 in
 {
   config = lib.mkIf cfg.enable {

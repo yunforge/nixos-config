@@ -10,11 +10,11 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.tools.yt-dlp;
-  cliCfg = config.mengw.cli;
+  cfg = config.myHome.cli.tools.yt-dlp;
+  cliCfg = config.myHome.cli;
 in
 {
-  options.mengw.cli.tools.yt-dlp.enable = lib.mkOption {
+  options.myHome.cli.tools.yt-dlp.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 yt-dlp 及下载配置";

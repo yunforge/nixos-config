@@ -18,11 +18,11 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.vscode;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.vscode;
+  guiCfg = config.myHome.gui;
 in
 {
-  options.mengw.gui.vscode.enable = lib.mkOption {
+  options.myHome.gui.vscode.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 VSCode 编辑器（macOS 上程序走 Homebrew cask）";

@@ -7,8 +7,8 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.communication;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.communication;
+  guiCfg = config.myHome.gui;
 
   wechat-scaled = myLib.wrapQtXWayland {
     inherit pkgs;
@@ -16,7 +16,7 @@ let
   };
 in
 {
-  options.mengw.gui.apps.communication.enable = lib.mkOption {
+  options.myHome.gui.apps.communication.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用通讯工具";

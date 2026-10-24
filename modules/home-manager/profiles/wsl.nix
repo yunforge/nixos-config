@@ -9,10 +9,10 @@
 }:
 {
   config = {
-    mengw.cli.enable = lib.mkDefault true;
-    mengw.dev.enable = lib.mkDefault true;
-    mengw.gui.enable = lib.mkDefault false;
-    mengw.desktop.enable = lib.mkDefault false;
+    myHome.cli.enable = lib.mkDefault true;
+    myHome.dev.enable = lib.mkDefault true;
+    myHome.gui.enable = lib.mkDefault false;
+    myHome.desktop.enable = lib.mkDefault false;
   };
 
   imports = [

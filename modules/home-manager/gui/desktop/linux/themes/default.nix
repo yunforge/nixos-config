@@ -6,14 +6,14 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.themes;
-  desktopCfg = config.mengw.desktop;
+  cfg = config.myHome.gui.themes;
+  desktopCfg = config.myHome.desktop;
 in
 {
   # 亮/暗两套变体与切换入口（真源：Noctalia 的 theme mode）
   imports = [ ./variants.nix ];
 
-  options.mengw.gui.themes.enable = lib.mkOption {
+  options.myHome.gui.themes.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Qt/GTK 主题配置";

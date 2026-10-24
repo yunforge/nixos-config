@@ -5,11 +5,11 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.dev.others;
-  devCfg = config.mengw.dev;
+  cfg = config.myHome.cli.dev.others;
+  devCfg = config.myHome.dev;
 in
 {
-  options.mengw.cli.dev.others.enable = lib.mkOption {
+  options.myHome.cli.dev.others.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用其他语言的开发环境（LSP、格式化工具等）";

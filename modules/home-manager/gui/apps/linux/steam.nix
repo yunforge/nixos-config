@@ -6,11 +6,11 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.steam;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.steam;
+  guiCfg = config.myHome.gui;
 in
 {
-  options.mengw.gui.apps.steam.enable = lib.mkOption {
+  options.myHome.gui.apps.steam.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用游戏工具（MangoHud、GameMode、Gamescope 等）";

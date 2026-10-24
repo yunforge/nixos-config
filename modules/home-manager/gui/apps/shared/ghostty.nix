@@ -18,11 +18,11 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.ghostty;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.ghostty;
+  guiCfg = config.myHome.gui;
 in
 {
-  options.mengw.gui.apps.ghostty.enable = lib.mkOption {
+  options.myHome.gui.apps.ghostty.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Ghostty 终端配置（程序本体在 macOS 走 Homebrew cask）";

@@ -49,11 +49,11 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.mpv;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.mpv;
+  guiCfg = config.myHome.gui;
 in
 {
-  options.mengw.gui.apps.mpv.enable = lib.mkOption {
+  options.myHome.gui.apps.mpv.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 mpv（uosc Cupertino 定制界面）";

@@ -92,7 +92,7 @@ mySystem.virtualization.enable = true;   # hosts/<host>/default.nix 已设
 | `qemu.vhostUserPackages = [ virtiofsd ]` | 主机目录共享（virtiofs）所需 |
 | `environment.systemPackages` 里的 `windowsVmMedia` | 装机盘：`/run/current-system/sw/share/windows-vm-media/windows-vm-media.iso` |
 | `mySystem.proxy.exposeToVms` | 在网桥地址上转发宿主 Clash（`libvirt-proxy-forward.service`），客户机据此上外网（见 §10.4） |
-| HM `mengw.gui.winapps` | `winapps`、`winapps-launcher`、`LIBVIRT_DEFAULT_URI=qemu:///system`、`winapps.conf`、askpass |
+| HM `myHome.gui.winapps` | `winapps`、`winapps-launcher`、`LIBVIRT_DEFAULT_URI=qemu:///system`、`winapps.conf`、askpass |
 
 装机盘内容（一张盘搞定装机与配置）：
 
@@ -124,7 +124,7 @@ windows-vm-media.iso
 | 安装来源 | 本地安装介质 → 选 Windows 11 ISO（勾选「自动从安装介质检测」） |
 | 内存 / CPU | 建议 ≥ 8192 MiB / 4 vCPU（本机配了 16 GiB / 8 vCPU） |
 | 存储 | 建议 ≥ 64 GB（本机 128 GB 级即可；qcow2 稀疏分配，按需增长） |
-| 名称 | **必须与 `mengw.gui.winapps.vmName` 一致**，默认 `RDPWindows` |
+| 名称 | **必须与 `myHome.gui.winapps.vmName` 一致**，默认 `RDPWindows` |
 | 勾选 | 「在安装前自定义配置」 |
 
 在「自定义配置」里确认/补齐：
@@ -284,13 +284,13 @@ winapps cleanrdp                    # 清理孤儿进程跟踪文件
 | --- | --- |
 | 剪贴板 | 文本双向直接可用；**文件**也支持（FreeRDP 剪贴板文件通道默认开）：Linux 文件管理器 `Ctrl+C` → Windows `Ctrl+V` |
 | `\\tsclient\home` | 整个宿主 `~` 映射进 Windows（`RDP_FLAGS` 里的 `+home-drive`） |
-| `\\tsclient\proj` | 额外共享盘（`RDP_FLAGS` 里的 `/drive:proj,/home/yunforge/Projects`，可用 `mengw.gui.winapps.extraDrives` 增删） |
+| `\\tsclient\proj` | 额外共享盘（`RDP_FLAGS` 里的 `/drive:proj,/home/yunforge/Projects`，可用 `myHome.gui.winapps.extraDrives` 增删） |
 | 拖拽文件 | ❌ RDP 协议不支持（SPICE 侧也是实验性），别指望 |
 
 ### 8.2 高 DPI 与缩放
 
 `RDP_SCALE` 只接受 `100`/`140`/`180`；本仓库按 `mySystem.desktop.scale` 自动取值
-（1.5 倍屏 → `140`）。若文字偏大/偏小，改 `mengw.gui.winapps.rdpScale` 后 `nixos-rebuild switch`。
+（1.5 倍屏 → `140`）。若文字偏大/偏小，改 `myHome.gui.winapps.rdpScale` 后 `nixos-rebuild switch`。
 
 ---
 
@@ -329,7 +329,7 @@ winapps-usb detach 0483:3748   # 用完还给 Linux
 **实测过的设备 ID**（本机 4K 主机）：ST-Link V2 `0483:3748`（`Product: STM32 STLink`）、
 CH340 USB-UART `1a86:7523`。J-Link 是 `1366:xxxx`，CMSIS-DAP 是 `0d28:xxxx`。
 查 ID 用 `winapps-usb`（顺带标出归属）；`lsusb` 也可用（usbutils 由
-`mengw.gui.apps.embedded` 提供）。
+`myHome.gui.apps.embedded` 提供）。
 
 #### 独占语义（常被误解）
 
@@ -445,10 +445,10 @@ curl.exe -x http://192.168.122.1:7897 -sI https://www.google.com
 
 | 选项 | 默认 | 说明 |
 | --- | --- | --- |
-| `mengw.gui.winapps.enable` | `true` | 总开关（desktop/laptop 的 gui 模块内） |
-| `mengw.gui.winapps.vmName` | `"RDPWindows"` | 必须与 `virsh list` 中的名字一致 |
-| `mengw.gui.winapps.windowsUser` | `"mengw"` | Windows 账户名（**不是**计算机名，也不是显示名） |
-| `mengw.gui.winapps.extraDrives` | `[ proj → ~/Projects ]` | 额外暴露给 Windows 的目录（`\\tsclient\<name>`） |
+| `myHome.gui.winapps.enable` | `true` | 总开关（desktop/laptop 的 gui 模块内） |
+| `myHome.gui.winapps.vmName` | `"RDPWindows"` | 必须与 `virsh list` 中的名字一致 |
+| `myHome.gui.winapps.windowsUser` | `"mengw"` | Windows 账户名（**不是**计算机名，也不是显示名） |
+| `myHome.gui.winapps.extraDrives` | `[ proj → ~/Projects ]` | 额外暴露给 Windows 的目录（`\\tsclient\<name>`） |
 | `rdpScale` | 由 `mySystem.desktop.scale` 派生 | 100 / 140 / 180 |
 
 生成的 `~/.config/winapps/winapps.conf`（示例，实际由 Nix 渲染）：

@@ -24,8 +24,8 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.winapps;
-  desktopCfg = config.mengw.desktop;
+  cfg = config.myHome.gui.winapps;
+  desktopCfg = config.myHome.desktop;
 
   winapps = inputs.winapps.packages.${pkgs.stdenv.hostPlatform.system};
 
@@ -183,7 +183,7 @@ let
   '';
 in
 {
-  options.mengw.gui.winapps = {
+  options.myHome.gui.winapps = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = true;

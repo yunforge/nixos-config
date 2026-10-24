@@ -7,11 +7,11 @@
 # ~/.local/share/nvim（Omarchy 用约 116MiB 预缓存规避这一次下载，Nix 侧不做）。
 { lib, config, ... }:
 let
-  cfg = config.mengw.cli.editors.neovim;
-  cliCfg = config.mengw.cli;
+  cfg = config.myHome.cli.editors.neovim;
+  cliCfg = config.myHome.cli;
 in
 {
-  options.mengw.cli.editors.neovim.enable = lib.mkEnableOption "Neovim（Omarchy 的 LazyVim 配置）" // {
+  options.myHome.cli.editors.neovim.enable = lib.mkEnableOption "Neovim（Omarchy 的 LazyVim 配置）" // {
     default = true;
   };
 
@@ -34,7 +34,7 @@ in
       };
     };
 
-    mengw.appearance.switchTargets = [
+    myHome.appearance.switchTargets = [
       {
         live = ".config/theme-variants/nvim/mode.lua";
         dark = ".config/theme-variants/nvim/dark.lua";

@@ -10,9 +10,9 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.tools.tmux;
+  cfg = config.myHome.cli.tools.tmux;
   persist = cfg.persistence;
-  cliCfg = config.mengw.cli;
+  cliCfg = config.myHome.cli;
 
   resurrect = pkgs.tmuxPlugins.resurrect;
   continuum = pkgs.tmuxPlugins.continuum;
@@ -148,7 +148,7 @@ let
   linuxPersist = persist.enable && pkgs.stdenv.hostPlatform.isLinux;
 in
 {
-  options.mengw.cli.tools.tmux = {
+  options.myHome.cli.tools.tmux = {
     enable = lib.mkOption {
       type = lib.types.bool;
       default = true;

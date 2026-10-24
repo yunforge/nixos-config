@@ -11,8 +11,8 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.wm.noctalia;
-  desktopCfg = config.mengw.desktop;
+  cfg = config.myHome.gui.wm.noctalia;
+  desktopCfg = config.myHome.desktop;
 
   # DDC/CI 亮度：由主机声明的 mySystem.desktop.monitors 中 ddc = true 的输出
   # 派生（desktop 的外接屏 DP-2；需硬件支持且主机已开 hardware.i2c）。
@@ -38,12 +38,12 @@ let
   # 写 store 路径会在 rebuild 后指向一个可能已被 GC 的旧 hash。
   defaultWallpaper =
     if wallpapers == [ ] then
-      throw "mengw.gui.wm.noctalia：mySystem.desktop.wallpapers 为空，无法确定默认壁纸"
+      throw "myHome.gui.wm.noctalia：mySystem.desktop.wallpapers 为空，无法确定默认壁纸"
     else
       "${wallpaperSet}/${baseNameOf (lib.head wallpapers)}";
 in
 {
-  options.mengw.gui.wm.noctalia.enable = lib.mkOption {
+  options.myHome.gui.wm.noctalia.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Noctalia Shell 用户级配置";

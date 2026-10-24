@@ -5,11 +5,11 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.dev.cpp;
-  devCfg = config.mengw.dev;
+  cfg = config.myHome.cli.dev.cpp;
+  devCfg = config.myHome.dev;
 in
 {
-  options.mengw.cli.dev.cpp.enable = lib.mkOption {
+  options.myHome.cli.dev.cpp.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 C/C++ 开发环境";

@@ -86,7 +86,7 @@ distrobox 默认拿宿主 `$HOME` 当容器 home，两个方向都会出问题�
 - 容器里 `pip install --user` / `cargo install` 写进 `~/.local/bin`、`~/.cargo/bin`，
   宿主 PATH 里又有这些目录，容器装的二进制“跑”到了宿主上，绕过 NixOS 包管理。
 
-`mengw.cli.tools.distrobox`（`modules/home-manager/common/tools/distrobox.nix`）因此写
+`myHome.cli.tools.distrobox`（`modules/home-manager/common/tools/distrobox.nix`）因此写
 `~/.config/distrobox/distrobox.conf`，设 `container_home_prefix = ~/.distrobox`：
 新容器的 `HOME` 与 `XDG_*` 全部落在 `~/.distrobox/<name>`，宿主的 fish 配置和宿主
 PATH 都不再被卷入。容器里 `distrobox` 可能有自己的 fish（arch/ubuntu 里装了），

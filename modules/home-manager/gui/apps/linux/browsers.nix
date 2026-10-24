@@ -7,13 +7,13 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.browsers;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.browsers;
+  guiCfg = config.myHome.gui;
 in
 {
   imports = [ inputs.zen-browser.homeModules.beta ];
 
-  options.mengw.gui.apps.browsers.enable = lib.mkOption {
+  options.myHome.gui.apps.browsers.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用浏览器应用";

@@ -5,11 +5,11 @@
   ...
 }:
 let
-  cfg = config.mengw.cli.dev.node;
-  devCfg = config.mengw.dev;
+  cfg = config.myHome.cli.dev.node;
+  devCfg = config.myHome.dev;
 in
 {
-  options.mengw.cli.dev.node.enable = lib.mkOption {
+  options.myHome.cli.dev.node.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用 Node.js 开发环境";

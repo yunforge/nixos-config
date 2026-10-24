@@ -9,11 +9,11 @@
   ...
 }:
 let
-  cfg = config.mengw.gui.apps.embedded;
-  guiCfg = config.mengw.gui;
+  cfg = config.myHome.gui.apps.embedded;
+  guiCfg = config.myHome.gui;
 in
 {
-  options.mengw.gui.apps.embedded.enable = lib.mkOption {
+  options.myHome.gui.apps.embedded.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
     description = "启用嵌入式单片机开发环境（ARM/AVR 交叉工具链、烧录调试、PlatformIO）";

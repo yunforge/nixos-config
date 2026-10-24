@@ -8,7 +8,7 @@
   ...
 }:
 let
-  desktopCfg = config.mengw.desktop;
+  desktopCfg = config.myHome.desktop;
   niriConfigPath = "${config.home.homeDirectory}/Projects/nixos-config/modules/home-manager/gui/desktop/linux/niri/config";
 
   # ── 概览底色 ────────────────────────────────────────────────────────────
@@ -189,7 +189,7 @@ let
         );
     in
     if monitors == [ ] then
-      throw "mengw.gui.wm: 主机未声明 mySystem.desktop.monitors，无法生成 niri outputs.kdl"
+      throw "myHome.gui.wm: 主机未声明 mySystem.desktop.monitors，无法生成 niri outputs.kdl"
     else
       lib.concatMapStringsSep "\n" monitorKdl monitors;
 
@@ -214,7 +214,7 @@ in
     ./noctalia.nix
   ];
 
-  # 门控：mengw.desktop.enable 控制整个桌面会话层，无中间层开关
+  # 门控：myHome.desktop.enable 控制整个桌面会话层，无中间层开关
   config = lib.mkIf desktopCfg.enable {
     # Symlink 整个 Niri 配置目录到 git 仓库（保持可编辑性）
     xdg.configFile."niri".source = config.lib.file.mkOutOfStoreSymlink niriConfigPath;

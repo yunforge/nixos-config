@@ -71,7 +71,7 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
   `lib.optionals stdenv.hostPlatform.isLinux` 自行过滤。
 - **dev**（`modules/home-manager/dev/languages/`）：语言工具链
   （Go / Node / Rust / Python / C++ / 其它 LSP）。与普通 CLI 分层：
-  是否安装完整工具链由角色决定（`mengw.dev.enable`）。
+  是否安装完整工具链由角色决定（`myHome.dev.enable`）。
 - **gui**（`modules/home-manager/gui/`）：
   - `apps/shared/`：跨平台 GUI 应用**配置**（Ghostty / VSCode）。
     配置共享，安装方式按平台分开：Linux 走 HM 的 `programs.<name>` 装包，
@@ -114,8 +114,11 @@ HM 侧导入：common + dev + `gui/apps/shared`（跨平台 GUI 应用配置）+
 - 每个域的**聚合模块**（如 `hardware/default.nix`、`desktop/default.nix`）用 `lib.mkDefault`
   给出该域的默认开关组合，主机文件因此只写**例外**（关单项用 `lib.mkForce`）。
 - 主机数据（如 `mySystem.desktop.monitors`）留在 `hosts/`；共享模块只做生成器与消费方。
-- HM 层门控：`mengw.cli.enable`（common）、`mengw.dev.enable`（dev）、
-  `mengw.gui.enable`（GUI 应用）、`mengw.desktop.enable`（Linux 桌面会话）。
+- 选项根按平台层分：系统层（NixOS / nix-darwin）用 `mySystem.*`，用户层（HM）用
+  `myHome.*`。两者都不含用户名——账户名只由 `mySystem.primaryUser` /
+  `system.primaryUser` 声明，改用户名不需要动选项树。
+- HM 层门控：`myHome.cli.enable`（common）、`myHome.dev.enable`（dev）、
+  `myHome.gui.enable`（GUI 应用）、`myHome.desktop.enable`（Linux 桌面会话）。
   这四个开关由角色 profile 用 `mkDefault` 给出，主机可用 `mkForce` 覆盖。
 
 **选项清单不在文档里维护**：`rg 'mkEnableOption|mkOption' modules/` 是唯一权威。
