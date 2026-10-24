@@ -1,5 +1,5 @@
 {
-  description = "NixOS + Niri(+Nocatalia)/Gnome 个人开发计算机";
+  description = "NixOS + Niri(+Noctalia) 个人开发计算机";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/master";
