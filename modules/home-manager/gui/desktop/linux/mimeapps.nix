@@ -46,6 +46,7 @@ in
       "x-scheme-handler/tg" = "org.telegram.desktop.desktop";
       "x-scheme-handler/tonsite" = "org.telegram.desktop.desktop";
       "application/x-zerosize" = "typora.desktop";
+      "text/markdown" = "typora.desktop";
       "x-scheme-handler/jetbrains" = "jetbrainsd.desktop";
       "x-scheme-handler/chrome" = "brave-browser.desktop";
       "application/x-extension-htm" = "brave-browser.desktop";
@@ -123,6 +124,10 @@ in
       "x-scheme-handler/tg" = [ "org.telegram.desktop.desktop" ];
       "x-scheme-handler/tonsite" = [ "org.telegram.desktop.desktop" ];
       "application/x-zerosize" = [ "typora.desktop" ];
+      "text/markdown" = [
+        "typora.desktop"
+        "org.gnome.TextEditor.desktop"
+      ];
       "application/epub+zip" = [ "com.github.johnfactotum.Foliate.desktop" ];
       "x-scheme-handler/http" = [
         "brave-browser.desktop"
