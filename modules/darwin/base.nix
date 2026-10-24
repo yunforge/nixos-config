@@ -17,7 +17,8 @@
   # 但 cpp.nix 开发环境无条件引入它，放行以允许 darwin 求值
   nixpkgs.config.problems.handlers.valgrind.broken = "warn";
 
-  # 放行 Linux-only 包的评估（flakehub-push 会评估所有平台，但 darwin 不需要这些包）
+  # 放行 Linux-only 包的评估（共享 shell 模块把 sysstat 等带进 darwin toplevel，
+  # macbook 本机 rebuild 与 CI 对 darwin 的 dry-build 求值都会踩到平台守卫）
   nixpkgs.config.allowUnsupportedSystem = true;
 
   # 系统级包

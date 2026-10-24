@@ -30,7 +30,7 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
 │     └─ profiles/          # 角色配置（workstation / server / wsl / macbook）
 ├─ overlays/ + pkgs/        # 自维护包的单一注入点与包本体
 ├─ docs/                    # 子系统深度说明，索引见 docs/README.md
-└─ .github/workflows/       # flake-check（eval + dry-build + niri validate）、flakehub-publish
+└─ .github/workflows/       # flake-check（eval + dry-build + niri validate）
 ```
 
 编辑之前：
