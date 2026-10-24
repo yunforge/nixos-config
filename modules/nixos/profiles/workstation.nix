@@ -13,14 +13,16 @@
 # 在这里是角色的默认开关（mkDefault），主机仍可用 mkForce 覆盖。
 { lib, ... }:
 {
-  mySystem.hardware.enable = true;
-  mySystem.desktop.enable = true;
+  mySystem.hardware.enable = lib.mkDefault true;
+  mySystem.desktop.enable = lib.mkDefault true;
 
-  # 虚拟化与代理曾在 hosts/<host>/default.nix 里按桌面能力逐台打开，
-  # 现在由 workstation 角色统一给默认值（libvirtd 是 WinApps /
-  # distrobox 的依赖，代理为 mihomo 客户机转发的前置条件）。
-  # mySystem.desktop.enable 的聚合模块（modules/nixos/desktop/default.nix）
-  # 已对这几项给出 mkDefault，此处不再重复声明，避免多层默认值互相覆盖。
+  # 虚拟化与代理曾在 hosts/<host>/default.nix 里按桌面能力逐台打开，后由
+  # desktop 聚合模块代管，现收口回角色层：libvirtd 是 WinApps / distrobox 的
+  # 依赖、代理为 mihomo 客户机转发的前置条件——这是「工作站」的组合，而非
+  # 桌面能力本身的要求（server 即便开桌面也不该隐式带出它们）。
+  mySystem.virtualization.enable = lib.mkDefault true;
+  mySystem.proxy.enable = lib.mkDefault true;
+  mySystem.proxy.exposeToVms = lib.mkDefault true;
 
   # 工作站加入 tailnet（desktop / laptop 互相访问；服务器与 WSL 不导入
   # 本角色，不会被启用）。首次使用需手动 sudo tailscale login 一次。

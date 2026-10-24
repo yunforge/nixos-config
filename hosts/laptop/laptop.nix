@@ -6,8 +6,6 @@
 }:
 
 {
-  # 电池状态监控
-  services.upower.enable = true;
   # 温控守护进程，CPU 温度过高时主动降温
   # 关闭：thermald 的功耗上限调整反而可能触发 BIOS 暴力拉风扇
   services.thermald.enable = false;

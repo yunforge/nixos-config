@@ -11,6 +11,10 @@ let
   desktopCfg = config.mySystem.desktop;
 in
 {
+  # 选项就近定义在实现模块（与 distrobox.nix / steam.nix 同构）；
+  # 域内默认值（mkDefault true）由聚合模块 ../default.nix 给出。
+  options.mySystem.desktop.niri.enable = lib.mkEnableOption "Niri 窗口管理器";
+
   config = lib.mkIf (cfg.enable && desktopCfg.enable) {
     # 启用 niri
     programs.niri.enable = true;

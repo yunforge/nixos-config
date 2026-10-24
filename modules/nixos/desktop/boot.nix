@@ -12,11 +12,13 @@ in
   config = lib.mkIf cfg.enable {
     boot = {
       consoleLogLevel = 3;
+      # nvidia_drm.fbdev=1 仅 NVIDIA 主机需要（DRM KMS 提前接管控制台），
+      # 随 mySystem.hardware.nvidia.enable 门控，避免带进 AMD/Intel 桌面
       kernelParams = [
         "fbcon=nodefer"
-        "nvidia_drm.fbdev=1"
         "console=tty1"
-      ];
+      ]
+      ++ lib.optionals config.mySystem.hardware.nvidia.enable [ "nvidia_drm.fbdev=1" ];
 
       # 硬冻结（桌面无响应、只能按电源键）现场捕获 + 软恢复。
       # 根因疑为 NVIDIA 专有驱动挂死，但默认 hung_task_panic=0、panic_on_oops=0

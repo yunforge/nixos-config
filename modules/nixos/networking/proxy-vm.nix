@@ -34,8 +34,22 @@ in
 {
   options.mySystem.proxy.exposeToVms = lib.mkEnableOption "把主机代理转发到 libvirt 网桥（供客户机上网）";
 
-  config = lib.mkIf (cfg.enable && cfg.exposeToVms) {
-    systemd.services.libvirt-proxy-forward = {
+  config = {
+    # 误用防护：exposeToVms 开而 virtualization 未开时，virbr0 永不出现，
+    # 下面的转发服务只能靠 Restart 轮询无限空转（注释自己承认的场景，
+    # 升级为 assertion 在构建期拦下）
+    assertions = [
+      {
+        assertion = cfg.exposeToVms -> config.mySystem.virtualization.enable;
+        message = ''
+          mySystem.proxy.exposeToVms 已开启，但 mySystem.virtualization.enable 未开启：
+          libvirt 默认网桥 virbr0 不会存在，libvirt-proxy-forward 只能无限重试。
+          先开虚拟化，或关掉 exposeToVms。
+        '';
+      }
+    ];
+
+    systemd.services.libvirt-proxy-forward = lib.mkIf (cfg.enable && cfg.exposeToVms) {
       description = "把主机代理（Clash Verge）转发到 libvirt 网桥";
 
       # 不声明 libvirtd 依赖：libvirtd 是 socket 激活的，virbr0 何时出现不由本单元

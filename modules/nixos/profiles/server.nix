@@ -11,10 +11,8 @@
 # 自动升级）是所有 NixOS 主机共享的，此处不重复。
 { lib, ... }:
 {
-  # 明确不启用工作站能力；主机若真需要某项（如跑容器的服务器开虚拟化）
-  # 可在 hosts/<host>/default.nix 里显式打开
-  mySystem.hardware.enable = lib.mkDefault false;
-  mySystem.desktop.enable = lib.mkDefault false;
+  # 明确不启用工作站能力（mkEnableOption 默认即 false，此处不再写 mkDefault false）；
+  # 主机若真需要某项（如跑容器的服务器开虚拟化）可在 hosts/<host>/default.nix 里显式打开
 
   # ── 服务器安全策略 ──────────────────────────────────────────────
   # core 的 SSH 默认允许密码认证（为局域网登录保留）。服务器面向不可信网络，
