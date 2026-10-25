@@ -13,6 +13,9 @@ let
       pkgs,
       pkg,
       binary ? null,
+      # 多入口二进制包（如 wpsoffice 的 wps/et/wpp/wpspdf）传 binaries= 逐个
+      # wrap；单入口应用维持 binary= 用法不变。
+      binaries ? [ ],
       # 可选：若应用运行窗口的 WM_CLASS 与桌面文件 ID 不一致（如欧陆词典窗口类为
       # eudic 而桌面文件是 eusoft-eudic.desktop），GNOME Shell / Dash to Panel 会
       # 无法把窗口与桌面文件关联，导致任务栏显示成通用图标。传入该窗口类名可为
@@ -31,6 +34,18 @@ let
           binary
         else
           pkg.pname or pkg.meta.mainProgram or (throw "wrapQtXWayland: 无法确定主程序名，请显式传入 binary=...");
+      bins = if binaries != [ ] then binaries else [ bin ];
+
+      # 每个入口一段相同的 wrapProgram，供 map 拼接
+      wrapOne = b: ''
+        wrapProgram $out/bin/${b} \
+          --unset WAYLAND_DISPLAY \
+          --set QT_QPA_PLATFORM "wayland;xcb" \
+          --set GTK_IM_MODULE "fcitx" \
+          --set QT_IM_MODULE "fcitx" \
+          --set XMODIFIERS "@im=fcitx" \
+          ${extraWrapArgs}
+      '';
 
       desktopFilePatch = lib.optionalString (startupWMClass != null) ''
         desktopFiles=${
@@ -58,13 +73,7 @@ let
       paths = [ pkg ];
       buildInputs = [ pkgs.makeWrapper ];
       postBuild = ''
-        wrapProgram $out/bin/${bin} \
-          --unset WAYLAND_DISPLAY \
-          --set QT_QPA_PLATFORM "wayland;xcb" \
-          --set GTK_IM_MODULE "fcitx" \
-          --set QT_IM_MODULE "fcitx" \
-          --set XMODIFIERS "@im=fcitx" \
-          ${extraWrapArgs}
+        ${lib.concatStringsSep "\n" (map wrapOne bins)}
         ${desktopFilePatch}
       '';
     };

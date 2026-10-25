@@ -3,6 +3,7 @@
   lib,
   config,
   pkgs,
+  myLib,
   ...
 }:
 let
@@ -37,6 +38,22 @@ let
       '';
     }
   );
+
+  # WPS：自带 Qt5（libQt5CoreKso 等）与自带的 fcitx 输入法插件
+  # （office6/qt/plugins/platforminputcontexts/），该插件仅在
+  # QT_IM_MODULE=fcitx 时被 Qt 加载，而 Qt5 无 XIM（全局 XMODIFIERS 兜不住）；
+  # 全局 QT_IM_MODULE 删除后（见 docs/input.md 路线变更）照微信/欧陆词典
+  # 按应用注入。desktop 文件 Exec 是裸命令名走 PATH，四个入口都要 wrap。
+  wpsoffice-wrapped = myLib.wrapQtXWayland {
+    inherit pkgs;
+    pkg = pkgs.wpsoffice-cn;
+    binaries = [
+      "wps"
+      "et"
+      "wpp"
+      "wpspdf"
+    ];
+  };
 in
 {
   options.myHome.gui.apps.productivity.enable = lib.mkOption {
@@ -64,7 +81,7 @@ in
       obsidianNoUpdater # 笔记软件（pkgs.obsidian 关掉内置更新器，见上方 let 块）
       typora # markdown 编辑器
       thunderbird # 邮件管理
-      wpsoffice-cn # 微软办公套件（中文）
+      wpsoffice-wrapped # WPS 办公套件（中文；wrap 注入 IM 变量，见上方 let 块）
     ];
 
     # 思源笔记是 Electron 应用，其 package.json 的 desktopName 为 "org.b3log.siyuan"，
