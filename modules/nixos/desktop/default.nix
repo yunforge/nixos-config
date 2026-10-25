@@ -149,14 +149,16 @@ in
     # 确保 fcitx5 在登录时自动启动
     services.xserver.desktopManager.runXdgAutostartIfNone = true;
 
-    # 输入法环境变量
-    # 注意：nixpkgs 的 fcitx5 模块在 waylandFrontend=true 时不设置
-    # GTK_IM_MODULE/QT_IM_MODULE（原生 Wayland 应用走 zwp_input_method_v2），
-    # 但 XWayland 应用仍依赖这些变量，因此在此处手动补齐。
+    # 输入法环境变量：不设 GTK_IM_MODULE/QT_IM_MODULE——原生 Wayland 应用
+    # 走 text-input-v3 → niri（input-method-v2 中转）→ fcitx5 classicui 画
+    # 候选窗，即上游在 fcitx5-gtk PR #44 指明的路线（fcitx5-gtk 的
+    # client-side popover 及其复刻的主题渲染上游已宣布不维护）。XWayland
+    # 应用不靠全局变量：Qt 侧由 lib.wrapQtXWayland 按应用注入，其余 X11
+    # 应用靠 XIM（XMODIFIERS 兜底）。注意：nixpkgs 的 fcitx5 模块把
+    # XMODIFIERS 只写进 environment.variables（登录 shell 可见、到不了
+    # 图形会话），因此这里仍需手动补齐。
     environment.sessionVariables = {
       XMODIFIERS = "@im=fcitx";
-      GTK_IM_MODULE = "fcitx";
-      QT_IM_MODULE = "fcitx";
       SDL_IM_MODULE = "fcitx";
       GLFW_IM_MODULE = "fcitx";
       NIXOS_OZONE_WL = "1";

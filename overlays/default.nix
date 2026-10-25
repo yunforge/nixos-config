@@ -24,21 +24,10 @@ final: prev: {
     }
   );
 
-  # fcitx5-gtk：候选窗竖切线 1px 线的**已证修复**。
-  # 真凶是 GTK im module 的 client-side popover（GTK4 应用走 im module 时由应用
-  # 进程自己画候选窗），不是 classicui、也不是 msime 插件；九宫格在
-  # gtk3/fcitxtheme.cpp 的 Theme::paint 里拼，GTK 先把整块录制进 recording
-  # surface、回放时才乘 1.5，所以「按设备像素量化切线」在录制上下文里拿不到
-  # 缩放（已真机实测无效）。现补丁改为让相邻瓦片沿共享切线重叠 1 逻辑像素 +
-  # CAIRO_EXTEND_PAD，不依赖读取缩放；九片在 group 内用 CAIRO_OPERATOR_SOURCE
-  # 绘制、alpha 最后整体应用一次，避免半透明美术（高亮条）在重叠处叠两次而出现
-  # 亮带。真机 A/B：未打补丁 7/7 组出缝，打补丁 0/8 组无缝且无亮带。上游未接受
-  # 前保留；根因与移除条件见 docs/quirks.md。
-  fcitx5-gtk = prev.fcitx5-gtk.overrideAttrs (
-    finalAttrs: previousAttrs: {
-      patches = (previousAttrs.patches or [ ]) ++ [ ../pkgs/fcitx5-gtk/nine-slice-overlap.patch ];
-    }
-  );
+  # fcitx5-gtk 的九宫格 1px 缝补丁已于 2026-10-25 退役：全局 IM 变量移除后
+  # Wayland 应用走 text-input-v3/classicui，X11 下 fcitx5-gtk 的候选窗由
+  # classicui-XCBUI 绘制（不经 gtk3/fcitxtheme.cpp 的 client-side popover），
+  # 无消费场景；上游亦拒收此修复（PR #44）。根因记录见 docs/quirks.md。
 
   # 自打包主题（nixpkgs 未收录）：MacTahoe GTK / 图标主题 / Kvantum(Qt) 主题
   mactahoe-gtk-theme = prev.callPackage ../pkgs/mactahoe-gtk-theme { };

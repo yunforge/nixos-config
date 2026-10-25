@@ -37,15 +37,23 @@ msime-linux-setup --download
 
 ## 环境变量
 
-XWayland 应用仍依赖传统输入法环境变量，已手动补齐：
+原生 Wayland 应用（GTK3/4、Qt6）**不设** `GTK_IM_MODULE` / `QT_IM_MODULE`：
+候选窗走 text-input-v3 → niri（input-method-v2 中转）→ fcitx5 classicui——上游在
+[fcitx5-gtk PR #44](https://github.com/fcitx/fcitx5-gtk/pull/44) 的回复中指明的路线
+（fcitx5-gtk 的 client-side popover 及其复刻的主题渲染上游已不再维护）。
+全局仅保留（`modules/nixos/desktop/default.nix`）：
 
 ```nix
-XMODIFIERS = "@im=fcitx";
-GTK_IM_MODULE = "fcitx";
-QT_IM_MODULE = "fcitx";
+XMODIFIERS = "@im=fcitx"; # XIM 兜底：XWayland 下未按应用 wrap 的 X11 应用
 SDL_IM_MODULE = "fcitx";
 GLFW_IM_MODULE = "fcitx";
+NIXOS_OZONE_WL = "1";
 ```
+
+XWayland 应用不靠全局变量：微信、欧陆词典、WPS 等 Qt 应用由 `lib/default.nix` 的
+`wrapQtXWayland` 按应用注入 `GTK_IM_MODULE` / `QT_IM_MODULE` / `XMODIFIERS`
+（**Qt5 应用没有 XIM 支持**，`XMODIFIERS` 兜不住它们，必须 wrap，WPS 即此例）。
+某个 X11 GTK 应用若 XIM 体验不可接受，照同一模式按应用 wrap `GTK_IM_MODULE=fcitx`。
 
 ## 候选词窗外观
 
@@ -56,6 +64,12 @@ GLFW_IM_MODULE = "fcitx";
 需要副本的原因：水杉插件**每次 fcitx5 启动都重新生成** `themes/msime/theme.conf`（切线位置与
 `shape-*.png` 由 `libmsime-fcitx5.so` 在运行时算出，store 里没有可 patch 的源文件），直接改那份会在
 下次重启被覆盖。
+
+**路线变更（2026-10-24，10-25 真机验证通过）**：全局 `GTK_IM_MODULE` 已移除（见上文「环境变量」），
+Wayland GTK 应用改走 text-input-v3 → classicui，不再经过下述 client-side popover。ghostty、WPS、
+XIM 兜底三项手测全部通过后，`nine-slice-overlap.patch` 与 `overlays/default.nix` 的 fcitx5-gtk
+override 已于 2026-10-25 退役（X11 下 fcitx5-gtk 的候选窗由 classicui-XCBUI 绘制，不经此代码；
+若未来重新启用 popover 路径需恢复补丁）。以下为当时的根因记录：
 
 关键几何约束（2026-10-22 已定位并修复）：候选窗右侧竖切线上的那根 1px 线**不在 classicui 的
 瓦片绘制里**——GTK4 应用（ghostty 等）在 `GTK_IM_MODULE=fcitx` 下由**应用进程自己**用 GTK im module
@@ -123,7 +137,7 @@ fcitx5-diagnose
 
 - fcitx5 配置目录：`~/.config/fcitx5`
 - 水杉的用户数据与词库：`~/.local/share/msime`
-- Niri 下已在 `startup.kdl` 中自启 fcitx5；XWayland 应用输入法由 `GTK_IM_MODULE` 等变量接管
+- Niri 下已在 `startup.kdl` 中自启 fcitx5；XWayland 应用输入法由 `wrapQtXWayland` 按应用注入的变量接管（Qt5 应用无 XIM 支持，必须 wrap，如 WPS），其余 X11 应用走 XIM
 
 排查时优先看日志（fcitx5 自动启动，stderr 会进 journal）：
 
