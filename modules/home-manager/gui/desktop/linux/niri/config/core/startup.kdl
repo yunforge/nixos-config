@@ -3,8 +3,11 @@
 spawn-at-startup "polkit-gnome-authentication-agent-1"
 // noctalia shell
 spawn-at-startup "noctalia"
-// 输入法
-spawn-at-startup "fcitx5"
+// 输入法 fcitx5 不在此 spawn：由 runXdgAutostartIfNone 生成的
+// app-org.fcitx.Fcitx5@autostart.service 用户单元独占拉起，避免两实例
+// 抢 DBus 名（原 spawn 实例赢、单元 217ms 让位退出，systemd 管理与
+// journal 日志全部落空）。该单元在 graphical-session.target 之后启动，
+// Wayland/X11 连接实测就绪。
 
 // niri 启动时不自动展示快捷键叠加层
 hotkey-overlay {

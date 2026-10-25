@@ -137,7 +137,10 @@ fcitx5-diagnose
 
 - fcitx5 配置目录：`~/.config/fcitx5`
 - 水杉的用户数据与词库：`~/.local/share/msime`
-- Niri 下已在 `startup.kdl` 中自启 fcitx5；XWayland 应用输入法由 `wrapQtXWayland` 按应用注入的变量接管（Qt5 应用无 XIM 支持，必须 wrap，如 WPS），其余 X11 应用走 XIM
+- fcitx5 由 systemd 用户单元 `app-org.fcitx.Fcitx5@autostart.service` 自启（xdg-autostart 生成，
+  在 graphical-session.target 之后拉起，Wayland/X11 连接就绪）；niri 的 `startup.kdl` 不再 spawn
+  fcitx5（曾与之抢 DBus 名，spawn 实例赢、单元 217ms 让位，导致下面的 restart 命令失效）
+- XWayland 应用输入法由 `wrapQtXWayland` 按应用注入的变量接管（Qt5 应用无 XIM 支持，必须 wrap，如 WPS），其余 X11 应用走 XIM
 
 排查时优先看日志（fcitx5 自动启动，stderr 会进 journal）：
 
