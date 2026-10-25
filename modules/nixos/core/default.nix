@@ -130,18 +130,47 @@ in
     # NUR overlay 与自定义包 overlay 由共享模块 ../../shared/nix.nix 统一注入
     # （与 darwin 同源）。此处只加水杉输入法的 Fcitx5 插件：插件加载进 fcitx5
     # 进程，必须按本系统的 nixpkgs 构建，才能与系统上的 Fcitx5 出自同一份
-    # （消费方见 ../desktop）。fixNoticeLists 补上游 notice 两表错位
-    # （frontend-npm-NOTICES.txt 装不出来 → installCheckPhase 失败），
-    # 见 pkgs/msime-fcitx5 补丁头与 docs/quirks.md。
+    # （消费方见 ../desktop）。msimeLibFixed 补上游 nix 打包 fileset 白名单漏掉的
+    # 根目录文件（见下方注释与 docs/quirks.md）。
     nixpkgs.overlays = [
       (final: prev: {
         msime-fcitx5 =
-          (inputs.msime.overlays.default final prev).msime-fcitx5.overrideAttrs
-            (previousAttrs: {
-              patches = (previousAttrs.patches or [ ]) ++ [
-                ../../../pkgs/msime-fcitx5/notice-lists-alignment.patch
-              ];
-            });
+          let
+            msimePkgs = inputs.msime.overlays.default final prev;
+            # 上游 nix 打包全靠 lib.fileset 白名单选源码（default.nix 的 cargoSources、
+            # desktop.nix 的前端 src 等），而 2026-10-24/25 的提交让 crates 与 packages/ui
+            # 引用了白名单外的根目录文件：plugins/phrase_table/latex-symbols/symbols.tsv
+            # （engine/symbol_groups.rs include_str!，c289dd69）与
+            # resources/keyboard-skin-presets.json（packages/ui 皮肤预设，da0e42f7）。
+            # 文件在上游 git 树里存在、构建树里没有 → cargo 报 include_str! 找不到、
+            # vite 报 Module not found。给这层 lib 的 fileset.toSource 包一层，统一把
+            # 两个文件并进白名单，经 .override { lib } 作用于 host-api/mcp/desktop
+            # 三个包（fcitx5 自身 src 不缺文件，不动）。上游修好 fileset 后整段 let
+            # 可删；多并的文件对修好的上游是幂等的。
+            msimeLibFixed = prev.lib.extend (
+              lself: lprev: {
+                fileset = lprev.fileset // {
+                  toSource =
+                    args@{ root, fileset }:
+                    lprev.fileset.toSource (
+                      args
+                      // {
+                        fileset = lprev.fileset.unions [
+                          fileset
+                          (root + "/resources/keyboard-skin-presets.json")
+                          (root + "/plugins/phrase_table/latex-symbols/symbols.tsv")
+                        ];
+                      }
+                    );
+                };
+              }
+            );
+          in
+          msimePkgs.msime-fcitx5.override {
+            settingsWindow = msimePkgs.msime-desktop.override { lib = msimeLibFixed; };
+            "msime-host-api" = msimePkgs.msime-host-api.override { lib = msimeLibFixed; };
+            "msime-mcp" = msimePkgs.msime-mcp.override { lib = msimeLibFixed; };
+          };
       })
     ];
 
