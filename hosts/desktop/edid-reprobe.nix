@@ -34,13 +34,17 @@
 #
 # hosts/desktop/edid/icd-gx288ur.bin = 本屏健康时的完整 EDID（384 字节，块 2 是 DisplayID，
 # 含 3840x2160@150 的 Type I 时序）。显示器换机或换固件后需要重新生成：
-#   cat /sys/class/drm/card1-DP-2/edid > hosts/desktop/edid/icd-gx288ur.bin   # 在 4K150 正常时
+#   cat /sys/class/drm/card1-DP-3/edid > hosts/desktop/edid/icd-gx288ur.bin   # 在 4K150 正常时
 #
 # 已排除：drm.edid_firmware（开机即生效 → 冷启动早期就把 4K 模式塞给未就绪面板，且 override
-# 不再复位 → 黑屏）、video=DP-2:...（NVIDIA 拒绝 user-defined 模式 → 黑屏）。
-{ pkgs, ... }:
+# 不再复位 → 黑屏）、video=DP-3:...（NVIDIA 拒绝 user-defined 模式 → 黑屏）。
+{
+  pkgs,
+  ...
+}:
 let
-  connector = "card1-DP-2";
+  # ICD 4K 屏所在连接器（2026-10-26 新增华为 SSN-24 占用 DP-2 后，本屏从 DP-2 挪到 DP-3）
+  connector = "card1-DP-3";
   card = "card1";
   expectedMode = "3840x2160";
   # 换屏保护：ddcutil 报的 mfg:model 必须与 EDID 文件对得上，否则不注入
@@ -85,12 +89,12 @@ let
       [ "$($od -An -j8 -N4 -tx1 "$sys/edid" 2>/dev/null | $tr -d ' \n')" = "3ac40000" ]
     }
 
-    # 连接器 debugfs 目录用的是 connector->name（本机 DP-2），不是 sysfs 的 card1-DP-2；
-    # 实测完整路径是 /sys/kernel/debug/dri/0000:01:00.0/DP-2/edid_override
+    # 连接器 debugfs 目录用的是 connector->name（本机 DP-3），不是 sysfs 的 card1-DP-3；
+    # 实测完整路径是 /sys/kernel/debug/dri/0000:01:00.0/DP-3/edid_override
     # （中间那层是 PCI 名，不是 minor 号），故这里按名字找而不是写死路径。
     find_override() {
       $find /sys/kernel/debug/dri -maxdepth 3 -type f -name edid_override 2>/dev/null |
-        $grep -E '/DP-2/edid_override$' | $head -1
+        $grep -E '/DP-3/edid_override$' | $head -1
     }
 
     # niri（经 smithay 的 udev backend）只跟踪 sysname 匹配 card[0-9] 的显卡设备本身，
@@ -131,8 +135,10 @@ let
 
     log "${connector} 已连接但 EDID 是 NVIDIA 合成 stub（无 $expected），等显示器就绪后注入真实 EDID"
 
-    # ddcutil 在 NVIDIA 上映射不出连接器名（nvidia-drm 没把 ddc 从设备注册到连接器），
-    # 但本机只有这一台显示器，用 detect 的结果做"面板已就绪 + 身份匹配"的判据。
+    # 用 detect 的结果做"面板已就绪 + 身份匹配"的判据：detect 能按身份列出
+    # ICD，本身就说明该屏 DDC 已成功读出 EDID（身份串来自 EDID），无需再探
+    # VCP——多显示器下 getvcp 不带 --bus 只摸默认 display，而 --bus 要抓
+    # detect 报的瞬时总线号，本机 NVIDIA 的 i2c 总线号在两次探测间会漂移，有竞态。
     deadline=$(($($date +%s) + ${toString readyTimeout}))
     rounds=0
     while :; do
@@ -141,13 +147,8 @@ let
         exit 0
       }
 
-      info=$($ddc detect --brief 2>/dev/null) || info=""
-      if [ -n "$info" ] && $ddc getvcp d6 >/dev/null 2>&1; then
-        if $grep -qF "$expected_panel" <<<"$info"; then
-          break
-        fi
-        log "检测到的显示器不是 $expected_panel，跳过（EDID 文件可能已过期）"
-        exit 0
+      if $ddc detect --brief 2>/dev/null | $grep -qF "$expected_panel"; then
+        break
       fi
 
       if [ "$($date +%s)" -ge "$deadline" ]; then

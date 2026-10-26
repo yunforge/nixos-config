@@ -15,7 +15,7 @@
     # 放在主机级而非 nvidia-base：该参数会覆盖 finegrained 经 modprobe.d 注入的
     # 0x02（内核 cmdline 优先级更高），对 PRIME offload 笔记本是有害的。
     "nvidia.NVreg_DynamicPowerManagement=0x00"
-    # 不用 video= 强制模式：video=DP-2:3840x2160@150 会创建 user-defined 模式，
+    # 不用 video= 强制模式：video=DP-3:3840x2160@150 会创建 user-defined 模式，
     # 显示器唤醒时被 NVIDIA 拒绝报 "User-defined mode not supported" → 黑屏。
     # 显示器 EDID 的 DisplayID 块已原生声明 3840x2160@150Hz(1329MHz)，
     # 无需强制即可使用。也不使用 e 标志强制输出，否则会阻止连接器热插拔事件，

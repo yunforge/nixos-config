@@ -16,7 +16,7 @@ let
   desktopCfg = config.myHome.desktop;
 
   # DDC/CI 亮度：由主机声明的 mySystem.desktop.monitors 中 ddc = true 的输出
-  # 派生（desktop 的外接屏 DP-2；需硬件支持且主机已开 hardware.i2c）。
+  # 派生（desktop 两块外接屏均已开启；需硬件支持且主机已开 hardware.i2c）。
   # 内屏 eDP 走 sysfs backlight；在不支持的主机上 enable_ddcutil 只会让
   # noctalia 反复跑必然失败的 ddcutil detect。
   ddcMonitors = lib.filter (m: m.ddc) osConfig.mySystem.desktop.monitors;
