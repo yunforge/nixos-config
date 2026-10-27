@@ -22,9 +22,9 @@ in
     description = "显示器逻辑缩放（分数缩放值，如 1.5）；AWT 应用会向上取整为整数 uiScale";
   };
 
-  # 显示器声明：主机数据，驱动 niri outputs.kdl 生成与 Noctalia 的 DDC 亮度
-  # （消费方见 modules/home-manager/gui/desktop/linux/niri/）。共享模块只做生成器，
-  # 新增/换显示器只动 hosts/。
+  # 显示器声明：主机数据，驱动 niri outputs.kdl 生成、Noctalia 的 DDC 亮度
+  # 与状态栏按屏开关（消费方见 modules/home-manager/gui/desktop/linux/niri/）。
+  # 共享模块只做生成器，新增/换显示器只动 hosts/。
   options.mySystem.desktop.monitors = lib.mkOption {
     type = lib.types.listOf (
       lib.types.submodule {
@@ -49,11 +49,16 @@ in
             default = false;
             description = "此显示器走 DDC/CI 调亮度（需硬件支持且主机已开 hardware.i2c；内屏 eDP 走 sysfs backlight，勿开）";
           };
+          bar = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "此输出是否显示 Noctalia 状态栏（false = 该屏不生成 bar 实例，Noctalia 默认每块屏都生成一份）";
+          };
         };
       }
     );
     default = [ ];
-    description = "显示器声明（按主机）：niri 输出配置与 Noctalia DDC 亮度的数据源";
+    description = "显示器声明（按主机）：niri 输出配置、Noctalia DDC 亮度与状态栏按屏开关的数据源";
   };
 
   # 默认壁纸集（产品资产，文件在 assets/wallpapers/）。首项即默认壁纸 —— 与

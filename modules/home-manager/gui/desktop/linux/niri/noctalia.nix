@@ -22,6 +22,19 @@ let
   ddcMonitors = lib.filter (m: m.ddc) osConfig.mySystem.desktop.monitors;
   useDdc = ddcMonitors != [ ];
 
+  # 状态栏按输出开关：主机在 mySystem.desktop.monitors 里用 bar = false 标记
+  # 不要状态栏的输出。Noctalia 的 bar 默认在**每块**连着的屏上都生成一份实例
+  # （见上游 Bar 文档 "Each bar is spawned on every connected monitor"），
+  # 唯一的逐屏开关是 [bar.<name>.monitor.<match>] 的 enabled = false。
+  #
+  # match 走"连接名精确匹配"（上游 outputMatchesSelector：先比 connector name，
+  # 再在描述/make/model/serial 里做整词匹配），故直接用 m.name 原样作 match：
+  # DP-2 精确命中自己，不会被 DP-3 的描述误伤。
+  #
+  # 这段是 Nix 侧独有的表：运行时 state 的 [bar.default] 只有标量键，
+  # 不会遮蔽它（Noctalia 合并 config.toml 与 state 时表是逐键深合并）。
+  barlessMonitors = lib.filter (m: !m.bar) osConfig.mySystem.desktop.monitors;
+
   # ── 壁纸 ──────────────────────────────────────────────────────────────
   # 默认集来自系统层 mySystem.desktop.wallpapers（首项为默认壁纸），部署到
   # picker 浏览根下的独立子目录：与用户自己的图分开，同时仍是面板里可浏览的
@@ -147,6 +160,19 @@ in
             "brightness"
             "session"
           ];
+          # 逐屏覆盖：主机声明 bar = false 的输出在这里被关掉状态栏
+          # （desktop 的 24" DP-2）。表名为输出名，match 同名。
+          monitor = lib.mkIf (barlessMonitors != [ ]) (
+            lib.listToAttrs (
+              map (
+                m:
+                lib.nameValuePair m.name {
+                  match = m.name;
+                  enabled = false;
+                }
+              ) barlessMonitors
+            )
+          );
         };
         # 不写 widget.cat.rave_mode：小部件本身（其 id 与 type）由 GUI 持有，
         # 只声明它的一个子键会在 config.toml 里生成一个无 type 的 [widget.cat] 段，

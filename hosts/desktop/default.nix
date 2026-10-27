@@ -43,6 +43,10 @@
         name = "DP-2";
         scale = 1.5;
         ddc = true;
+        # 这块屏不显示状态栏：Noctalia 的 bar 默认每块连着的屏都生成一份，
+        # 这里关掉它，状态栏只留在 4K 主力屏（DP-3）。
+        # 派生见 modules/home-manager/gui/desktop/linux/niri/noctalia.nix
+        bar = false;
       }
     ];
     # 与 laptop 的真实差异：这台是游戏机，开 Steam

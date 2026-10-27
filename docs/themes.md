@@ -358,6 +358,7 @@ audio 那组里 `sound_volume` / `volume_change_sound` / `notification_sound` �
 - **调色板归 Nix**：`programs.noctalia.customPalettes.mactahoe` 写 `~/.config/noctalia/palettes/mactahoe.json`，配合 `theme.source = "custom"`。这是唯一能在版本控制里钉死“MacTahoe 中性灰 + `#0088FF`”的入口
 - **模板声明（`theme.templates`）归 Nix**：见「Noctalia 统一渲染各应用主题」。⚠️ 同 `bar.default` 的坑 —— 运行时 `settings.toml` 里若已有 `[theme.templates]` 段会**整体覆盖**这里，首次生效需把那段删一次再 `noctalia msg config-reload`
 - **bar 布局的四项归 Nix**：`bar.default` 的 `background_opacity` / `start` / `center` / `end` —— 它们没有密钥，可以声明式
+- **bar 的逐屏开关归 Nix**：`[bar.default.monitor.*]` 表，见下节
 - **bar 其余键与插件配置归 GUI**：前者是 `capsule` / `enabled` / `margin_edge` 这类外观键，后者在 `settings.toml` 里且包含明文 API key（`[plugin_settings."coder/deepseek_usage"]` 的 `api_key`）。托管插件配置等于把密钥写进全局可读的 store，与当初 WinApps RDP 密码做到一半的判断一个道理，所以不做
 - 因此 `theme.source` 即使写在 Nix 里，**首次也需在 GUI 选一次**，或跑：
 
@@ -367,6 +368,34 @@ audio 那组里 `sound_volume` / `volume_change_sound` / `notification_sound` �
   ```
 
   若调色板文件有问题，noctalia 会在日志里报 `custom palette 'mactahoe' not found or invalid; falling back to builtin`。
+
+### bar：按显示器开关（归 Nix）
+
+**Noctalia 的 bar 默认每块连着的屏都生成一份实例**（上游 Bar 文档原文："Each bar is
+spawned on every connected monitor"），逐屏的唯一开关是 `[bar.<name>.monitor.<match>]`
+的 `enabled = false`。desktop 换屏后两块外接屏上各有一条 bar，而状态栏只需要留在
+4K 主力屏（DP-3）——24" 的 DP-2 要没有。
+
+做法与仓库其它“主机事实”一致：**主机声明，共享模块只做生成器**。
+
+| 位置 | 内容 |
+|---|---|
+| `hosts/desktop/default.nix` | DP-2 那条写 `bar = false`（选项定义在 `modules/nixos/desktop/default.nix` 的 `mySystem.desktop.monitors` 子模块，默认 `true`） |
+| `modules/home-manager/gui/desktop/linux/niri/noctalia.nix` | 由 `mySystem.desktop.monitors` 里 `bar = false` 的输出生成 `[bar.default.monitor.<输出名>] match = "<输出名>" enabled = false` |
+
+`match` 用输出连接名原样匹配（上游 `outputMatchesSelector` 先比 connector name，
+再在描述/make/model/serial 里做整词匹配），所以 `DP-2` 精确命中自己，不会被 DP-3
+的描述误伤。
+
+**为什么这张表没被运行时 state 遮蔽**：Noctalia 合并 `~/.config/noctalia/config.toml`
+（Nix 管）与 `~/.local/state/noctalia/settings.toml`（GUI 管）时是**逐键深合并**——表与表
+按键递归合并，标量与数组才整体替换。运行时 state 的 `[bar.default]` 只有标量键，没有
+`monitor` 子表，故 Nix 这张嵌套表原样保留。反过来，若在 GUI 里改了 bar 的逐屏设置，
+GUI 会把自己的 `[bar.default.monitor.*]` 写进 state，那时起就以 GUI 为准（同「bar 其余键
+归 GUI」的规则）。
+
+生效路径：rebuild 后 `~/.config/noctalia/config.toml` 带上该表；Noctalia 盯着配置目录，
+一般会自动 reload，必要时 `noctalia msg config-reload`。
 
 ### 调色板取值为何不用社区方案 ADW
 
