@@ -8,13 +8,13 @@
 
 ## 清单
 
-版本核对于 2026-10-25（当日全部升到上游最新）。
+版本核对于 2026-10-28（当日全部升到上游最新）。
 
 | 属性名 | 上游 | 钉法 | 当前钉住 | 上游最新 | 状态 |
 |--------|------|------|----------|----------|------|
 | `babry` | [kregonia/babry](https://github.com/kregonia/babry) | tag | `v0.1.4` | `v0.1.4` | 最新 |
-| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.1491` | `v0.1.1491` | 最新 |
-| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.10.24.1` | `2026.10.24.1` | 最新 |
+| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.1852` | `v0.1.1852` | 最新 |
+| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.10.26.2` | `2026.10.26.2` | 最新 |
 | `liquidbird` | [StatIndet/liquidbird](https://github.com/StatIndet/liquidbird) | commit（main） | `0f8148d` | 同一 commit | 最新 |
 | `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit（tag 指向） | `839848b`（tag `2026-09-10`） | 同一 commit | 最新 |
