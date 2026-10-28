@@ -59,7 +59,8 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 |------|------|
 | gapless | 本地音乐播放器 |
 
-| mpv | 视频播放器，uosc「Cupertino」定制界面（配置整棵 vendored 在 `modules/home-manager/gui/apps/linux/mpv/`，见该目录的 README.md / CUSTOMIZATION.md） |
+| mpv | 视频播放器，uosc「Cupertino」定制界面（配置整棵 vendored 在 `modules/home-manager/gui/apps/linux/mpv/`，见该目录的 README.md / CUSTOMIZATION.md）；**视频类文件的默认打开方式**（mp4 / mkv / webm / mov / avi / wmv / flv / ts …）由 `gui/desktop/linux/mimeapps.nix` 声明为 mpv，音频类不动（仍归 g4music） |
+| umpv | mpv 包自带的「单实例」包装（mpv 上游 `TOOLS/umpv` 的 Python 脚本，nixpkgs 再包一层 C wrapper 把 `MPV` 指到包装后的 mpv）：已经在跑的 umpv 实例会把新文件追加进播放列表，而不是另开一个窗口；桌面条目 `umpv.desktop` 带 `NoDisplay=true`，不进应用菜单，默认关联用的是 mpv 那一支 |
 | OBS Studio | 录屏 / 直播 |
 | babry | 全机唯一的截图工具（CV 智能选区 + 标注 + 贴图，Wayland 原生，`Mod+P` / `Mod+Ctrl+P`；nixpkgs 未收录，自维护见 `pkgs/babry`） |
 | PicGo | 剪贴板图片上传图床 |
