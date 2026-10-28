@@ -40,7 +40,7 @@ in
       ];
       boot.blacklistedKernelModules = [ "nouveau" ];
 
-      # PRIME offload 主机（iGPU 显示、dGPU 按需唤醒）不能全局注入下列三个变量：
+      # PRIME offload 主机（iGPU 显示、dGPU 按需唤醒）不能全局注入下列几个变量：
       # 它们强制 Mesa / VA-API 的所有客户端走 dGPU 后端，轻则 GNOME 硬件加速异常，
       # 重则阻止 dGPU 进入 D3cold 直接吃续航。offload 模式应按程序经 nvidia-offload
       # wrapper 注入（wrapper 已自带 __GLX_VENDOR_LIBRARY_NAME=nvidia）。
@@ -51,6 +51,17 @@ in
           LIBVA_DRIVER_NAME = "nvidia";
           GBM_BACKEND = "nvidia-drm";
           __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+
+          # EGL（GTK4 / Qt5 / WebKit 走的路）要拿到 NVIDIA，须让 glvnd 找到
+          # NVIDIA 的外部平台：它的 Wayland/X11/GBM 平台不在 glvnd 内置支持里，
+          # 而由 egl_external_platform.d/*.json 声明。glvnd 只编译进了
+          # egl_vendor.d 的默认路径，外部平台目录没有默认值，不指路就永远不加载。
+          # __GLX_VENDOR_LIBRARY_NAME 只管 GLX（X11 的 OpenGL），对 EGL 无效，
+          # 所以 EGL 一直落到 Mesa 的 swrast（软件渲染）。
+          __EGL_EXTERNAL_PLATFORM_CONFIG_DIRS = "/run/opengl-driver/share/egl/egl_external_platform.d";
+          # glvnd 的 EGL_DEFAULT_DISPLAY 会先落到 Mesa，须显式指定平台，
+          # EGL 才用上 NVIDIA 的外部平台。
+          EGL_PLATFORM = "wayland";
         })
         // {
           __GL_VRR_ALLOWED = "1";
