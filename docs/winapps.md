@@ -15,7 +15,7 @@
 sudo nixos-rebuild switch --flake ~/Projects/nixos-config#desktop
 
 # 一次性（Windows 侧）：建 VM → 装 Win11 Pro → 运行装机盘里的 WINAPPS-SETUP.bat → 重启
-#                        → 墙内再加一步：把 Windows 系统代理指向 192.168.122.1:7897（见 §10.4）
+#                        （墙内默认已透明代理，无需再配 Windows 系统代理；见 §10.4）
 # 一次性（Linux 侧）：填 Windows 账户密码，然后扫描并生成应用入口
 printf '%s' '你的Windows账户密码' > ~/.config/winapps/rdp-pass && chmod 600 ~/.config/winapps/rdp-pass
 winapps-setup --user
@@ -46,7 +46,7 @@ winapps help         # 其余子命令
 │   │ TermService :3389                                │                       │
 │   │ 防火墙：装机盘 WINAPPS-SETUP.bat 按“语言无关”方式放行 ← 关键             │
 │   │ UV4.exe 等 → 在 Linux 上是独立窗口（图标/剪贴板/声音/麦克风）             │
-│   │ 上外网：系统代理 192.168.122.1:7897（socat → 宿主 Clash，见 §10.4）      │
+│   │ 上外网：默认透明代理（virbr0 → redsocks → 宿主 Clash，见 §10.4）        │
 │   └──────────────────────────────────────────────────┘                       │
 │   ~/.config/winapps/winapps.conf   ← home-manager 托管（勿手改）              │
 │   ~/.config/winapps/rdp-pass       ← 唯一不托管的输入，0600，手动维护         │
@@ -57,7 +57,7 @@ winapps help         # 其余子命令
 | --- | --- |
 | `flake.nix` / `flake.lock` | `winapps` 输入：只提供 `winapps` / `winapps-launcher` 两个**包**（上游没有 NixOS/HM 模块） |
 | `modules/nixos/virtualization/default.nix` | libvirtd / qemu_kvm / swtpm / virtiofsd + 装机盘 `windowsVmMedia` |
-| `modules/nixos/networking/proxy-vm.nix` | 客户机上网：把宿主 Clash 转发到网桥 `virbr0`（`libvirt-proxy-forward.service`，见 §10.4） |
+| `modules/nixos/networking/proxy-vm.nix` | 客户机上网：透明代理（`redsocks` + `virbr0` 重定向）或手动代理（`libvirt-proxy-forward.service`），见 §10.4 |
 | `pkgs/windows-vm-media/` | 装机盘 ISO 的构建：上游 virtio-win ISO + 上游 `oem/` + 本仓库的 `WINAPPS-SETUP.bat` / `winapps-fix-rdp.ps1` |
 | `modules/home-manager/gui/desktop/linux/winapps.nix` | 接入层：包、`winapps.conf`、askpass 脚本、密码缺失提示、`RDP_SCALE` 派生 |
 | `~/.config/winapps/winapps.conf` | 运行时配置，由 home-manager 生成（改配置改 Nix，勿手改） |
@@ -73,7 +73,7 @@ winapps help         # 其余子命令
 | 宿主磁盘 | VM 磁盘 + 10GB 余量；本机 VM 磁盘为 qcow2，落在 `/var/lib/libvirt/images` |
 | Windows 镜像 | **Windows 11 Pro / Enterprise**（RemoteApp 需要 RDP 服务端，Home 版不行） |
 | Windows 账户 | 必须**设置了密码**（空密码账户无法 RDP 登录） |
-| 代理（可选） | 若在墙内：宿主侧由 `mySystem.proxy.exposeToVms = true`（desktop/laptop 已开）把 Clash 转发到网桥，guest 里把系统代理指向 `192.168.122.1:7897`（见 §10.4） |
+| 代理（可选） | 墙内默认由 `mySystem.proxy.transparentForVms = true`（desktop/laptop 已开）把客户机 TCP/DNS 透明转给 Clash，guest 无需配置；手动代理（`exposeToVms`）作为备选，见 §10.4 |
 
 ---
 
@@ -91,7 +91,8 @@ mySystem.virtualization.enable = true;   # hosts/<host>/default.nix 已设
 | nixpkgs 默认携带的 OVMF | UEFI + Secure Boot 固件（`/run/libvirt/nix-ovmf/`） |
 | `qemu.vhostUserPackages = [ virtiofsd ]` | 主机目录共享（virtiofs）所需 |
 | `environment.systemPackages` 里的 `windowsVmMedia` | 装机盘：`/run/current-system/sw/share/windows-vm-media/windows-vm-media.iso` |
-| `mySystem.proxy.exposeToVms` | 在网桥地址上转发宿主 Clash（`libvirt-proxy-forward.service`），客户机据此上外网（见 §10.4） |
+| `mySystem.proxy.transparentForVms` | virbr0 上透明转发客户机 TCP/DNS 到宿主 Clash（`redsocks`），客户机零配置上外网（见 §10.4） |
+| `mySystem.proxy.exposeToVms` | 在网桥地址上转发宿主 Clash（`libvirt-proxy-forward.service`），供客户机手动配置代理（见 §10.4） |
 | HM `myHome.gui.winapps` | `winapps`、`winapps-launcher`、`LIBVIRT_DEFAULT_URI=qemu:///system`、`winapps.conf`、askpass |
 
 装机盘内容（一张盘搞定装机与配置）：
@@ -381,7 +382,51 @@ winapps-usb attach 1a86:7523   # CH340，用完 detach 交还，否则 Linux 侧
   用 `winapps windows` 进整机桌面更顺；日常编码再回 `winapps UV4`。
 - 每个应用 = 一个独立 RDP 会话；关窗不断 VM。
 
-### 10.4 让 Windows 侧能上网（下载 Keil DFP / 许可校验）
+### 10.4 让客户机上网（下载 Keil DFP / 许可校验）
+
+desktop/laptop 的 workstation 角色默认开启 `mySystem.proxy.transparentForVms`：
+客户机**不需要**任何代理配置，virbr0 上的 TCP 与 DNS 会自动经宿主 Clash。
+
+```
+┌─ 客户机（Windows / Linux）─┐     ┌─ 宿主（NixOS）──────────────────────────────┐
+│ 无代理配置                 │ TCP │ iptables nat PREROUTING（仅 virbr0）        │
+│ 默认网关 192.168.122.1     ├────▶│   REDIRECT :12345 → redsocks               │
+│ DNS 192.168.122.1:53       ├────▶│   REDIRECT :1053 → mihomo fake-ip DNS      │
+└────────────────────────────┘     │        │ HTTP CONNECT                      │
+                                   │        ▼                                    │
+                                   │   127.0.0.1:7897（mihomo / Clash Verge）    │
+                                   └─────────────────────────────────────────────┘
+```
+
+覆盖范围与代价：
+
+- **IPv4 TCP 全部**（任意端口）经 redsocks → mihomo；
+- **DNS** 劫持到 mihomo 的 fake-ip DNS，客户机里 `nslookup` 看到 `198.18.x.x` 属正常；
+- **UDP/443（QUIC）被 DROP**，迫使浏览器回落 TCP；其他 UDP（游戏、语音等）不在本方案
+  覆盖范围内，仍直连。取舍原因见 `modules/nixos/networking/proxy-vm.nix` 的注释。
+
+**验证**：
+
+```bash
+# 宿主侧：redsocks 在听、规则已挂上
+systemctl status redsocks --no-pager
+ss -tlnp | grep 12345
+iptables -w -t nat -S LIBVIRT_PROXY
+# 宿主侧：经代理出去能通（客户端 IP 与直连不同即证明走了代理）
+curl --noproxy '' -x http://127.0.0.1:7897 -s https://api.ipify.org; echo
+```
+
+```powershell
+# 客户机内（PowerShell）：应返回代理出口 IP，而不是宽带的真实 IP
+curl.exe -s https://api.ipify.org
+```
+
+> 首次切换后建议在客户机里刷新 DNS（Windows `ipconfig /flushdns`，Linux
+> `resolvectl flush-caches`），让新查询走 mihomo 的 fake-ip。
+
+宿主自身的 RDP 流量会自动绕过代理（`no_proxy` 里含 `192.168.0.0/16`），不必额外配置。
+
+#### 手动代理（备选，`transparentForVms` 关闭时）
 
 宿主侧**不需要**任何 GUI 开关（Clash 保持默认的 `allow-lan: false` 即可）：仓库在开机时
 于网桥地址上起了 socat 转发，把客户机看到的网关口直通宿主 Clash 的回环口。
@@ -434,8 +479,9 @@ Test-NetConnection 192.168.122.1 -Port 7897
 curl.exe -x http://192.168.122.1:7897 -sI https://www.google.com
 ```
 
-宿主自身的 RDP 流量会自动绕过代理（`no_proxy` 里含 `192.168.0.0/16`），不必额外配置。
-个别自带代理设置的程序（部分 Qt/Electron 应用）不读系统代理，需在其内部单独填同一地址。
+手动代理与透明模式可以并存：透明规则对 `192.168.122.1` 这类私网地址直接 RETURN，
+客户机填了手动代理也照常走 socat。个别自带代理设置的程序（部分 Qt/Electron 应用）
+不读系统代理，透明模式下不需要它们配合。
 
 ---
 
@@ -472,6 +518,7 @@ DEBUG="true"
 | --- | --- |
 | `mySystem.virtualization.enable` | libvirtd + qemu_kvm + swtpm + spice USB 重定向 + `virbr0` 信任 |
 | `qemu.vhostUserPackages = [ virtiofsd ]` | 建 virtiofs 共享时需要 |
+| `mySystem.proxy.transparentForVms` | virbr0 上把客户机 TCP/DNS 透明转给宿主代理（`redsocks`；需同开 `proxy.enable` 与 `virtualization.enable`） |
 | `mySystem.proxy.exposeToVms` | 在网桥地址上转发宿主代理给客户机（需该主机同开 `proxy.enable`；socat 转发，仅监听 virbr0） |
 | `environment.systemPackages` 含装机盘 | 不再新建 VM 后，可把这行删掉省 ~840MB |
 
@@ -533,23 +580,29 @@ winapps killrdp
 sed -n '1,80p' ~/.local/share/winapps/winapps.log   # DEBUG="true" 时的运行日志
 ```
 
-### 12.5 客户机里上不了网（宿主代理不可达）
+### 12.5 客户机里上不了网
 
-先分清「宿主侧没转发」与「客户机侧没配好」：
+默认是透明代理（§10.4），先看宿主侧：
 
 ```bash
-ss -tlnp | grep 7897                                   # 期望两条：192.168.122.1:7897 与 127.0.0.1:7897
-journalctl -u libvirt-proxy-forward -n 30 --no-pager   # 期望一行 [DEBUG] ... virbr0 192.168.122.1:7897 -> 127.0.0.1:7897
+systemctl status redsocks --no-pager
+ss -tlnp | grep -E '12345|7897'                        # 期望 12345（redsocks）与 127.0.0.1:7897（mihomo）
+ss -ulnp | grep 1053                                   # mihomo 的 DNS（UDP）
+iptables -w -t nat -S LIBVIRT_PROXY                    # 期望 DNS/TCP 两条 REDIRECT
+journalctl -u redsocks -n 30 --no-pager
 ```
 
 | 症状 | 原因 / 处理 |
 | --- | --- |
-| 只有 `127.0.0.1:7897` 一条监听 | 转发服务没起：确认该主机 `mySystem.proxy.exposeToVms = true;` 并重建（见 §3） |
-| 日志刷 `网桥 virbr0 无 IPv4 地址` | libvirt 默认网络未启动：`virsh -c qemu:///system net-list` 应为 `default` active + autostart；服务每 10s 重试一次，网络起来后自动接上 |
-| 转发在听，客户机仍不通 | 客户机侧没配好：按 §10.4 把 WinINET 与 WinHTTP 都指到 `192.168.122.1:<port>`；地址/端口写错是最常见原因 |
-| 客户机里 `curl` 通、某个程序仍不通 | 该程序不读系统代理（自带代理设置，如部分 Qt/Electron 应用）：在其内部单独填同一地址 |
-| 期望 Clash 的 TUN 模式覆盖客户机 | TUN 只接管宿主自身流量，客户机流量不进宿主的 TUN 栈，必须在客户机侧显式设代理 |
-| 改过 libvirt 网络定义（网桥名/网段） | 模块只假定网桥名 `virbr0`（地址在运行时发现），改名后需同步 `modules/nixos/networking/proxy-vm.nix` |
+| redsocks 未运行，日志报绑定失败 | 网桥地址还没出现：`virsh -c qemu:///system net-list` 的 `default` 应为 active + autostart；服务每 10s 重试，网络起来后自动接上 |
+| `ss` 里没有 `12345` 监听 | 透明代理没开：确认 `mySystem.proxy.transparentForVms = true` 且 `proxy.enable` / `virtualization.enable` 同开，重建 |
+| 规则里没有 `PREROUTING -i virbr0` | 防火墙未启用或没 reload：`systemctl restart firewall`，并确认 `networking.firewall.enable` |
+| 客户机 DNS 全失败 | Clash 没开（1053 没监听）或 mihomo DNS 未启用；透明模式依赖 Clash 常开 |
+| 客户机 DNS 返回 `198.18.x.x` | 正常：mihomo fake-ip；连接仍会被 redsocks 映射回域名 |
+| 客户机 `curl` 通、某个程序仍不通 | 该程序走 UDP/QUIC 或自带 DoH：UDP/443 已被 DROP（浏览器会回落 TCP），纯 UDP 应用不在覆盖范围（§10.4） |
+| 期望 Clash 的 TUN 模式覆盖客户机 | TUN 只接管宿主自身流量；客户机由本模块的 redsocks 透明转发覆盖，不需要 TUN |
+| 改过 libvirt 网络定义（网桥名/网段） | 模块假定网桥名 `virbr0`、redsocks 监听 `192.168.122.1`；改名/改网段后需同步 `modules/nixos/networking/proxy-vm.nix` |
+| 仍按旧文档配了手动代理 | 也能用：透明规则对私网地址 RETURN，手动代理照常走 socat；两套可并存 |
 
 ---
 

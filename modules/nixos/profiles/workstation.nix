@@ -23,6 +23,8 @@
   mySystem.virtualization.enable = lib.mkDefault true;
   mySystem.proxy.enable = lib.mkDefault true;
   mySystem.proxy.exposeToVms = lib.mkDefault true;
+  # 客户机零配置：virbr0 上的 TCP/DNS 透明转给 mihomo（见 networking/proxy-vm.nix）
+  mySystem.proxy.transparentForVms = lib.mkDefault true;
 
   # 工作站加入 tailnet（desktop / laptop 互相访问；服务器与 WSL 不导入
   # 本角色，不会被启用）。首次使用需手动 sudo tailscale login 一次。

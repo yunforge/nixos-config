@@ -25,6 +25,11 @@ in
       default = 7897;
       description = "代理端口（本机 Clash Verge 默认 7897）";
     };
+    dnsPort = lib.mkOption {
+      type = lib.types.int;
+      default = 1053;
+      description = "mihomo DNS 端口（Clash Verge 默认 1053，供客户机 DNS 劫持使用）";
+    };
   };
 
   config = lib.mkIf cfg.enable {
