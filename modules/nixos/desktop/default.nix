@@ -121,6 +121,16 @@ in
     # gvfs：文件管理、回收站、网络共享（mkDefault：主机可普通赋值关闭）
     services.gvfs.enable = lib.mkDefault true;
 
+    # Nautilus 的右键「在 Ghostty 中打开」来自 Ghostty 自带的 nautilus-python
+    # 扩展（见 modules/home-manager/gui/apps/linux/nautilus.nix）。NixOS 的
+    # per-user profile 只链 environment.pathsToLink 里的 share 子目录，默认
+    # 没有 nautilus-python，不补这条 nautilus-python 就扫不到扩展脚本；
+    # /share/locale 是扩展相对 __file__ 找翻译的目录，缺了菜单会退回英文。
+    environment.pathsToLink = [
+      "/share/nautilus-python/extensions"
+      "/share/locale"
+    ];
+
     # 以下三项原先由 GNOME 会话模块顺带打开（mkDefault），本仓库不再装 GNOME 会话后
     # 显式声明——它们与 GNOME 无关，而是桌面/音视频栈真正需要的：
     services.upower.enable = lib.mkDefault true; # 电源/电量状态（Noctalia 电量控件、笔记本）

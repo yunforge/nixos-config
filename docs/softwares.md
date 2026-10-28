@@ -70,7 +70,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | 欧陆词典 | 查词 |
 | 迅雷（xunlei-uos） | 下载 |
 | Logisim Evolution | 数字电路模拟 |
-| file-roller / Nautilus | 压缩 / 文件管理（Nautilus 右键「脚本」→ 在 Ghostty 中打开，见 `gui/apps/linux/nautilus.nix`） |
+| file-roller / Nautilus | 压缩 / 文件管理（Nautilus 右键「在 Ghostty 中打开」，文件夹与空白处均有一级入口，见 `gui/apps/linux/nautilus.nix`） |
 
 ## 游戏
 
