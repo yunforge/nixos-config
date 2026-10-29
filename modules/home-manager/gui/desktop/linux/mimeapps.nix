@@ -62,8 +62,13 @@ in
     # 语法要点：值是「且仅有一个元素」的列表，get_supported_types 才会把它当默认程序；
     # 单元素写了会被 GLib 读成 NULL。HM 会把它序列化成 `key=app;`。
     xdg.mimeApps.defaultApplications = {
-      "x-scheme-handler/clash" = "clash-verge.desktop";
-      "x-scheme-handler/clash-verge" = "clash-verge.desktop";
+      # 代理客户端换成 FlClash（见 media.nix）。它的 .desktop 声明了
+      # clash / clashmeta / flclash 三个 scheme；clash-verge 那个是旧客户端的
+      # 专属 scheme，留着映射到 FlClash，免得老链接点不开。
+      "x-scheme-handler/clash" = "flclash.desktop";
+      "x-scheme-handler/clashmeta" = "flclash.desktop";
+      "x-scheme-handler/flclash" = "flclash.desktop";
+      "x-scheme-handler/clash-verge" = "flclash.desktop";
       "x-scheme-handler/mailto" = "thunderbird.desktop";
       "message/rfc822" = "thunderbird.desktop";
       "x-scheme-handler/mid" = "thunderbird.desktop";
@@ -165,8 +170,10 @@ in
     xdg.mimeApps.associations.added = {
       "x-scheme-handler/mailto" = [ "thunderbird.desktop" ];
       "x-scheme-handler/mid" = [ "thunderbird.desktop" ];
-      "x-scheme-handler/clash" = [ "clash-verge.desktop" ];
-      "x-scheme-handler/clash-verge" = [ "clash-verge.desktop" ];
+      "x-scheme-handler/clash" = [ "flclash.desktop" ];
+      "x-scheme-handler/clashmeta" = [ "flclash.desktop" ];
+      "x-scheme-handler/flclash" = [ "flclash.desktop" ];
+      "x-scheme-handler/clash-verge" = [ "flclash.desktop" ];
       "application/pdf" = [ "org.gnome.Papers.desktop" ];
       "application/x-subrip" = [ "org.gnome.TextEditor.desktop" ];
       "image/jpeg" = [ "com.interversehq.qView.desktop" ];

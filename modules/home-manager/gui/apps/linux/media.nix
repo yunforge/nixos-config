@@ -70,27 +70,29 @@ in
       picgo-wrapped
       picgo-clipboard-upload
       wl-clipboard
-      clash-verge-rev # 代理软件（原 flclash 已被 nixpkgs 移除）
+      flclash # 代理客户端（nixpkgs 已移除 flclash，本仓库自维护，见 pkgs/flclash/）
       bilibili
     ];
 
-    # 声明式管理 clash-verge 自启：应用自带的 GUI 开关会把 Nix store 路径
-    # 写死进 ~/.config/autostart/Clash Verge.desktop，升级被 GC 后开机不自启。
-    # 改用 xdg.autostart.entries 链接自制 desktop 文件，Exec 用稳定的
-    # clash-verge 命令名（meta.mainProgram），恒指向当前版本。
+    # 声明式管理 FlClash 自启：应用自带的「开机自启」开关（设置里的
+    # autoLaunch）会把当时的**绝对 store 路径**写进 ~/.config/autostart/
+    # FlClash.desktop，升级被 GC 后开机不自启（与 magpie / clash-verge 同一个坑，
+    # 见 docs/quirks.md）。故用 xdg.autostart.entries 自制 desktop 文件，Exec 用
+    # 稳定的 FlClash 命令名（meta.mainProgram），恒指向当前版本；应用内那个
+    # 开关要保持关闭，否则两个自启条目会各拉起一个实例。
     xdg.autostart = {
       enable = true;
       entries = [
         (pkgs.writeTextFile {
-          name = "clash-verge.desktop";
+          name = "flclash.desktop";
           text = ''
             [Desktop Entry]
             Type=Application
-            Name=Clash Verge
-            Comment=Clash Verge 开机自启
-            Exec=clash-verge
-            Icon=clash-verge
-            StartupWMClass=clash-verge
+            Name=FlClash
+            Comment=FlClash 开机自启
+            Exec=FlClash
+            Icon=flclash
+            StartupWMClass=com.follow.clash
             Terminal=false
             X-GNOME-Autostart-enabled=true
           '';

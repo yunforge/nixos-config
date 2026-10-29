@@ -154,16 +154,19 @@ window-rule {
     // 尺寸，只有它主动放弃首选尺寸时才会落到下面的浮窗默认值）。
     match app-id="(?i)pot"
     // 其它（邮件 / AI 模型选择器 / Anki / 音乐 / 代理 / 磁盘占用图）
-    // ⚠ 这 6 个的 app-id 都是**实测**得来，不是照 .desktop 文件名写的 ——
+    // ⚠ 这几个的 app-id 都不是照 .desktop 文件名写的 ——
     // thunderbird 的 Wayland app-id 是 "thunderbird"（不是 org.mozilla.Thunderbird，
     // .desktop 的 --name 只改 X11 的 WM_CLASS）、gapless 其实是 g4music
-    // （com.github.neithern.g4music）、clash-verge 带连字符。照文件名写会静默不命中
+    // （com.github.neithern.g4music）。照文件名写会静默不命中
     // （gnome-text-editor 那条就是这么错的）。
     match app-id="(?i)thunderbird"
     match app-id="(?i)magpie"
     match app-id="(?i)anki"
     match app-id="(?i)g4music"
-    match app-id="(?i)clash.verge"
+    // FlClash（代理客户端，取代 clash-verge）：app-id 来自上游
+    // linux/CMakeLists.txt 的 APPLICATION_ID（com.follow.clash），
+    // runner 里 g_set_prgname(APPLICATION_ID) 后作 Wayland app_id。
+    match app-id="(?i)com.follow.clash"
     match app-id="(?i)disktree"
     // bilibili 桌面客户端（实测 app-id 就是 bilibili）
     match app-id="(?i)bilibili"

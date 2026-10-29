@@ -394,7 +394,7 @@ desktop/laptop 的 workstation 角色默认开启 `mySystem.proxy.transparentFor
 │ DNS 192.168.122.1:53       ├────▶│   REDIRECT :1053 → mihomo fake-ip DNS      │
 └────────────────────────────┘     │        │ SOCKS5                            │
                                    │        ▼                                    │
-                                   │   127.0.0.1:7897（mihomo / Clash Verge）    │
+                                   │   127.0.0.1:7897（mihomo / FlClash）        │
                                    └─────────────────────────────────────────────┘
 ```
 
@@ -437,7 +437,7 @@ curl.exe -s https://api.ipify.org
 │ 192.168.122.1:7897 ├────────▶ │   virbr0 192.168.122.1:7897                 │
 │ （= 客户机默认网关）│          │        │ socat 转发（仅监听 virbr0）       │
 └────────────────────┘          │        ▼                                    │
-                                │   127.0.0.1:7897（mihomo / Clash Verge）     │
+                                │   127.0.0.1:7897（mihomo / FlClash）         │
                                 └─────────────────────────────────────────────┘
 ```
 

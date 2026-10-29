@@ -1,6 +1,6 @@
 # 把主机 HTTP 代理转发给 libvirt NAT 网段里的客户机
 #
-# mihomo（Clash Verge）默认只监听 127.0.0.1（allow-lan: false），而 libvirt 默认
+# mihomo（FlClash）默认只监听 127.0.0.1（allow-lan: false），而 libvirt 默认
 # NAT 网络的网关就是宿主机（192.168.122.1）。本模块提供两种互不冲突的方式：
 #
 #   - exposeToVms：在网桥地址上 socat 转发到回环端口，客户机手动把系统代理
@@ -10,7 +10,7 @@
 #     UDP/QUIC 丢弃迫使应用回落 TCP。
 #
 # 两条常见出路都不可取：
-#   - 在 Clash Verge 里开「允许局域网连接」：mihomo 改绑 0.0.0.0，代理顺带对整个
+#   - 在 FlClash 里开「允许局域网连接」：mihomo 改绑 0.0.0.0，代理顺带对整个
 #     局域网开放；而且该开关是 GUI 状态（不归 Nix 管），重建/重装后不保证还在；
 #   - 仿 Docker 用 nftables DNAT 到 127.0.0.1：需要打开
 #     net.ipv4.conf.all.route_localnet，等于允许把回环地址当可路由地址使用，
@@ -75,7 +75,7 @@ in
     ];
 
     systemd.services.libvirt-proxy-forward = lib.mkIf (cfg.enable && cfg.exposeToVms) {
-      description = "把主机代理（Clash Verge）转发到 libvirt 网桥";
+      description = "把主机代理（FlClash）转发到 libvirt 网桥";
 
       # 不声明 libvirtd 依赖：libvirtd 是 socket 激活的，virbr0 何时出现不由本单元
       # 掌控，靠 Restart 轮询等待更可靠（每次重试都在日志里写明原因）。

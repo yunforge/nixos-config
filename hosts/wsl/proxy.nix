@@ -1,6 +1,6 @@
 # WSL2 代理地址自适应
 #
-# Windows 侧 Clash Verge 监听 mySystem.proxy.port，但 WSL2 的网络模式由
+# Windows 侧 FlClash 监听 mySystem.proxy.port，但 WSL2 的网络模式由
 # Windows 侧 %USERPROFILE%\.wslconfig 决定，不在本仓库管理范围内：
 #   - mirrored 模式：Windows 的 localhost 映射进容器，127.0.0.1 直接可达
 #   - NAT 模式（默认）：Windows 宿主位于容器默认网关，127.0.0.1 不可达

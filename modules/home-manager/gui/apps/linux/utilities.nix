@@ -90,7 +90,7 @@ in
     # magpie 开机自启（托盘常驻：网关要在登录时就位，各 agent 才连得上）。
     # 不用 magpie 自带的 `magpie autostart on`：它把 os.Executable() 的**绝对
     # store 路径**写进 ~/.config/autostart/magpie.desktop，升级被 GC 后开机就
-    # 起不来（与上面桌面文件同一个坑）。照 clash-verge 的既有做法（media.nix）
+    # 起不来（与上面桌面文件同一个坑）。照 FlClash 的既有做法（media.nix）
     # 由 HM 声明一条自制 autostart 条目，Exec 用稳定的命令名走 PATH，恒指向
     # 当前版本；systemd 的 xdg-autostart-generator 会在登录时拉起它。
     # 参数 `tray` 是上游自启的形态（只进托盘、不开窗，见 cli help）。
