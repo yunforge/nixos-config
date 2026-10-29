@@ -392,7 +392,7 @@ desktop/laptop 的 workstation 角色默认开启 `mySystem.proxy.transparentFor
 │ 无代理配置                 │ TCP │ iptables nat PREROUTING（仅 virbr0）        │
 │ 默认网关 192.168.122.1     ├────▶│   REDIRECT :12345 → redsocks               │
 │ DNS 192.168.122.1:53       ├────▶│   REDIRECT :1053 → mihomo fake-ip DNS      │
-└────────────────────────────┘     │        │ HTTP CONNECT                      │
+└────────────────────────────┘     │        │ SOCKS5                            │
                                    │        ▼                                    │
                                    │   127.0.0.1:7897（mihomo / Clash Verge）    │
                                    └─────────────────────────────────────────────┘

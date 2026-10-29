@@ -116,8 +116,14 @@ in
       '';
     };
 
-    # 透明模式的后端：redsocks 接收被 REDIRECT 进来的客户机 TCP，再用 HTTP
-    # CONNECT 转给 mihomo 的 mixed 端口。只监听网桥地址，不暴露给局域网。
+    # 透明模式的后端：redsocks 接收被 REDIRECT 进来的客户机 TCP，再用 SOCKS5
+    # 转给 mihomo 的 mixed 端口。只监听网桥地址，不暴露给局域网。
+    #
+    # 用 socks5 而不是 http-connect：redsocks 0.5 判断 libevent 版本用的是
+    # _EVENT_NUMERIC_VERSION，而 libevent 2.1 已改名为 EVENT__NUMERIC_VERSION，
+    # 于是编译时落到旧接口 evbuffer_readline（EOL_ANY）。该接口会把响应头末尾
+    # 的 "\r\n\r\n" 当作一段连续换行一并吞掉，http-connect 状态机永远等不到
+    # 空行、不会进入 relay，客户机表现为「连上了但没有响应」。详见 docs/quirks.md。
     services.redsocks = lib.mkIf (cfg.enable && cfg.transparentForVms) {
       enable = true;
       redsocks = [
@@ -125,7 +131,7 @@ in
           ip = "192.168.122.1";
           port = redsocksPort;
           proxy = "127.0.0.1:${toString cfg.port}";
-          type = "http-connect";
+          type = "socks5";
           # 不启用模块自带的 iptables 规则：那些规则挂在 OUTPUT 上，会连宿主
           # 自己的流量一起劫持；virbr0 的 PREROUTING 规则由本模块显式管理
           redirectCondition = false;
@@ -169,7 +175,7 @@ in
       iptables -w -t nat -A LIBVIRT_PROXY -d 224.0.0.0/4 -j RETURN
       iptables -w -t nat -A LIBVIRT_PROXY -d 240.0.0.0/4 -j RETURN
 
-      # 其余 TCP 全部交给 redsocks（HTTP CONNECT 可承载任意 TCP）
+      # 其余 TCP 全部交给 redsocks（SOCKS5 可承载任意 TCP）
       iptables -w -t nat -A LIBVIRT_PROXY -p tcp -j REDIRECT --to-ports ${toString redsocksPort}
 
       iptables -w -t nat -D PREROUTING -i ${bridge} -j LIBVIRT_PROXY 2>/dev/null || true
