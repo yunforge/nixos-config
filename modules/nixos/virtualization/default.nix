@@ -11,6 +11,16 @@
 }:
 let
   cfg = config.mySystem.virtualization;
+
+  # virgl 3D 加速下 QEMU 要在宿主 GPU 上建 EGL 上下文，除 libvirt 为 <gl>
+  # 动态补的 /dev/dri/renderD* 外还需要 NVIDIA 的字符设备；缺了会 EGL_NOT_INITIALIZED。
+  # 注意：本机 cgroup v2 上 libvirt 并未挂 device BPF（scope 的 cgroup.controllers
+  # 里没有 device），这份 ACL 实际未被强制执行，属于兜底；SPICE 3D 黑屏的真因见
+  # docs/quirks.md「SPICE 3D 在本机 NVIDIA 专有驱动上必然黑屏」。
+  nvidiaDeviceAcl = lib.optionalString config.mySystem.hardware.nvidia.enable ''
+    , "/dev/nvidiactl", "/dev/nvidia0", "/dev/nvidia-modeset",
+      "/dev/nvidia-uvm", "/dev/nvidia-uvm-tools"
+  '';
 in
 {
   config = lib.mkIf cfg.enable {
@@ -36,6 +46,15 @@ in
         # 主机目录共享给 Windows 客户机（virtiofs）需要 vhost-user 后端可执行文件；
         # 否则 virsh/virt-manager 建 virtiofs 共享时报 "virtiofsd not found"
         vhostUserPackages = [ pkgs.virtiofsd ];
+
+        verbatimConfig = ''
+          namespaces = []
+          cgroup_device_acl = [
+            "/dev/null", "/dev/full", "/dev/zero",
+            "/dev/random", "/dev/urandom",
+            "/dev/ptmx", "/dev/kvm", "/dev/net/tun"${nvidiaDeviceAcl}
+          ]
+        '';
       };
     };
 
