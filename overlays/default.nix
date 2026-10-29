@@ -57,6 +57,14 @@ final: prev: {
   # 包只摆好文件，落地见 modules/home-manager/gui/apps/productivity.nix。
   liquidbird = prev.callPackage ../pkgs/liquidbird { };
 
+  # flclash：基于 ClashMeta 的代理客户端（上游 chen08209/FlClash）。
+  # nixpkgs 2026-08-17 以「用户少 + 无人维护」为由把它从 master 移除
+  # （26.05 分支里还留着 0.8.92），本仓库的 nixpkgs 跟 master，故自维护一份。
+  # 打包理由与升级步骤见 pkgs/flclash/default.nix 顶部。
+  # 属性名与 nixpkgs 那个 throw 墓碑同名，overlay 把它盖掉——本仓库要的是
+  # 能用的 flclash，不是 nixpkgs 那句「已移除」的报错。
+  flclash = prev.callPackage ../pkgs/flclash { };
+
   # Windows 客户机装机介质（virtio-win ISO + WinApps oem 脚本）。
   # winappsRev 取自 flake.lock 的 winapps 输入，升级输入后 oem 脚本哈希失配
   # 会显式报错，保证介质与 winapps 版本同步（消费方：modules/nixos/virtualization）。

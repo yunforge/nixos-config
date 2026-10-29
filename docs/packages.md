@@ -15,6 +15,7 @@
 | `babry` | [kregonia/babry](https://github.com/kregonia/babry) | tag | `v0.1.4` | `v0.1.4` | 最新 |
 | `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.1852` | `v0.1.1852` | 最新 |
 | `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.10.26.2` | `2026.10.26.2` | 最新 |
+| `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.2` | `0.9.2` | 最新（nixpkgs 已移除，见下） |
 | `liquidbird` | [StatIndet/liquidbird](https://github.com/StatIndet/liquidbird) | commit（main） | `0f8148d` | 同一 commit | 最新 |
 | `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit（tag 指向） | `839848b`（tag `2026-09-10`） | 同一 commit | 最新 |
@@ -23,6 +24,16 @@
 
 各包的**为什么这么打包**写在 `pkgs/<包名>/default.nix` 文件头，这里不重复。
 
+### `flclash` 为什么是「nixpkgs 曾经有、后来移除」
+
+nixpkgs 在 26.05 分支收录过 `flclash`（0.8.92），2026-08-17 以「用户少 + 无人维护」
+为由从 master 移除，`pkgs/top-level/aliases.nix` 里留了 throw 的墓碑。本仓库的
+nixpkgs 输入跟 master，`nix flake update` 不会把它带回来——要就得自维护。
+
+烂掉的是 nixpkgs 那份**打包**（源码构建，每个上游版本要同步 `pubspec.lock.json`、
+`git-hashes.json`、core 的 `vendorHash` 三份钉子），不是软件：上游 2026-10-24 发了
+v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb，升级只改版本 + 哈希。
+
 消费方（改包时确认影响面）：
 
 | 包 | 装在哪 |
@@ -30,6 +41,7 @@
 | `babry` | `modules/home-manager/gui/apps/linux/utilities.nix`（`Mod+P` / `Mod+Ctrl+P`，见 `docs/niri.md`） |
 | `magpie` | 同上（desktop/laptop 桌面版）；`magpie-cli` 在 `hosts/wsl/default.nix` |
 | `mcpp-m` | `modules/home-manager/dev/languages/cpp.nix`（所有 Linux 主机 + macbook） |
+| `flclash` | `modules/home-manager/gui/apps/linux/media.nix`（代理客户端，取代 clash-verge-rev） |
 | `liquidbird` | `modules/home-manager/gui/apps/linux/productivity.nix`（Thunderbird 主题） |
 | `mactahoe-*` | `gui/desktop/linux/themes/default.nix`、`themes/variants.nix`、`modules/nixos/desktop/gdm.nix` |
 | `windows-vm-media` | `modules/nixos/virtualization`（`mySystem.virtualization`） |
@@ -52,7 +64,7 @@ nix flake update
 # 3. 验证
 nix fmt
 nix flake check
-nix build --dry-run .#babry .#magpie .#magpie-cli .#mcpp-m .#liquidbird \
+nix build --dry-run .#babry .#magpie .#magpie-cli .#mcpp-m .#flclash .#liquidbird \
   .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum .#windows-vm-media
 nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 ```
@@ -67,7 +79,7 @@ nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 git ls-remote --tags --refs https://github.com/<owner>/<repo> \
   | sed 's#.*refs/tags/##' | sort -V | tail -3
 
-# 走 GitHub Release 的（mcpp）：看 latest 跳转到哪个 tag
+# 走 GitHub Release 的（mcpp / flclash）：看 latest 跳转到哪个 tag
 curl -sI https://github.com/<owner>/<repo>/releases/latest | grep -i '^location'
 
 # 跟 main 走的（liquidbird / MacTahoe-kde）：HEAD 即最新
@@ -117,6 +129,32 @@ sources = {
 
 三个平台都要更新（上游只发这三个；其余平台由包内 `throw` 显式报错）。
 
+### release 资产（deb，`flclash`）
+
+上游每个版本发一组预编译产物（deb / AppImage / rpm / dmg / exe）与一份
+`SHA256SUMS`，本包只取 Linux 的两个 deb：
+
+```nix
+version = "0.9.2";
+
+sources = {
+  x86_64-linux  = { asset = "amd64"; hash = "sha256-…"; };
+  aarch64-linux = { asset = "arm64"; hash = "sha256-…"; };
+};
+```
+
+```bash
+# ① 上游 SHA256SUMS（十六进制）转 SRI
+curl -sL https://github.com/chen08209/FlClash/releases/download/v<版本>/SHA256SUMS \
+  | grep 'linux-\(amd64\|arm64\)\.deb'
+nix hash convert --hash-algo sha256 --to sri <hex>
+```
+
+- 资产名规则是 `FlClash-<版本>-linux-<amd64|arm64>.deb`；上游若改命名规则，构建会以
+  404 失败，照报错改 `url` 即可。
+- 升级只改 `version` + 两个哈希，**不需要**重算别的东西（不走源码构建，没有
+  pubspec.lock / vendorHash 那三份钉子）。
+
 ### commit 钉法（`liquidbird`、`mactahoe-*`）
 
 ```nix
@@ -165,6 +203,22 @@ nix store prefetch-file --json \
 - **上游脚本把 stderr 重定向到临时文件**：`libs/lib-core.sh` 里 `exec 2> $MACTAHOE_TMP_DIR/error_log.txt`，
   构建失败时 `nix log` 只看得到截断的 stdout。排查时把 `installPhase` 临时改成
   `HOME=/nix/store ./install.sh ...` 手工跑一遍，再看 `/tmp/MacTahoe.lock/error_log.txt`。
+- **flclash 的 bundle 目录布局不能改**：上游 `lib/common/path.dart` 用
+  `dirname(Platform.resolvedExecutable)` 拼 `FlClashCore` / `FlClashHelperService`，
+  GUI 与 core 必须同目录，`lib/`、`data/` 相对该目录。包内整体放
+  `$out/libexec/flclash/`，`$out/bin/FlClash` 是 exec 的 wrapper——软链会让
+  `resolvedExecutable` 落到软链路径上，core 就找不到了。
+- **flclash 的 `$ORIGIN/lib` 不能被 autoPatchelf 换掉**：FlClash 与 libflutter 都靠
+  `RUNPATH=$ORIGIN/lib` 找引擎与插件 .so，nixpkgs 的 autoPatchelf 默认把 RUNPATH 换成
+  绝对 store 路径。故包内设 `autoPatchelfFlags = [ "--preserve-origin" ]`（nixpkgs 自己的
+  `pkgs/test/auto-patchelf-hook-preserve-origin` 就是这个用例）。
+- **flclash 只剩「系统代理」模式**：TUN 模式依赖 `FlClashHelperService` 提权（上游 Linux
+  包装给 setuid root），Nix store 不允许 setuid。仓库的客户机透明转发走 redsocks +
+  mihomo，不依赖 TUN，不受影响。
+- **flclash 与 clash-verge-rev 抢同一批端口**（7890/7897/1053），两者只能同时开一个。
+  2026-10-28 已把系统里的 clash-verge-rev 换成 FlClash：两者都是 Clash 内核的 GUI，
+  但 FlClash 沿用同一套端口（mixed-port 7897、dns listen 0.0.0.0:1053），
+  `modules/nixos/networking/proxy*.nix` 不用改。
 - **升级后必须跑 `nix flake check`**：它会逐一评估 `packages.*`，哈希失配与依赖 API 变更
   在这一步就暴露，不必等到主机 dry-build。
 
