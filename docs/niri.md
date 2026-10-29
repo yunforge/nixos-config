@@ -100,4 +100,5 @@ niri 的 `screenshot-path`（`config.kdl`）已随 niri 自带截图动作一并
 
 - **最大化打开**：VSCode、Logisim、Brave、Zotero
 - **浮动打开（居中，统一 0.50×0.60）**：Fcitx5 配置、PicGo、btop、qView、LocalSend、微信、QQ、Telegram、Discord、欧陆词典、gnome-text-editor、Pot（含其偏好面板）、Thunderbird、magpie、Anki、gapless、FlClash、disktree、bilibili
+- **微信额外禁止全屏**（`open-fullscreen false`）：XWayland 的 satellite 会把「尺寸等于某块输出」的窗口判成全屏，从而盖掉浮动预设 —— 根因与移除条件见 `docs/quirks.md`
 - 全局默认平铺，圆角 8px（`geometry-corner-radius`，原为 24，理由见 `docs/themes.md`）

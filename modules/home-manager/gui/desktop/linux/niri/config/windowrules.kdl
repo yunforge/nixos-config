@@ -175,3 +175,36 @@ window-rule {
     default-column-width { proportion 0.50; }
     default-window-height { proportion 0.60; }
 }
+
+// ═══════════════════════════════════════════════
+// 微信 —— 拒掉客户端自带的全屏请求
+// ═══════════════════════════════════════════════
+//
+// 2026-10-29 定因：微信一登录主窗口就铺满整屏（niri 里 tile = 2560×1440、
+// is_floating = false），「朋友圈」窗口同样如此，与下面浮动窗口组的
+// 0.50×0.60 预设不符 —— 全屏窗口只能待在 scrolling layout，会把
+// open-floating + 尺寸预设整条盖掉。
+//
+// 客户端并没有真的要全屏，是 xwayland-satellite 判错了：微信在 X11 侧
+// 请求 1920×1080（= DP-2 的物理尺寸），而 satellite 有一条启发式 ——
+// 窗口尺寸与某块输出完全相等就当作全屏（日志原文：
+// 「creating toplevel for Window { res_id: … } fullscreen: true」），
+// 并在首个 commit 之前就发出 set_fullscreen。
+//
+// niri 侧的处理是「wants_fullscreen.is_some() && rules.open_fullscreen.is_none()」
+// 即客户端要全屏而规则没表态就照单全收。open-fullscreen false 正是
+// niri 文档给出的拦截开关：它在初始 configure 阶段生效，而 satellite
+// 恰好在这个阶段就发了请求，所以拦得住。
+//
+// app-id 两个都写上：
+//   - "wechat" —— 主窗口、朋友圈、公众号等可见窗口（实测 WM_CLASS 类名
+//     均为 "wechat"，包括 Chromium 渲染的子窗口）；
+//   - "WeChatAppEx" —— 微信自带的 RadiumWMPF 运行时窗口，目前只在
+//     离屏渲染时出现（实测 540×540 → 1050×960，不成为 toplevel），
+//     但它同样是 X11 客户端、同样可能被 satellite 判成全屏，一并挡住。
+window-rule {
+    match app-id="(?i)^wechat$"
+    match app-id="(?i)^WeChatAppEx$"
+
+    open-fullscreen false
+}
