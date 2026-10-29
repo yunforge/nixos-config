@@ -13,7 +13,17 @@ let
     url = "https://raw.githubusercontent.com/pot-app/pot-desktop/master/public/icon.svg";
     hash = "sha256-Fgn8kC4GhIOkzUmGre7OCW5fED5N1AU1KrXbbCh714I=";
   };
-  potPackage = pkgs.nur.repos.awa2333.pot-translation;
+  pot-unwrapped = pkgs.nur.repos.awa2333.pot-translation;
+
+  # Pot 的 AppImage 随包了 libgcrypt，却把 libgpg-error.so.0 留给系统提供
+  # （上游假设发行版自带）；而 NUR 用 appimageTools.wrapType2 打出的 FHS 环境
+  # 里没有它，于是冷启动直接报 "libgpg-error.so.0: cannot open shared object
+  # file"。FHS 内 /nix 是可见的，用 LD_LIBRARY_PATH 指向 nixpkgs 的实现即可。
+  gpgErrorLib = lib.makeLibraryPath [ pkgs.libgpg-error ];
+  potPackage = pkgs.writeShellScriptBin "pot" ''
+    exec env LD_LIBRARY_PATH=${gpgErrorLib}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
+      ${pot-unwrapped}/bin/pot "$@"
+  '';
   pot-desktop = pkgs.makeDesktopItem {
     name = "pot";
     desktopName = "Pot";
