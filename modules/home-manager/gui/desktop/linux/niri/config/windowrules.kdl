@@ -110,6 +110,9 @@ window-rule {
 // 2026-10-06：删掉原来的六档尺寸表（sidebar/tool/chat/settings/content）与逐应用
 // 分档，改为所有浮动窗口共用一个尺寸。
 //
+// 2026-10-29：尺寸从「工作区比例 0.50×0.60」改为固定 900×623（比例 13:9，
+// 取自 Omarchy `Super + O` 的 1300×900）。取舍与算法见下面「尺寸」段的说明。
+//
 // 尺寸只写在一个地方：niri 没有「全局浮动尺寸」选项，尺寸只能落在 window-rule 上；
 // 但一条规则里可以写多个 match（彼此是 OR —— 见 niri wiki「Window Rules」：
 // is_active / title / app-id 多条 `match` 之间是「或」）。于是下面把 19 个 app-id
@@ -121,11 +124,32 @@ window-rule {
 // 只需要一处尺寸 + 不写 default-floating-position —— 后者一旦写出就会覆盖居中、
 // 把窗口推到屏幕角上。原 Pot 那条 relative-to="top-right" 正是这么做的，现已删除。
 //
-// 比例基于工作区（扣掉状态栏），不是整块屏幕：
-//   宽 0.50 → work area 广 2560 → 约 1276 逻辑像素
-//   高 0.60 → work area 高 1409 → 约 845 逻辑像素
-// 在 2560×1440@1.5 的 4K 屏上约 1914×1268 物理像素，居中展示。想要别的尺寸
-// 改下面两个 proportion 即可，全应用一起变；临时单独调用 Mod+= / Mod+Shift+=。
+// 尺寸：900×623 逻辑像素，比例 13:9（取自 Omarchy 的 `Super + O`）。
+//
+// Omarchy 那边 `Super + O` = 「Pop window out (float & pin)」，实现在
+// bin/omarchy-hyprland-window-pop：脚本默认 width=1300 height=900，
+// 即 `hyprctl dispatch resizeactive exact 1300 900` 后 `centerwindow`，
+// 再 `pin` 钉住（浮动但不平铺）。故取其宽高比 1300:900 ≈ 13:9。
+//
+// 为什么用 fixed 绝对值而不是 proportion：niri 的 default-column-width 与
+// default-window-height 是**两个各自独立**按工作区边长算的比例，无法表达
+// 「宽高比」——同一个 (0.50, 0.60) 在 2544×1424 的 4K 工作区得 1272×854
+// （比 1.489），在 1264×704 的 1080p 工作区得 632×422（比 1.496），两块屏
+// 的比例都随屏幕长宽比漂移。而窗口规则无法按输出分别声明（open-on-output
+// 一条规则只对一个输出），所以 proportion 方案做不到双屏统一 13:9。
+//
+// 900×623 是能在**两块屏都放得下**的 13:9 尺寸：1080p 屏工作区仅
+// 1264×704（900 占 71% 宽、623 占 88% 高），4K 屏工作区 2544×1424
+// （占 35% 宽、44% 高）。比 Omarchy 的 1300×900 小 —— 那边是给 1920×1080
+// 屏设计的，本机 1080p 屏的逻辑工作区只有 1264×704，照搬会放不下。
+//
+// 客户端仍可自选尺寸（niri 文档：the window itself always has a final say
+// in its size）—— 规则只决定初始 configure 的尺寸。实测：disktree 严格按
+// 900×623 打开（= 规则值）；但微信主窗口实测是 900×720 —— 宽守住了 900，
+// 高被客户端自己选的 720 顶掉（它的 X11 min_size 是 845×858）。试过加
+// `max-height 623` 强制钳死，结果 niri 侧与客户端的 min_size 冲突，窗口
+// 直接无法映射；`max-width 900` 则无效果（客户端请求的宽本就等于 900）。
+// 故此处不加 max-*，宽高比由「客户端配合」决定，规则保证的是初始尺寸。
 //
 // open-floating 仍逐条写明：全局规则声明了 open-floating false，而本规则要把它翻回
 // true。niri 对同一条规则内的多个 match 不做「后覆盖前」——一条规则要么整体命中、
@@ -172,8 +196,8 @@ window-rule {
     match app-id="(?i)bilibili"
 
     open-floating true
-    default-column-width { proportion 0.50; }
-    default-window-height { proportion 0.60; }
+    default-column-width { fixed 900; }
+    default-window-height { fixed 623; }
 }
 
 // ═══════════════════════════════════════════════
