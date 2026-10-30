@@ -39,6 +39,11 @@
 # 文件留在 vendored 树里保持与上游一致；若将来重新 vendored 后出现了 `ass:texture(`
 # 的调用（历史上用它画菜单暗化的斜纹底），把下面这行再补回去即可。
 #
+# mpv.conf 里 `keepaspect-window=no` 也是本地加的（上游没有）。mpv 默认 yes 会把窗口
+# 撑成视频宽高比，而 niri 的列高由客户端决定、照单全收：竖屏视频窗口实测被撑到
+# 1268×2255，屏幕只有 1440 高 —— 看上去就是「放大到满屏」。关掉后窗口保持 niri
+# 给的尺寸，视频在窗口内按原始比例留黑边。
+#
 # mpv.conf 里 vo=gpu-next / gpu-api=vulkan / hwdec=nvdec 是上游按 NVIDIA 给的。本仓库
 # 只有 desktop / laptop 导入 gui/，两台都是 NVIDIA（hosts/*/nvidia.nix），故可直接用；
 # 换 AMD/Intel 主机时改成 hwdec=auto-safe 并按显卡调 gpu-api。
