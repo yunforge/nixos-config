@@ -13,6 +13,7 @@ in
 {
   imports = [
     ./yazi.nix
+    ./ssh.nix
     ./tmux.nix
     ./distrobox.nix
     ./yt-dlp.nix
