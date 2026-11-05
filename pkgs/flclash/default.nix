@@ -54,17 +54,17 @@
   pango,
 }:
 let
-  version = "0.9.2";
+  version = "0.9.3";
 
   # 上游每个版本只发这两个平台的 deb，资产名见 release 页
   sources = {
     x86_64-linux = {
       asset = "amd64";
-      hash = "sha256-xso3RG25K1cwnRxwn7piCfLGebbTPPx0j3O46xpZpug=";
+      hash = "sha256-QGQlQym7OcYonHQ+FuVyauVrWFPobZ+I4BReKvAyNRs=";
     };
     aarch64-linux = {
       asset = "arm64";
-      hash = "sha256-FXAhGSGNKIlDl4YR22dO63SVkR0Hul4URHRDYTU98+Y=";
+      hash = "sha256-hnieeEeG59U9zkSFj/m9zY9DCjvRNmvJ0HG/aGIr56c=";
     };
   };
 
