@@ -42,8 +42,8 @@
 - **fastfetch 不跟随 Noctalia。** 上游有 community 模板，但它的 `apply.sh` 要求 `config.jsonc`
   是**严格 JSON**（带注释直接报错退出），而本仓库那份的注释里写着 10 阶渐变的对比度算据、
   不能丢；且 `apply.sh` 会改写 `config.jsonc`（HM 只读软链）里的 `logo` / `display` 两段。
-  继续走 `theme-apply` 翻软链：亮色那份的 10 阶渐变是**重算**的，不是换色值（推导见
-  `assets/fastfetch/nixos-01-light.jsonc` 顶部注释）。
+  继续走 `theme-apply` 翻软链：亮色那份的 10 阶渐变是**重算亮度**的，色相/彩度与暗色相同
+  （推导见 `assets/fastfetch/nixos-01-light.jsonc` 顶部注释）。
 - **gtk3/gtk4/qt 三个 builtin 模板不启用** —— GTK/Qt 保持 MacTahoe 自打包完整主题，见「主题栈」。
 - **bat 不跟随 Noctalia（社区模板已失效）。** 上游 `bat` 社区模板往 `~/.config/bat/config`
   写 `--theme=noctalia` 并渲染 `themes/noctalia.tmTheme`，但那个文件现由 `programs.bat`
@@ -275,7 +275,7 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 | 层 | 家族 | 元 |
 |---|---|---|
 | 壳层：niri 装饰 + GTK + Qt + Noctalia bar | macOS 中性灰 + 单一强调色 `#0088FF` | MacTahoe-Dark 的 `gtk-4.0/gtk.css` |
-| 工作区：终端 + 编辑器 + shell + 文件管理器 + 系统监控 | 暗 Catppuccin Frappe / 亮 Catppuccin Latte | **Noctalia 调色板的 `terminal` 色槽**；ghostty、Neovim、yazi、btop、fastfetch、eza、fish 多处同源 |
+| 工作区：终端 + 编辑器 + shell + 文件管理器 + 系统监控 | 暗 Catppuccin Frappe / 亮 Catppuccin Latte | **Noctalia 调色板的 `terminal` 色槽**；ghostty、Neovim、yazi、btop、eza、fish 多处同源。例外：fastfetch 的 10 阶渐变取自 **logo 的官方双色**（见「fastfetch」一节） |
 
 > 工作区一族现在也由 Noctalia 的 `terminal` 色槽统一供色：暗色块填 Frappe、亮色块填 Latte，
 > 亮暗切换时整族一起换（ghostty/btop/yazi/eza/fish 由 Noctalia 模板渲染，nvim/tmux/fastfetch 随终端或自行跟随）。
@@ -307,10 +307,14 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
   不存在的 `nixos_logo_1.webp`）；量宽度或排查 logo 时先确认量到的不是回退产物。
 - **那 10 个常量是冷色明度渐变，不是彩虹。** 它们会被用在约 30 个键名标签上
   （`├ Board` / `├ CPU` …），10 个色相铺满一列文字就是噪声。
-  而原设计的端点是 NixOS 品牌蓝 `#5277C3`，压在终端底色 `#303446` 上只有 **2.81:1**
-  （低于 AA），最上面几行的键名本身就偏暗 —— 所以这里既修可读性，也修配色家族：
-  改为经过 4 个 Frappe 真实色的关键帧插值（`overlay2` → `blue` → `sapphire` → `sky`），
-  10 阶全部 ≥ 4.53:1。
+  **色相与彩度取自 logo 的官方双色**：深蓝 `#5277C3`（OKLCH H263.4 / C0.1248）与浅蓝
+  `#7EBAE4`（H239.9 / C0.0866），10 阶沿这两点在 OKLCH 里插值 —— 整列文字与 logo 同族。
+  亮度被对比度顶住而非直接取 logo 值：`#5277C3` 压在终端底色 `#303446` 上只有 **2.81:1**
+  （低于 AA），故暗色那份 `{$1}` 抬到刚好 4.53:1（L=0.6985），`{$10}` 恰好落在 logo 浅蓝
+  `#7EBAE4`（5.88:1，端点即品牌色），10 阶全部 ≥ 4.53:1。
+  亮色那份**色相/彩度完全相同，只翻亮度方向**：Latte 底色上两个 logo 蓝都不可读
+  （3.88 / 1.85），故 `{$1}` 压到 4.79:1（L=0.5270），`{$10}` 沿用暗色那份的亮度跨度
+  0.0651 → 6.19:1。亮暗翻软链时色族不变。
 
 - **宽度预算 ≲ 102 列**（半屏终端），实测最长 **102 列**（最长行来自模块区，不是 logo）。历史上是 133 列：分组横线原来是
   10 段 × 7 字符（横线自己就有 70 列）+ 43 列的手绘 logo。收的过程：横线改 10 段 × 2 字符；
