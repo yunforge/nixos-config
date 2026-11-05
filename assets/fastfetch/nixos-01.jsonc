@@ -1,15 +1,23 @@
 {
   "logo": {
-    // 用文本 logo（type=file）而不是图片。
-    // 内置的 NixOS logo 是纯文本、**不可着色**（实测 --logo-color-1..9 对它完全无效，
-    // 输出逐字节相同），而文本文件可以逐行内嵌 ANSI 码，于是 logo 能跟着
-    // 工作区的 Frappe 调色板走，而不是全屏幕唯一一处不着色的东西。
-    // 图片 logo 在这个尺寸下只有约 80×42 像素（40×21 字符 × 半块两像素），
-    // 比 ASCII 更糊；而且当时配的 nixos_logo_1.webp 根本不存在，一直在静默回退。
-    // 文件由 home-manager 从 assets/fastfetch/logo/nixos_logo_1.txt 部署。
-    // 不再写 height/width：那两个选项只对图片 logo 有效。
-    "type": "file",
-    "source": "~/.config/fastfetch/logo/nixos_logo_1.txt",
+    // 用图片 logo（type=kitty，Kitty graphics protocol）。Ghostty 只支持这一种图片协议
+    // （没有 sixel、没实现 iTerm2 OSC 1337），而 fastfetch 的 auto 不会自动协商图片协议
+    // （auto = 先 builtin 再 file），所以图片协议必须写死。
+    // 收益：logo 区 44 列 × 20 行在 Ghostty 里约 440×400 px，真图是抗锯齿平滑曲线、
+    // 保留官方双色渐变；半块字符图时代只有 44×40 的像素格、边缘阶梯。
+    // 源图：官方 nix-snowflake-colours.svg 经 rsvg-convert -w 1024 -h 1024 的透明底 PNG
+    // （配方见 docs/themes.md 的 fastfetch 一节），由 home-manager 部署成普通文件。
+    // 退化与坑：tmux / SSH / 管道等协议不可用环境里 fastfetch **静默回退内置 NixOS ASCII**
+    // （单色、跟前景色；文件缺失同样，实测 rc 0 无 stderr）—— 本仓库历史上第二个静默回退点
+    // （第一个是当年不存在的 nixos_logo_1.webp），png 路径不要随手挪/改名。
+    // logo 不区分亮/暗：透明底 + 官方双色在两种底色上都成立，只部署一份，
+    // 这句 source 两份 jsonc 相同。
+    // width/height 单位是字符，占位 44 列 × 20 行（模块列位置与字符图时代一致）；
+    // 这两个选项只对图片 logo 有效。
+    "type": "kitty",
+    "source": "~/.config/fastfetch/logo/nixos_snowflake.png",
+    "width": 44,
+    "height": 20,
     "padding": {
       "top": 2,
       "left": 3,
@@ -61,7 +69,7 @@
     },
   },
   "modules": [
-    // 宽度预算：logo 43 列之后，模块行 ≲ 101 列（半屏终端，实测最长 101）。
+    // 宽度预算：logo 44 列（官方矢量重生成版），模块行 ≲ 102 列（半屏终端，实测最长 102，最长行在模块区）。
     // 信息头用中文 —— fastfetch 不会按显示宽度对齐 CJK，空格是手工补到 8 列的。
     // 分组：硬件 / 软件 / 网络。原来的 Time 组只剩「系统年龄」一行，并进软件组。
     "break",

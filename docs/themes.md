@@ -33,7 +33,7 @@
 | btop | Noctalia builtin `btop` 模板写 `themes/noctalia.theme` | 下次启动生效 |
 | yazi | Noctalia community `yazi` 模板写 `flavors/noctalia.yazi/*` | — |
 | eza / fish | 本仓库用户模板（见下节） | fish 新开 shell 生效 |
-| fastfetch（config + logo） | 登记进 `myHome.appearance.switchTargets`，翻软链 | 下次启动生效 |
+| fastfetch config | 登记进 `myHome.appearance.switchTargets`，翻软链（logo 不区分亮/暗，普通文件部署） | 下次启动生效 |
 | nvim | 翻一份 `mode.lua`，`theme.lua` 据此设 `vim.o.background`，catppuccin `flavour="auto"` | 要重进（或 `:colorscheme catppuccin`） |
 | tmux | 颜色全用 ANSI 名称，配色由终端提供 | 随终端自动跟 |
 
@@ -293,15 +293,19 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 
 细节全在 `assets/fastfetch/nixos-01.jsonc` 的注释里，两个结论：
 
-- **logo 是文本文件（type=file）而不是内置 logo。** fastfetch 内置 logo
-  不可着色 —— 实测 `--logo-color-1..9` 对它完全无效（输出逐字节相同）。而文本文件可以
-  逐行内嵌 ANSI 码，于是 logo 能跟着工作区的 Frappe / Latte 调色板走，而不是全屏幕
-  唯一一处不着色的东西。图形是文本形式的 NixOS 美术图（40 列 × 20 行）：暗色
-  Frappe 蓝 `#8CAAEE`，亮色 Latte 蓝 `#1E66F5`（浅底上原蓝会糊）。
-  文件：`assets/fastfetch/logo/nixos_logo_1{,-light}.txt`，由 `common/tools/default.nix`
-  部署。
-  ⚠️ 文件路径写错时 fastfetch **静默回退到内置 logo**（不报错）—— 量宽度时踩过一次，
-  以为在量文件 logo，其实量的是内置 NixOS ASCII。
+- **logo 是图片（type=kitty，Kitty graphics protocol），不是字符图也不是内置 logo。**
+  内置 logo 不可着色（实测 `--logo-color-1..9` 完全无效）；半块字符图时代（44 列 × 20 行、
+  官方双色 `#5277C3` / `#7EBAE4`）在字符格分辨率下无损但边缘阶梯。Kitty 协议按真像素画
+  （logo 区 44 列 × 20 行在 Ghostty 里约 440×400 px），抗锯齿平滑、保留官方双色渐变。
+  Ghostty 只支持 Kitty graphics protocol（没有 sixel、没实现 iTerm2 OSC 1337），而
+  fastfetch 的 `auto` 不会自动协商图片协议（auto = 先 builtin 再 file），所以必须写死
+  `type: "kitty"`。源图：`nixos-artwork` 的 `logo/nix-snowflake-colours.svg` →
+  `rsvg-convert -w 1024 -h 1024` 透明底 PNG → `assets/fastfetch/logo/nixos_snowflake.png`，
+  由 `common/tools/default.nix` 部署（不区分亮/暗、不登记进 switchTargets）。
+  `width` / `height` 以字符为单位占位 44 列 × 20 行，模块列位置与字符图时代一致。
+  ⚠️ tmux / SSH / 管道等协议不可用环境、或文件缺失时，fastfetch **静默回退内置 NixOS
+  ASCII**（单色、跟前景色，rc 0 无 stderr）—— 历史上第二个静默回退点（第一个是当年
+  不存在的 `nixos_logo_1.webp`）；量宽度或排查 logo 时先确认量到的不是回退产物。
 - **那 10 个常量是冷色明度渐变，不是彩虹。** 它们会被用在约 30 个键名标签上
   （`├ Board` / `├ CPU` …），10 个色相铺满一列文字就是噪声。
   而原设计的端点是 NixOS 品牌蓝 `#5277C3`，压在终端底色 `#303446` 上只有 **2.81:1**
@@ -309,14 +313,16 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
   改为经过 4 个 Frappe 真实色的关键帧插值（`overlay2` → `blue` → `sapphire` → `sky`），
   10 阶全部 ≥ 4.53:1。
 
-- **宽度预算 ≲ 101 列**（半屏终端），实测最长 **101 列**（换回 43 列的 NixOS logo 后）。历史上是 133 列：分组横线原来是
-  10 段 × 7 字符（横线自己就有 70 列）+ 43 列的 logo。收的过程：横线改 10 段 × 2 字符；
-  logo 一度换成 32 列的鲸鱼（90 列），现在换回 43 列的 NixOS 文本 logo；模块格式只留有效字段（`os` 名字+版本、`disk` 不留文件系统类型、
+- **宽度预算 ≲ 102 列**（半屏终端），实测最长 **102 列**（最长行来自模块区，不是 logo）。历史上是 133 列：分组横线原来是
+  10 段 × 7 字符（横线自己就有 70 列）+ 43 列的手绘 logo。收的过程：横线改 10 段 × 2 字符；
+  logo 一度换成 32 列的鲸鱼（90 列），换回 43 列的手绘 NixOS 图后又嫌它「从两边往中间扁」，
+  现在是 Kitty 协议画的官方矢量图（`logo.width` 占位 44 列，见上面 logo 一节）；模块格式只留有效字段（`os` 名字+版本、`disk` 不留文件系统类型、
   `localip` 不留 MAC、`display` 分辨率+刷新率、`packages` 改 `nix: A+B`）；模块清单也砍了
   一批（Board / Sound / BIOS / Packages / Processes / Term Font / BT Radio / WiFi / DNS /
   Public IP / 日期时间 / 运行时长）。
-  量法：`fastfetch --pipe -c assets/fastfetch/nixos-01.jsonc` 后取最长行（**先把 logo 路径
-  换成绝对路径**，否则静默回退到内置 logo，量出来的宽度是假的）。
+  量法：`fastfetch --pipe -c assets/fastfetch/nixos-01.jsonc` 后取最长行。注意管道环境
+  Kitty 协议必然不可用，logo 永远走内置 ASCII 回退（比 44 列占位窄），所以管道量到的是
+  宽度**下界**；真实 44 列占位只在 Ghostty 窗口里体现。
   信息头（键名）改成中文，按显示宽度手工补空格到 8 列 —— fastfetch 不会自己对齐 CJK。
   分组收敛成三组：**硬件 / 软件 / 网络**（原来的 Time 组只剩「系统年龄」一行，并进软件组）。
   用量相关的三行（memory / swap / 两块 disk）统一成 `已用 / 总量 (百分比)`，**没有进度条**：
