@@ -16,7 +16,6 @@
 | `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.2020` | `v0.1.2020` | 最新 |
 | `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.10.29.1` | `2026.10.29.1` | 最新 |
 | `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.2` | `0.9.2` | 最新（nixpkgs 已移除，见下） |
-| `liquidbird` | [StatIndet/liquidbird](https://github.com/StatIndet/liquidbird) | commit（main） | `0f8148d` | 同一 commit | 最新 |
 | `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit（tag 指向） | `839848b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-kvantum` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde) | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 最新 |
@@ -42,7 +41,6 @@ v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb�
 | `magpie` | 同上（desktop/laptop 桌面版）；`magpie-cli` 在 `hosts/wsl/default.nix` |
 | `mcpp-m` | `modules/home-manager/dev/languages/cpp.nix`（所有 Linux 主机 + macbook） |
 | `flclash` | `modules/home-manager/gui/apps/linux/media.nix`（代理客户端，取代 clash-verge-rev） |
-| `liquidbird` | `modules/home-manager/gui/apps/linux/productivity.nix`（Thunderbird 主题） |
 | `mactahoe-*` | `gui/desktop/linux/themes/default.nix`、`themes/variants.nix`、`modules/nixos/desktop/gdm.nix` |
 | `windows-vm-media` | `modules/nixos/virtualization`（`mySystem.virtualization`） |
 
@@ -64,7 +62,7 @@ nix flake update
 # 3. 验证
 nix fmt
 nix flake check
-nix build --dry-run .#babry .#magpie .#magpie-cli .#mcpp-m .#flclash .#liquidbird \
+nix build --dry-run .#babry .#magpie .#magpie-cli .#mcpp-m .#flclash \
   .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum .#windows-vm-media
 nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 ```
@@ -82,7 +80,7 @@ git ls-remote --tags --refs https://github.com/<owner>/<repo> \
 # 走 GitHub Release 的（mcpp / flclash）：看 latest 跳转到哪个 tag
 curl -sI https://github.com/<owner>/<repo>/releases/latest | grep -i '^location'
 
-# 跟 main 走的（liquidbird / MacTahoe-kde）：HEAD 即最新
+# 跟 main 走的（MacTahoe-kde）：HEAD 即最新
 git ls-remote https://github.com/<owner>/<repo> HEAD
 ```
 
@@ -155,7 +153,7 @@ nix hash convert --hash-algo sha256 --to sri <hex>
 - 升级只改 `version` + 两个哈希，**不需要**重算别的东西（不走源码构建，没有
   pubspec.lock / vendorHash 那三份钉子）。
 
-### commit 钉法（`liquidbird`、`mactahoe-*`）
+### commit 钉法（`mactahoe-*`）
 
 ```nix
 rev = "<新 commit>";
@@ -171,7 +169,6 @@ git log -1 --format=%ci <rev>   # 取日期填 version
   （`git ls-remote --tags --refs` 直接给出 rev），`version` 填该 tag 名（两者现在一致）。
   早期曾出现 `version = "2026-08-07"` 而 tag 叫 `2026-08-08` 的一天偏差，现在按 tag 名写即可。
 - `mactahoe-kvantum` 上游没有 tag，跟 main HEAD。
-- `liquidbird` 上游尚未为 Linux 侧打 tag（`v0.1.0` 只有 macOS），继续跟 main commit。
 
 ### 跟随 flake 输入（`windows-vm-media`）
 

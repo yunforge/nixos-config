@@ -52,11 +52,6 @@ final: prev: {
   #（grim/wl-copy/notify-send）由包内 wrapProgram 钉进 PATH。
   babry = prev.callPackage ../pkgs/babry { };
 
-  # liquidbird：Thunderbird 的 Liquid Glass 主题（上游 StatIndet/liquidbird，
-  # nixpkgs 未收录）。不是 add-on，是 profile 里的 userChrome/userContent 体系：
-  # 包只摆好文件，落地见 modules/home-manager/gui/apps/productivity.nix。
-  liquidbird = prev.callPackage ../pkgs/liquidbird { };
-
   # flclash：基于 ClashMeta 的代理客户端（上游 chen08209/FlClash）。
   # nixpkgs 2026-08-17 以「用户少 + 无人维护」为由把它从 master 移除
   # （26.05 分支里还留着 0.8.92），本仓库的 nixpkgs 跟 master，故自维护一份。

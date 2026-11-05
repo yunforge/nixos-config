@@ -50,7 +50,6 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | Zotero | 文献管理 |
 | Anki | 记忆卡片 |
 | XMind | 思维导图 |
-| Thunderbird | 邮件 |
 | Pot | 划词翻译（Alt+T / Alt+I / Alt+X） |
 
 ## 媒体与工具

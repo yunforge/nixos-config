@@ -179,13 +179,11 @@ window-rule {
     // 都在本规则内，面板不再像原来那样另设一档尺寸（niri 会遵从面板自己请求的
     // 尺寸，只有它主动放弃首选尺寸时才会落到下面的浮窗默认值）。
     match app-id="(?i)pot"
-    // 其它（邮件 / AI 模型选择器 / Anki / 音乐 / 代理 / 磁盘占用图）
+    // 其它（AI 模型选择器 / Anki / 音乐 / 代理 / 磁盘占用图）
     // ⚠ 这几个的 app-id 都不是照 .desktop 文件名写的 ——
-    // thunderbird 的 Wayland app-id 是 "thunderbird"（不是 org.mozilla.Thunderbird，
-    // .desktop 的 --name 只改 X11 的 WM_CLASS）、gapless 其实是 g4music
+    // gapless 其实是 g4music
     // （com.github.neithern.g4music）。照文件名写会静默不命中
     // （gnome-text-editor 那条就是这么错的）。
-    match app-id="(?i)thunderbird"
     match app-id="(?i)magpie"
     match app-id="(?i)anki"
     match app-id="(?i)g4music"

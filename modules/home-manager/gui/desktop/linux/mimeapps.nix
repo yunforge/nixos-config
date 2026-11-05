@@ -1,11 +1,9 @@
 # MIME 默认程序 / 关联
 #
-# 为什么整份都由 HM 托管：Thunderbird 启动时（打包默认 mail.shell.checkDefaultClient=true）
-# 会把邮件类默认程序抢成自己，走 libgio 的 g_app_info_set_as_default_for_type —— 该函数
-# 先 mkstemp 生成一个新的 ~/.local/share/applications/userapp-Thunderbird-XXXXXX.desktop，
-# 再写 ~/.config/mimeapps.list。mimeapps.list 一旦成为 HM 的只读符号链接，写配置那步会
-# 失败，但 userapp 文件在之前就已落地；真正止血的是下面 user.js 里的 checkDefaultClient=false
-# （见 productivity.nix），这里负责把「默认程序」声明式地钉死。
+# 为什么整份都由 HM 托管：把「默认程序」声明式地钉死，避免被各应用的
+# GUI「设为默认」行为覆盖、或被启动时重抢（此前 Thunderbird 的
+# mail.shell.checkDefaultClient 会经 libgio 在 ~/.local/share/applications/ 下
+# mkstemp 出 userapp-Thunderbird-*.desktop 并改写 mimeapps.list；Thunderbird 已移除）。
 #
 # 注意：HM 的 xdg.mimeApps 是整份生成、覆盖式写入。原 ~/.config/mimeapps.list 里
 # 由各应用 GUI「设为默认」积累的关联必须全部搬进来，否则会被清掉。首次 switch 时
@@ -69,9 +67,6 @@ in
       "x-scheme-handler/clashmeta" = "flclash.desktop";
       "x-scheme-handler/flclash" = "flclash.desktop";
       "x-scheme-handler/clash-verge" = "flclash.desktop";
-      "x-scheme-handler/mailto" = "thunderbird.desktop";
-      "message/rfc822" = "thunderbird.desktop";
-      "x-scheme-handler/mid" = "thunderbird.desktop";
       "application/pdf" = "org.gnome.Papers.desktop";
       "application/x-subrip" = "org.gnome.TextEditor.desktop";
       "x-scheme-handler/claude-cli" = "claude-code-url-handler.desktop";
@@ -83,7 +78,6 @@ in
       "x-scheme-handler/unknown" = "brave-browser.desktop";
       "image/jpeg" = "com.interversehq.qView.desktop";
       "text/plain" = "org.gnome.TextEditor.desktop";
-      "x-scheme-handler/net.thunderbird" = "thunderbird.desktop";
       "image/webp" = "com.interversehq.qView.desktop";
       "x-scheme-handler/tg" = "org.telegram.desktop.desktop";
       "x-scheme-handler/tonsite" = "org.telegram.desktop.desktop";
@@ -168,8 +162,6 @@ in
 
     # Added Associations 只影响「用哪个打开」候选列表，用真实 .desktop 且保留多元素列表。
     xdg.mimeApps.associations.added = {
-      "x-scheme-handler/mailto" = [ "thunderbird.desktop" ];
-      "x-scheme-handler/mid" = [ "thunderbird.desktop" ];
       "x-scheme-handler/clash" = [ "flclash.desktop" ];
       "x-scheme-handler/clashmeta" = [ "flclash.desktop" ];
       "x-scheme-handler/flclash" = [ "flclash.desktop" ];
@@ -178,8 +170,6 @@ in
       "application/x-subrip" = [ "org.gnome.TextEditor.desktop" ];
       "image/jpeg" = [ "com.interversehq.qView.desktop" ];
       "text/plain" = [ "org.gnome.TextEditor.desktop" ];
-      "x-scheme-handler/net.thunderbird" = [ "thunderbird.desktop" ];
-      "message/rfc822" = [ "thunderbird.desktop" ];
       "image/webp" = [ "com.interversehq.qView.desktop" ];
       "x-scheme-handler/tg" = [ "org.telegram.desktop.desktop" ];
       "x-scheme-handler/tonsite" = [ "org.telegram.desktop.desktop" ];

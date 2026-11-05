@@ -253,7 +253,6 @@ shadow {
 | 框架 | 按钮由谁画 | 能否红绿灯 |
 |---|---|---|
 | GTK3 / GTK4 / libadwaita | GTK 主题的 CSD（`button.titlebutton`） | ✅ MacTahoe 直接给 PNG 三色灯 |
-| Thunderbird（LiquidBird） | 主题自带 PNG | ✅ 已按同一顺序重排（见 `productivity.nix`） |
 | mpv | uosc 自绘（`TopBar.lua`） | ✅ 按 MacTahoe SVG 的颜色/几何画圆 |
 | Chromium / Brave / Electron | 各自的 `views` 绘制 | ❌ 只有单色符号（`– □ ×`），顺序跟随 dlopen 的 GTK 布局 |
 | Qt6（Telegram / qView / VLC…） | Qt 自己 | ❌ **在 niri + `prefer-no-csd` 下根本不画标题栏** |
