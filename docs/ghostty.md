@@ -4,6 +4,15 @@
 着色器在 `modules/home-manager/gui/apps/shared/ghostty-shader/`，由 `xdg.configFile` 部署到
 `~/.config/ghostty/shader/`。
 
+## 光标拖尾
+
+`custom-shader = [ "~/.config/ghostty/shader/cursor_trail.glsl" ]` —— 单个「最简单的
+Kitty 样式拖尾」：光标移动时在上一位置与当前位置之间拖出一条四边形残影，颜色取当前光标色
+（`iCurrentCursorColor`，同 Kitty `cursor_trail` 默认取光标背景色），越靠后越淡，动画结束消失。
+没有彩虹、没有粒子。可调常量在着色器顶部：`DURATION`（时长，默认 0.3s）、
+`TRAIL_MAX_OPACITY`（拖尾最大不透明度，默认 0.35）。
+改动后 `ctrl+shift+,`（reload config）或新窗口即可看到。
+
 ## 亮/暗跟随
 
 一个选项写两态：
