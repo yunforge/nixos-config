@@ -127,6 +127,12 @@ in
       "firefox-esr-140-bin-unwrapped-140.17.0esr"
     ];
 
+    # 把被上游标记 broken 的包降级为警告（默认 broken 会硬报错，阻断整个求值）。
+    # gtk2（gtk+-2.24.33）2026-11 起在 nixpkgs master 标记 broken（计划 27.05 移除），
+    # 但迅雷 xunlei-uos 的预编译包仍以 gtk2 为 buildInputs —— 其余闭包不动它。
+    # 待 xunlei 上游改用 gtk3/gtk4，或该应用从仓库移除即删掉此行。
+    nixpkgs.config.problems.handlers."gtk+".broken = "warn";
+
     # NUR overlay 与自定义包 overlay 由共享模块 ../../shared/nix.nix 统一注入
     # （与 darwin 同源）。此处只加水杉输入法的 Fcitx5 插件：插件加载进 fcitx5
     # 进程，必须按本系统的 nixpkgs 构建，才能与系统上的 Fcitx5 出自同一份

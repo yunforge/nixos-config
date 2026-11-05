@@ -20,14 +20,12 @@ in
   };
 
   config = lib.mkIf (cfg.enable && guiCfg.enable) {
-    home.packages = with pkgs; [
-      brave
-    ];
-    # 默认浏览器是 Brave：MIME 关联在 gui/desktop/linux/mimeapps.nix 声明，
-    # 这里只补命令行侧（xdg-open / webbrowser 等读 BROWSER）。
-    home.sessionVariables.BROWSER = "brave";
+    # Brave 已于 2026-11-03 从 nixpkgs 移除（维护者缺失 + 安全问题，硬 throw），
+    # 本仓库不再声明它的包与默认关联；Brave 改在 ~/Apps 自行维护（自带 desktop
+    # entry，MIME 关联也由它自己「设为默认」，仓库不再钉）。故这里不再列 brave、
+    # 不再设 BROWSER=brave。
+    #
     # Zen browser — Firefox-based, from the community flake (beta channel).
-    # 保持非默认：该选项会写 BROWSER=zen-beta 并抢注 http(s)/text/html。
     programs.zen-browser = {
       enable = true;
       setAsDefaultBrowser = false;

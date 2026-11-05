@@ -71,11 +71,6 @@ in
       "application/x-subrip" = "org.gnome.TextEditor.desktop";
       "x-scheme-handler/claude-cli" = "claude-code-url-handler.desktop";
       "x-scheme-handler/siyuan" = "siyuan.desktop";
-      "text/html" = "brave-browser.desktop";
-      "x-scheme-handler/http" = "brave-browser.desktop";
-      "x-scheme-handler/https" = "brave-browser.desktop";
-      "x-scheme-handler/about" = "brave-browser.desktop";
-      "x-scheme-handler/unknown" = "brave-browser.desktop";
       "image/jpeg" = "com.interversehq.qView.desktop";
       "text/plain" = "org.gnome.TextEditor.desktop";
       "image/webp" = "com.interversehq.qView.desktop";
@@ -84,13 +79,6 @@ in
       "application/x-zerosize" = "typora.desktop";
       "text/markdown" = "typora.desktop";
       "x-scheme-handler/jetbrains" = "jetbrainsd.desktop";
-      "x-scheme-handler/chrome" = "brave-browser.desktop";
-      "application/x-extension-htm" = "brave-browser.desktop";
-      "application/x-extension-html" = "brave-browser.desktop";
-      "application/x-extension-shtml" = "brave-browser.desktop";
-      "application/xhtml+xml" = "brave-browser.desktop";
-      "application/x-extension-xhtml" = "brave-browser.desktop";
-      "application/x-extension-xht" = "brave-browser.desktop";
       "x-scheme-handler/x-github-client" = "github-desktop.desktop";
       "x-scheme-handler/x-github-desktop-dev-auth" = "github-desktop.desktop";
       "application/epub+zip" = "com.github.johnfactotum.Foliate.desktop";
@@ -179,27 +167,15 @@ in
         "org.gnome.TextEditor.desktop"
       ];
       "application/epub+zip" = [ "com.github.johnfactotum.Foliate.desktop" ];
-      "x-scheme-handler/http" = [
-        "brave-browser.desktop"
-        "zen-beta.desktop"
-      ];
-      "x-scheme-handler/https" = [
-        "brave-browser.desktop"
-        "zen-beta.desktop"
-      ];
+      "x-scheme-handler/http" = [ "zen-beta.desktop" ];
+      "x-scheme-handler/https" = [ "zen-beta.desktop" ];
       "video/mp4" = [
         "mpv.desktop"
         "zen-beta.desktop"
       ];
       "image/png" = [ "com.interversehq.qView.desktop" ];
-      "application/xhtml+xml" = [
-        "brave-browser.desktop"
-        "zen-beta.desktop"
-      ];
-      "text/html" = [
-        "brave-browser.desktop"
-        "zen-beta.desktop"
-      ];
+      "application/xhtml+xml" = [ "zen-beta.desktop" ];
+      "text/html" = [ "zen-beta.desktop" ];
       "audio/wav" = [ "com.github.neithern.g4music.desktop" ];
       "audio/webm" = [ "com.github.neithern.g4music.desktop" ];
       "audio/x-aac" = [ "com.github.neithern.g4music.desktop" ];
@@ -242,7 +218,6 @@ in
       "audio/x-xm" = [ "com.github.neithern.g4music.desktop" ];
       "audio/x-mpegurl" = [ "com.github.neithern.g4music.desktop" ];
       "audio/x-scpls" = [ "com.github.neithern.g4music.desktop" ];
-      "x-scheme-handler/chrome" = [ "brave-browser.desktop" ];
       "image/x-nikon-nef" = [ "com.interversehq.qView.desktop" ];
       "text/x-c++src" = [ "org.gnome.TextEditor.desktop" ];
     }
