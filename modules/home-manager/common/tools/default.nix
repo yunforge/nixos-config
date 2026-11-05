@@ -128,7 +128,7 @@ in
         light = ".config/theme-variants/fastfetch/light.jsonc";
       }
       {
-        live = ".config/fastfetch/logo/deepseek_whale.txt";
+        live = ".config/fastfetch/logo/nixos_logo_1.txt";
         dark = ".config/theme-variants/fastfetch/logo-dark.txt";
         light = ".config/theme-variants/fastfetch/logo-light.txt";
       }
@@ -142,16 +142,12 @@ in
         source = ../../../../assets/fastfetch/nixos-01.jsonc;
         force = true;
       };
-      # fastfetch 的 logo：DeepSeek 像素鲸鱼（32 列 × 22 像素行，半块字符渲染成 11 行），
-      # 逐行内嵌真彩色 ANSI（前景 = 上半像素、背景 = 下半像素）。之所以是文件而不是内置
-      # logo，见 jsonc 里的说明 —— 内置 logo 不可着色（fastfetch 实测，输出逐字节相同）。
-      # 亮色那份换了一套更深的调色板（浅底上 #4E6FFF 的腹部会糊掉）。
-      # 图形取自 @lhh010 的手绘像素材（dsh-ui-whale），经 MIT 许可的 dsh-TUI 转成半块像素图：
-      # https://github.com/ccch1mneyyy/dsh-TUI （MIT, Copyright (c) 2026 chimney）。
-      # 两套变体的文件名与源文件同名，只靠软链区分，所以 jsonc 里那句 source 路径
-      # （~/.config/fastfetch/logo/deepseek_whale.txt）不用变。
-      ".config/fastfetch/logo/deepseek_whale.txt" = {
-        source = ../../../../assets/fastfetch/logo/deepseek_whale.txt;
+      # fastfetch 的 logo：文本形式的 NixOS 美术图，逐行内嵌了 ANSI 码（暗色 = Frappe 蓝
+      # #8CAAEE，亮色 = Latte 蓝 #1E66F5）。之所以是文件而不是内置 logo，见 jsonc 里的说明
+      # —— 内置的 NixOS logo 不可着色。两套变体的文件名与源文件同名，只靠软链区分，
+      # 所以 jsonc 里那句 source 路径（~/.config/fastfetch/logo/nixos_logo_1.txt）不用变。
+      ".config/fastfetch/logo/nixos_logo_1.txt" = {
+        source = ../../../../assets/fastfetch/logo/nixos_logo_1.txt;
         force = true;
       };
 
@@ -159,9 +155,9 @@ in
       ".config/theme-variants/fastfetch/light.jsonc".source =
         ../../../../assets/fastfetch/nixos-01-light.jsonc;
       ".config/theme-variants/fastfetch/logo-dark.txt".source =
-        ../../../../assets/fastfetch/logo/deepseek_whale.txt;
+        ../../../../assets/fastfetch/logo/nixos_logo_1.txt;
       ".config/theme-variants/fastfetch/logo-light.txt".source =
-        ../../../../assets/fastfetch/logo/deepseek_whale-light.txt;
+        ../../../../assets/fastfetch/logo/nixos_logo_1-light.txt;
     };
 
   };

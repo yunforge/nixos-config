@@ -293,16 +293,15 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 
 细节全在 `assets/fastfetch/nixos-01.jsonc` 的注释里，两个结论：
 
-- **logo 是 DeepSeek 像素鲸鱼，走文件（文本）而不是内置 logo。** fastfetch 内置 logo
+- **logo 是文本文件（type=file）而不是内置 logo。** fastfetch 内置 logo
   不可着色 —— 实测 `--logo-color-1..9` 对它完全无效（输出逐字节相同）。而文本文件可以
-  逐行内嵌真彩色 ANSI，于是能用**半块字符**（`▀`/`▄`）一个字符塞两个像素：前景 = 上半
-  像素、背景 = 下半像素，32×22 的像素图只占 32 列 × 11 行；腹部冰蓝、白色前鳍这些
-  亮度差靠背景色画出来，纯前景色的 ASCII 画不出来。
-  文件：`assets/fastfetch/logo/deepseek_whale{,-light}.txt`，由 `common/tools/default.nix`
-  部署（暗色 / 亮色两套调色板，浅底上原蓝会糊）。图形取自 @lhh010 的手绘像素材
-  （`dsh-ui-whale`），经 MIT 许可的 `ccch1mneyyy/dsh-TUI` 转成半块像素图。
+  逐行内嵌 ANSI 码，于是 logo 能跟着工作区的 Frappe / Latte 调色板走，而不是全屏幕
+  唯一一处不着色的东西。图形是文本形式的 NixOS 美术图（40 列 × 20 行）：暗色
+  Frappe 蓝 `#8CAAEE`，亮色 Latte 蓝 `#1E66F5`（浅底上原蓝会糊）。
+  文件：`assets/fastfetch/logo/nixos_logo_1{,-light}.txt`，由 `common/tools/default.nix`
+  部署。
   ⚠️ 文件路径写错时 fastfetch **静默回退到内置 logo**（不报错）—— 量宽度时踩过一次，
-  以为在量鲸鱼，其实量的是内置 NixOS ASCII。
+  以为在量文件 logo，其实量的是内置 NixOS ASCII。
 - **那 10 个常量是冷色明度渐变，不是彩虹。** 它们会被用在约 30 个键名标签上
   （`├ Board` / `├ CPU` …），10 个色相铺满一列文字就是噪声。
   而原设计的端点是 NixOS 品牌蓝 `#5277C3`，压在终端底色 `#303446` 上只有 **2.81:1**
@@ -310,9 +309,9 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
   改为经过 4 个 Frappe 真实色的关键帧插值（`overlay2` → `blue` → `sapphire` → `sky`），
   10 阶全部 ≥ 4.53:1。
 
-- **宽度预算 ≲ 100 列**（半屏终端），实测最长 **90 列**。历史上是 133 列：分组横线原来是
+- **宽度预算 ≲ 101 列**（半屏终端），实测最长 **101 列**（换回 43 列的 NixOS logo 后）。历史上是 133 列：分组横线原来是
   10 段 × 7 字符（横线自己就有 70 列）+ 43 列的 logo。收的过程：横线改 10 段 × 2 字符；
-  logo 换 32 列的鲸鱼；模块格式只留有效字段（`os` 名字+版本、`disk` 不留文件系统类型、
+  logo 一度换成 32 列的鲸鱼（90 列），现在换回 43 列的 NixOS 文本 logo；模块格式只留有效字段（`os` 名字+版本、`disk` 不留文件系统类型、
   `localip` 不留 MAC、`display` 分辨率+刷新率、`packages` 改 `nix: A+B`）；模块清单也砍了
   一批（Board / Sound / BIOS / Packages / Processes / Term Font / BT Radio / WiFi / DNS /
   Public IP / 日期时间 / 运行时长）。

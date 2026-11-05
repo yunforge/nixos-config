@@ -1,17 +1,15 @@
 {
   "logo": {
-    // DeepSeek 像素鲸鱼，走文本（type=file）而不是图片。
-    // 文本文件可以逐行内嵌真彩色 ANSI：这里用半块字符（▀/▄）打包上下两个像素 ——
-    // 前景色 = 上半像素、背景色 = 下半像素，于是 32×22 的像素图只占 32 列 × 11 行，
-    // 而且亮度色（腹部冰蓝、白色前鳍）用背景色也能画出来，纯前景色的 ASCII 画不出来。
-    // 内置 logo 不可着色（实测 --logo-color-1..9 对它完全无效，输出逐字节相同），
-    // 所以必须是文件。图形取自 @lhh010 的手绘像素材（dsh-ui-whale），
-    // 经 MIT 许可的 dsh-TUI 转成半块像素图：https://github.com/ccch1mneyyy/dsh-TUI
-    // 文件由 home-manager 从 assets/fastfetch/logo/deepseek_whale.txt 部署，
-    // 亮色那份换成更深的调色板（浅底上原蓝会糊）。
+    // 用文本 logo（type=file）而不是图片。
+    // 内置的 NixOS logo 是纯文本、**不可着色**（实测 --logo-color-1..9 对它完全无效，
+    // 输出逐字节相同），而文本文件可以逐行内嵌 ANSI 码，于是 logo 能跟着
+    // 工作区的 Frappe 调色板走，而不是全屏幕唯一一处不着色的东西。
+    // 图片 logo 在这个尺寸下只有约 80×42 像素（40×21 字符 × 半块两像素），
+    // 比 ASCII 更糊；而且当时配的 nixos_logo_1.webp 根本不存在，一直在静默回退。
+    // 文件由 home-manager 从 assets/fastfetch/logo/nixos_logo_1.txt 部署。
     // 不再写 height/width：那两个选项只对图片 logo 有效。
     "type": "file",
-    "source": "~/.config/fastfetch/logo/deepseek_whale.txt",
+    "source": "~/.config/fastfetch/logo/nixos_logo_1.txt",
     "padding": {
       "top": 2,
       "left": 3,
@@ -63,7 +61,7 @@
     },
   },
   "modules": [
-    // 宽度预算：logo 32 列之后，模块行 ≲ 100 列（半屏终端）。
+    // 宽度预算：logo 43 列之后，模块行 ≲ 101 列（半屏终端，实测最长 101）。
     // 信息头用中文 —— fastfetch 不会按显示宽度对齐 CJK，空格是手工补到 8 列的。
     // 分组：硬件 / 软件 / 网络。原来的 Time 组只剩「系统年龄」一行，并进软件组。
     "break",
