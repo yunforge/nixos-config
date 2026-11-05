@@ -133,11 +133,8 @@ in
         set -gx EDITOR nvim
         # 初始化 fnm（HM 无 programs.fnm 模块，需手动 source）
         fnm env --use-on-cd | source
-        # API 密钥存放于 git 外的本地文件，避免明文入库
-        set -l atria_env ~/.config/atria/env.fish
-        if test -f $atria_env
-          source $atria_env
-        end
+        # Agent 侧 shell 集成（`cc` 别名、atria 密钥 source）在 common/ai/tools.nix，
+        # 随 myHome.ai.enable 门控，不在此处。
       '';
       shellAliases = {
         ".." = "cd ..";
@@ -163,7 +160,6 @@ in
         dufall = "duf --all";
         dufjson = "duf --json";
         zquery = "zoxide query -l -s";
-        cc = "claude --dangerously-skip-permissions";
       };
       shellInit = ''
         fish_add_path ${config.home.homeDirectory}/.cargo/bin

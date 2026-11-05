@@ -6,7 +6,7 @@
 
 | 层 | 位置 | 内容 |
 |----|------|------|
-| common | `modules/home-manager/common/` | 所有主机共享：shell / editors / 命令行与 AI 工具 |
+| common | `modules/home-manager/common/` | 所有主机共享：shell / editors / 命令行工具 / AI 工具（`common/ai/`） |
 | dev | `modules/home-manager/dev/languages/` | 语言工具链（Go / Node / Rust / Python / C++ / 其它 LSP） |
 | gui/apps/shared | `modules/home-manager/gui/apps/shared/` | 跨平台 GUI 应用配置（Ghostty / VSCode） |
 | platform | `modules/home-manager/platform/` | 平台专属用户级适配（Linux 的 XDG 用户目录） |
@@ -25,7 +25,7 @@ common 与 dev 里的 Linux 专属工具由各叶子模块用 `lib.optionals std
 
 - Shell：Fish + 常用 CLI 工具（eza / zoxide / bat / fzf / ripgrep / fd / jq / yq）
 - 编辑器：Neovim（`nvim`）+ VSCode（GUI）+ CLion
-- AI 编程：Claude Code（`cc` 别名）、pi-coding-agent、CodeX
+- AI 编程：Claude Code（`cc` 别名）、pi-coding-agent、CodeX、herdr（统一在 `modules/home-manager/common/ai/`，受 `myHome.ai.enable` 门控）
 - GitHub CLI：`gh`（`~/.config/gh/config.yml` 由 `programs.gh.settings` 生成，`gh config set` 的改动会被下次激活覆盖；`hosts.yml` 与登录状态不接管，token 在 keyring）
 
 ### 语言工具链

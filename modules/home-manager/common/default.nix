@@ -12,5 +12,6 @@
     ./shell
     ./editors
     ./tools
+    ./ai
   ];
 }

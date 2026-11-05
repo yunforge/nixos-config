@@ -25,10 +25,6 @@ in
       fastfetch
       lazydocker
       delta
-      claude-code
-      pi-coding-agent
-      codex
-      herdr
       unzip
       gzip
       tree

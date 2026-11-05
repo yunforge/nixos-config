@@ -70,7 +70,8 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
 
 - **common**（`modules/home-manager/common/`）：跨平台公共配置——
   shell（Fish + direnv / eza / zoxide / fzf / bat / ripgrep / fd / jq …）、
-  editors（Neovim）、tools（tmux / yazi / lazygit / btop / fastfetch / yt-dlp …）。
+  editors（Neovim）、tools（tmux / yazi / lazygit / btop / fastfetch / yt-dlp …）、
+  ai（AI Agent 用户环境：claude-code / pi-coding-agent / codex / herdr 及 `cc` 别名、atria 密钥 source）。
   所有主机无条件导入，Linux 专属工具由各叶子模块用
   `lib.optionals stdenv.hostPlatform.isLinux` 自行过滤。
 - **dev**（`modules/home-manager/dev/languages/`）：语言工具链
@@ -122,8 +123,9 @@ HM 侧导入：common + dev + `gui/apps/shared`（跨平台 GUI 应用配置）+
   `myHome.*`。两者都不含用户名——账户名只由 `mySystem.primaryUser` /
   `system.primaryUser` 声明，改用户名不需要动选项树。
 - HM 层门控：`myHome.cli.enable`（common）、`myHome.dev.enable`（dev）、
+  `myHome.ai.enable`（common/ai，Agent 用户环境，与 cli 解耦）、
   `myHome.gui.enable`（GUI 应用）、`myHome.desktop.enable`（Linux 桌面会话）。
-  这四个开关由角色 profile 用 `mkDefault` 给出，主机可用 `mkForce` 覆盖。
+  这些开关由角色 profile 用 `mkDefault` 给出，主机可用 `mkForce` 覆盖。
 
 **选项清单不在文档里维护**：`rg 'mkEnableOption|mkOption' modules/` 是唯一权威。
 手抄的表一定会漂，所以这里没有它。

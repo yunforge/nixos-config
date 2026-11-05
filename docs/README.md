@@ -14,6 +14,7 @@
 | 装了哪些应用 | `docs/softwares.md` | `modules/home-manager/gui/apps/linux/`（含嵌入式工具链） |
 | 自维护包（nixpkgs 未收录）的版本、升级与「更新系统」清单 | `docs/packages.md` | `pkgs/`、`overlays/default.nix` |
 | 开发工具链、Distrobox | `docs/environment.md` | `modules/home-manager/dev/languages/`、`modules/home-manager/common/tools/` |
+| AI Agent 用户环境（AI CLI 工具、`cc` 别名、MCP/skill 落位说明） | `docs/ai.md` | `modules/home-manager/common/ai/` |
 | 角色组合（workstation / server / wsl / macbook） | `docs/architecture.md` 的「角色组合」 | `modules/*/profiles/`、`flake.nix` |
 | tmux（含会话持久化） | `docs/tmux.md` | `modules/home-manager/common/tools/tmux.nix` + `tests/tmux-persistence.sh` |
 | WinApps / Windows 虚拟机 / 探针直通 | `docs/winapps.md` | `modules/home-manager/gui/desktop/linux/winapps.nix`、`pkgs/windows-vm-media`、`modules/nixos/virtualization` |
