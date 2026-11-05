@@ -13,7 +13,7 @@ Niri 配置分两半，`Mod` = `Super`（Windows 键）：
 |--------|------|
 | `Mod` + `Space` | Noctalia 应用启动器 |
 | `Mod` + `Return` | 终端（Ghostty） |
-| `Mod` + `Shift` + `Return` | 浏览器（Brave） |
+| `Mod` + `Shift` + `Return` | 浏览器（Microsoft Edge） |
 | `Mod` + `E` | 文件管理器（Nautilus） |
 | `Mod` + `Shift` + `M` | 系统监控（btop，浮动窗口） |
 | `Alt` + `T` | Pot 划词翻译 |

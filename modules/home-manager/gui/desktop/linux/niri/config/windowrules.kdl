@@ -76,6 +76,23 @@ window-rule {
     open-maximized true
 }
 
+// Microsoft Edge — 浏览器
+//
+// 用户要求：默认打开按「最大化列」（平铺的放大），不是「最大」。
+// niri 里这两者是不同的东西：
+//   - open-maximized true        → 最大化列，等价 proportion 1.0 / set-column-width 100%，
+//                                  仍在滚动平铺布局里、保留边框与间隙（就是 Mod+F）。
+//   - open-maximized-to-edges     → 最大化到屏幕边缘（Mod+M），才是通常说的「最大」。
+// Chromium 系（Edge）启动时自己会请求 maximized，niri 会映射成 maximize-to-edges，
+// 于是不加规则时 Edge 会「最大」铺满；这里 open-maximized true 让它以最大化列打开，
+// 再用 open-maximized-to-edges false 在初始 configure 阶段挡掉它自己的最大化请求。
+// app-id 兼容原生 Wayland（microsoft-edge）与 XWayland/com.microsoft.Edge 两种写法。
+window-rule {
+    match app-id="(?i)microsoft.?edge"
+    open-maximized true
+    open-maximized-to-edges false
+}
+
 // Zotero — 文献管理
 window-rule {
     match app-id="(?i)zotero"

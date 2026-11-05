@@ -15,7 +15,7 @@ binds {
 
     // 应用快捷方式
     Mod+Return         hotkey-overlay-title="终端"   { spawn "ghostty"; }
-    Mod+Shift+Return   hotkey-overlay-title="浏览器" { spawn "brave"; }
+    Mod+Shift+Return   hotkey-overlay-title="浏览器（Microsoft Edge）" { spawn "microsoft-edge-stable"; }
     Mod+E       hotkey-overlay-title="文件管理器"   { spawn "nautilus"; }
     // btop 单独指定 class，才能命中 windowrules.kdl 里按 app-id="btop" 定义的浮动规则
     // （ghostty 的 class 选项就是 Wayland 的 app_id）
