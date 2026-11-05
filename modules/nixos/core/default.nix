@@ -112,6 +112,44 @@ in
     # FHS 兼容：所有 NixOS 主机的系统基础（服务器也要跑闭源/预编译二进制）
     programs.nix-ld.enable = true;
 
+    # 预编译浏览器的共享库。agent-browser / Playwright 下载的 Chrome for Testing
+    # 没有 RPATH，且 NixOS 没有 apt/dnf/yum —— `install --with-deps` 必然失败。
+    # 交给 nix-ld 注入 NIX_LD_LIBRARY_PATH 后，下载来的 Chrome 可直接启动，
+    # 不再需要各处 export LD_LIBRARY_PATH。清单对应 Chrome 的直接依赖
+    # （headless 与 headed 共用部分）；上游新增依赖时在此补一行。
+    programs.nix-ld.libraries = with pkgs; [
+      alsa-lib
+      at-spi2-core
+      cairo
+      cups
+      dbus
+      expat
+      fontconfig
+      freetype
+      gdk-pixbuf
+      glib
+      gtk3
+      libdrm
+      libgbm
+      libx11
+      libxcb
+      libxcomposite
+      libxcursor
+      libxdamage
+      libxext
+      libxfixes
+      libxi
+      libxinerama
+      libxkbcommon
+      libxrandr
+      libxrender
+      libxshmfence
+      nspr
+      nss
+      pango
+      systemdLibs
+    ];
+
     # 系统总线
     services.dbus = {
       enable = true;
@@ -127,11 +165,12 @@ in
       "firefox-esr-140-bin-unwrapped-140.17.0esr"
     ];
 
-    # 把被上游标记 broken 的包降级为警告（默认 broken 会硬报错，阻断整个求值）。
     # gtk2（gtk+-2.24.33）2026-11 起在 nixpkgs master 标记 broken（计划 27.05 移除），
-    # 但迅雷 xunlei-uos 的预编译包仍以 gtk2 为 buildInputs —— 其余闭包不动它。
+    # 而迅雷 xunlei-uos 的预编译 thunder 仍直接 NEEDED libgtk-x11-2.0.so.0（RPATH 也钉
+    # gtk+），无法从依赖里去掉 —— 其余闭包不动它。默认 broken 会硬报错阻断求值；
+    # "warn" 则每次 rebuild 都打印 evaluation warning，故取 "ignore" 静默。
     # 待 xunlei 上游改用 gtk3/gtk4，或该应用从仓库移除即删掉此行。
-    nixpkgs.config.problems.handlers."gtk+".broken = "warn";
+    nixpkgs.config.problems.handlers."gtk+".broken = "ignore";
 
     # NUR overlay 与自定义包 overlay 由共享模块 ../../shared/nix.nix 统一注入
     # （与 darwin 同源）。此处只加水杉输入法的 Fcitx5 插件：插件加载进 fcitx5
