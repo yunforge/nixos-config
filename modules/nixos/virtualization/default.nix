@@ -40,6 +40,10 @@ in
 
     virtualisation.libvirtd = {
       enable = true;
+      # 开机不自动恢复“关机前仍在运行”的虚拟机；关机时改为正常关闭而非挂起，
+      # 避免留下 stale 的 managed-save 镜像（NixOS 默认 onBoot=start / onShutdown=suspend）。
+      onBoot = "ignore";
+      onShutdown = "shutdown";
       qemu = {
         package = pkgs.qemu_kvm;
         swtpm.enable = true;
