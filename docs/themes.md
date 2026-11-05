@@ -102,11 +102,10 @@ apply.sh 只负责首渲。
 | 图标 | **MacTahoe-dark** | 自定义打包图标（`pkgs/mactahoe-icon-theme`），为深色背景设计 |
 | 光标 | **Bibata-Modern-Classic** | 24px，XWayland 亦生效（软链到 `~/.local/share/icons`）；Bibata 只内嵌 16/20/22/24/28/32/40/… 整数档。**另有一份 `icons/default` 指向同一主题**：XWayland 上的 Qt5（微信）会退到字面量 `default`，缺它即回落 X 核心字体光标，见 `docs/quirks.md` |
 | Qt | **Kvantum + MacTahoeDark** | `QT_STYLE_OVERRIDE=kvantum`；主题来自自打包的 `pkgs/mactahoe-kvantum`（与 GTK 侧同一个上游作者），见下文 |
-| GDM 登录界面 | MacTahoe | 本仓库不再装 GNOME 会话，只留 GDM 做登录器；其 greeter 用的 gnome-shell 由 GDM 自己的闭包提供，靠 overlay 覆盖 `gnome-shell-theme.gresource` 换肤，**字体 / 图标 / 光标 / 壁纸**也一并声明（不然 greeter 会退回 Adwaita 默认），全部在 `modules/nixos/desktop/gdm.nix` |
+| GDM 登录界面 | MacTahoe | 本仓库不再装 GNOME 会话，只留 GDM 做登录器；其 greeter 用的 gnome-shell 由 GDM 自己的闭包提供，靠 overlay 覆盖 `gnome-shell-theme.gresource` 换肤，**字体 / 图标 / 光标**也一并声明（不然 greeter 会退回 Adwaita 默认），全部在 `modules/nixos/desktop/gdm.nix` |
 | Niri 装饰配色 | **Noctalia 调色板** | 由 builtin `niri` 模板写 `~/.config/niri/noctalia.kdl`（焦点环 / 标签指示器 / 插入提示 / 最近窗口高亮）；HM 只留结构项（宽度、几何、阴影），见下文 |
 | Niri 概览底色 | MacTahoe 同源 | `niri-colors/overview.kdl`，暗 `#242424` / 亮 `#FFFFFF`（Noctalia 的 niri 模板不管这一项） |
 | Noctalia Shell | **自定义调色板 `mactahoe`** | `customPalettes.mactahoe`，色值与 GTK/Qt/niri 同源；界面字体 HarmonyOS Sans SC。**仅调色板归 Nix，bar 布局归 GUI**，见下文 |
-| 壁纸 | **默认集纳管**（`assets/wallpapers/`） | `mySystem.desktop.wallpapers` 首项即默认；桌面会话与 GDM 登录界面共用同一张，可覆盖，见下文 |
 
 ## 字体
 
@@ -125,7 +124,7 @@ apply.sh 只负责首渲。
 - 标签指示器在列右侧，圆角 2px（3px 宽的条，半径 ≥ 半宽就是胶囊，不超过窗口圆角）；**仅当列进入 tabbed 显示模式（`Mod+W`）时出现**
 - 概览缩放 0.50，背景暗 `#242424` / 亮 `#FFFFFF`
 - `recent-windows` 高亮框圆角 8px（与窗口圆角同档；Omarchy 无对应项）
-- 模糊 `passes 4 / offset 5.0 / saturation 1.10`；终端（ghostty / btop）`opacity 0.85`，取值按最坏情况（近纯白壁纸）下的文字对比定，前提见下文壁纸一节
+- 模糊 `passes 4 / offset 5.0 / saturation 1.10`；终端（ghostty / btop）`opacity 0.85`，取值按亮壁纸下的文字对比定，见 `frosted-glass.kdl`
 - 窗口阴影由合成器提供（`shadow { on }`，参数由 MacTahoe 自己的 CSD 阴影反推，见下）
 - 窗口开/关动画 220ms / 180ms（退场比入场快；scale 0.96→1.0 + 淡入，不用自定义波纹 shader）
 
@@ -431,17 +430,7 @@ GUI 会把自己的 `[bar.default.monitor.*]` 写进 state，那时起就以 GUI
 
 当前 19 个控件、`background_opacity = 0.15`。以应用层为主体后应当退到背景，但不是退回隐形。
 
-**透明度是可算的，不该拍脑袋。** 合成永远是“`opacity` × 底色 + (1−`opacity`) × 模糊后的壁纸”。壁纸默认集纳管之后（见下节）这个输入是**已知**的，于是按两个默认壁纸各自的**屏顶 5% 均值**（bar 背后亮度的上界，模糊只会把它拉低）算：
-
-| opacity | `city-street`（73.4） | `ocean-waves`（120.7） |
-|---|---|---|
-| 0.15（原值） | `#444444` 7.24:1 ✅ | `#6C6C6C` 3.90:1 ⚠️ |
-| 0.25 | 7.71:1 ✅ | 4.40:1 ⚠️ |
-| **0.30（取）** | **7.95:1** ✅ | **4.75:1** ✅ |
-| 0.35 | 8.20:1 ✅ | 5.05:1 ✅ |
-| 0.80（旧“目标”） | 10.52:1 ✅ | 9.12:1 ✅ |
-
-取 **0.30**：两个默认壁纸下都过 AA，同时还是玻璃而不是板子。0.15 在 `ocean-waves` 下只有 3.90:1——默认集里有一张会让 bar 的字变糊；0.25 差一点（4.40）；而 0.80 是“壁纸是自由变量”时代按最坏情况推出来的，现在既没必要也不好看。
+**透明度取 0.30（原为 0.80）。** 合成永远是“`opacity` × 底色 + (1−`opacity`) × 模糊后的壁纸”。0.30 是按曾纳管的两张默认壁纸（现已移除）的屏顶 5% 均值校准的：两张下 bar 文字（`#DEDEDE`）对比度都过 AA，同时还是玻璃而不是板子。默认集移除后壁纸回归自由变量——取到近纯白壁纸时对比度会掉到 AA 以下，这是有意的取舍；追求极致可读可在 GUI 里把 opacity 调高。
 
 （终端 `opacity 0.85` 维持不变：用 16×16 分块的最亮块当背后最坏情况，0.80 只到 4.8:1，0.85 是 5.5:1。表在 `frosted-glass.kdl`。）
 
@@ -456,36 +445,13 @@ GUI 会把自己的 `[bar.default.monitor.*]` 写进 state，那时起就以 GUI
 
 **执行方式**：四项（`bar.default` 的 `background_opacity`/`start`/`center`/`end`）已声明在 `programs.noctalia.settings` —— 它们没有密钥，可以纳管。但运行时状态优先，已有 state 的主机要把 state 里那四行删一次才会生效，见 `docs/manager.md` 的「装机后的一次性步骤」。bar 其余的键（`capsule` / `enabled` / `margin_edge` …）仍归 GUI；表里的 `rave_mode` 也是 GUI 侧关（小部件的 id/type 归 GUI，只声明子键会被 validate 判为 “unrecognized widget type”）。
 
-### 壁纸：默认集纳管，可覆盖
+### 壁纸：**有意不纳管**
 
-`assets/wallpapers/` 放默认集（`city-street.jpg`、`ocean-waves.jpg`），由
-`mySystem.desktop.wallpapers` 声明 —— **首项即默认壁纸**（与 `monitors` 首项派生
-`scale` 同一约定）。两处消费同一份声明：
+壁纸不写进 Nix，保持手动更换（Noctalia 面板或 `Mod+Alt+W`）。这是明确的决定，不是遗漏：
 
-| 消费者 | 用哪条路径 | 为什么 |
-|---|---|---|
-| Noctalia（桌面会话） | `~/Pictures/wallpaper/默认集/<名>` | 面板会把选中的路径写进 `settings.toml`，写 store 路径会在 rebuild 后指向一个可能已被 GC 的旧 hash |
-| GDM（登录界面） | store 路径 | greeter 的 systemd 单元受限；store 世界可读且不可变 |
-
-默认集部署成 picker 浏览根（`~/Pictures/wallpaper/`）下的**子目录**：用户自己的图仍在同一层可浏览、可选中，换壁纸的流程（`Mod+Alt+W` / 面板）没有任何变化。锁屏不需要单独配：`lockscreen.wallpaper` 留空即“跟随桌面壁纸”。
-
-**为何改掉原来的“有意不纳管”**：透明度、模糊饱和度、焦点环对比度三处取值都建立在“壁纸是自由变量、按最坏情况定”这个前提上；而那个最坏情况不是假想的——近纯白的图就真实躺在 `~/Pictures/wallpaper/` 里。把默认集换成已知底色后，前提从“最坏情况”变成“已知情况”，这些约束才可以重算，而不是防御性拉高。
-
-选图准则（配合 `saturation 1.10`）：大面积暗部、低彩度、少高频细节。实测（YAVG 亮度 / SATAVG 饱和度，0–255）：
-
-| 图 | 分辨率 | YAVG | SATAVG |
-|---|---|---|---|
-| `city-street`（默认） | 5120×2880 | 44.8 | 2.4 |
-| `ocean-waves` | 5434×3053 | 85.4 | 8.9 |
-
-bar 文字（`#DEDEDE`）的对比度，背景取**屏顶 5% 均值**（bar 背后亮度的上界，模糊会把它拉向局部均值）：
-
-| 壁纸（屏顶均值） | opacity 0.15 | 0.50 | 0.80 |
-|---|---|---|---|
-| `city-street`（73.4） | **7.24:1** ✅ | 8.85:1 | 10.52:1 |
-| `ocean-waves`（120.7） | 3.90:1 ⚠️ | 6.19:1 ✅ | 9.12:1 |
-
-一次性步骤（已经选过壁纸的主机）：`noctalia msg wallpaper-set <path>` 会把所有输出与 `wallpaper.default.path` 一起写进 `settings.toml`。只改 Nix 声明不会生效——运行时状态优先（同 `theme.source` 那条）。把图丢进 `~/Pictures/wallpaper/` 即在面板里可选。
+- 模糊与半透明的观感直接吃壁纸，而壁纸是要经常换的，纳管反而碍事
+- 因此壁纸**不入 git**，`assets/` 下没有 `wallpapers/` 目录
+- 选壁纸的准则（配合 `saturation 1.10`）：大面积暗部、低彩度、少高频细节。`~/Pictures/wallpaper/` 里那些高彩度插画会被模糊 + 饱和度放大成“打翻的调色盘”
 
 ### 不认领的三个面（写下来的决定）
 
@@ -495,7 +461,7 @@ bar 文字（`#DEDEDE`）的对比度，背景取**屏顶 5% 均值**（bar 背�
 - **niri 自绘的浮层**（快捷键 overlay、截图 UI、退出确认对话框）：**配不了**。实测 `hotkey-overlay {}` / `screenshot-ui {}` / `ui {}` 三个节点都被 `niri validate` 拒绝——niri 的配置里没有给它们的颜色入口。它们的观感是 niri 自己的，改不了，也不必惦记。
 - **Windows / RemoteApp 窗口与 Steam 的内部 UI**：只有**外框**是我们的—— 8px 圆角与合成器阴影由 niri 统一绘制，所以它们与其它窗口的框架一致；窗口内部的标题栏、配色、控件全是它们自己的。这是“覆盖不了”，不是“没覆盖”。
 
-（第四个面——GDM 登录界面——是**认领**的：字体 / 图标 / 光标 / 壁纸都声明在 `modules/nixos/desktop/gdm.nix`，与桌面会话共用一套。）
+（第四个面——GDM 登录界面——是**认领**的：字体 / 图标 / 光标都声明在 `modules/nixos/desktop/gdm.nix`，与桌面会话共用一套。）
 
 ## 相关命令
 ```bash

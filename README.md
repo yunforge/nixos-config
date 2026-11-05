@@ -30,7 +30,7 @@ flake.nix / flake.lock   # 唯一入口：inputs、各主机输出、overlays、
 │  ├─ darwin/            # macOS 系统层：base / users / gui
 │  └─ home-manager/      # 用户层：common / dev / gui / platform / profiles
 ├─ overlays/ + pkgs/     # nixpkgs 未收录的自维护包（唯一注入点 + 包本体）
-├─ assets/               # 壁纸、fastfetch 配置等产品资产
+├─ assets/               # fastfetch 配置等产品资产
 ├─ tests/                # 需要真机验证的脚本（如 tmux 会话持久化）
 └─ docs/                 # 子系统深度说明，索引见 docs/README.md
 ```
@@ -91,7 +91,7 @@ nix store optimise
 
 系统已配置每周自动 GC（`--delete-older-than 7d`）与每日自动升级
 （`system.autoUpgrade`：只构建不重启，升级后把 `flake.lock` 提交回仓库保持工作区干净）。
-装机后 Noctalia 还有几步一次性设置（壁纸、调色板、bar 布局），见
+装机后 Noctalia 还有几步一次性设置（调色板、bar 布局），见
 [`docs/manager.md`](docs/manager.md)。
 
 ## 我的配置

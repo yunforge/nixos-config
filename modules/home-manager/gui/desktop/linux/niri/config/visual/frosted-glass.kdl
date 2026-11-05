@@ -40,7 +40,7 @@ window-rule {
 //
 // 门槛**取决于壁纸**：上面是当前那张高调（亮）壁纸的数字；纯白壁纸下 0.80 会掉到 4.29
 // （差一点），而换成暗调壁纸时 0.70 乃至 0.65 都还很安全、玻璃感明显得多——想要“一眼看得出
-// 是玻璃”，正确做法是配暗壁纸（见 docs/themes.md 的壁纸一节与选图准则）。
+// 是玻璃”，正确做法是配暗壁纸（见 docs/themes.md）。
 window-rule {
     match app-id=r#"^(ghostty|com\.mitchellh\.ghostty|btop)$"#
     opacity 0.80

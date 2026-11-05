@@ -61,25 +61,6 @@ in
     description = "显示器声明（按主机）：niri 输出配置、Noctalia DDC 亮度与状态栏按屏开关的数据源";
   };
 
-  # 默认壁纸集（产品资产，文件在 assets/wallpapers/）。首项即默认壁纸 —— 与
-  # monitors 首项派生 scale 同一约定。
-  #
-  # 为什么放在系统层：它是**桌面会话与 GDM 登录界面共用的同一张脸**。GDM 侧
-  # 要 store 路径（greeter 的 systemd 单元受限、store 世界可读且不可变），
-  # Noctalia 侧要部署后的家目录路径（运行时状态会记下这个路径，写 store 路径
-  # 会在 rebuild 后失效）。两处同源，故数据只声明一次，HM 经 osConfig 取回。
-  #
-  # 选图准则（配合 blur.kdl 的 saturation 1.10）：大面积暗部、低彩度、少高频
-  # 细节。实测亮度/饱和度与由此重算的透明度依据见 docs/themes.md 的壁纸一节。
-  options.mySystem.desktop.wallpapers = lib.mkOption {
-    type = lib.types.listOf lib.types.path;
-    default = [
-      ../../../assets/wallpapers/city-street.jpg
-      ../../../assets/wallpapers/ocean-waves.jpg
-    ];
-    description = "默认壁纸集（首项为默认壁纸），桌面会话与 GDM 登录界面共用";
-  };
-
   imports = [
     ./boot.nix
     ./gdm.nix

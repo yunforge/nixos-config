@@ -34,27 +34,6 @@ let
   # 这段是 Nix 侧独有的表：运行时 state 的 [bar.default] 只有标量键，
   # 不会遮蔽它（Noctalia 合并 config.toml 与 state 时表是逐键深合并）。
   barlessMonitors = lib.filter (m: !m.bar) osConfig.mySystem.desktop.monitors;
-
-  # ── 壁纸 ──────────────────────────────────────────────────────────────
-  # 默认集来自系统层 mySystem.desktop.wallpapers（首项为默认壁纸），部署到
-  # picker 浏览根下的独立子目录：与用户自己的图分开，同时仍是面板里可浏览的
-  # 一层（面板把子目录列成条目）。
-  #
-  # "Pictures/wallpaper" 是相对形式：home.file 的键必须相对 $HOME，而面板要
-  # 绝对路径，两者同源避免写两遍。
-  wallpaperRootRel = "Pictures/wallpaper";
-  wallpaperRoot = "${config.home.homeDirectory}/${wallpaperRootRel}";
-  wallpaperSetRel = "${wallpaperRootRel}/默认集";
-  wallpaperSet = "${config.home.homeDirectory}/${wallpaperSetRel}";
-  wallpapers = osConfig.mySystem.desktop.wallpapers;
-
-  # 发布后的真实路径，不是 store 路径：面板选中的路径会被写进 settings.toml，
-  # 写 store 路径会在 rebuild 后指向一个可能已被 GC 的旧 hash。
-  defaultWallpaper =
-    if wallpapers == [ ] then
-      throw "myHome.gui.wm.noctalia：mySystem.desktop.wallpapers 为空，无法确定默认壁纸"
-    else
-      "${wallpaperSet}/${baseNameOf (lib.head wallpapers)}";
 in
 {
   options.myHome.gui.wm.noctalia.enable = lib.mkOption {
@@ -64,11 +43,6 @@ in
   };
 
   config = lib.mkIf (cfg.enable && desktopCfg.enable) {
-    # 默认壁纸集部署进 picker 目录（见上方 wallpaperSet）
-    home.file = lib.listToAttrs (
-      map (w: lib.nameValuePair "${wallpaperSetRel}/${baseNameOf w}" { source = w; }) wallpapers
-    );
-
     # 本仓库自带的 Noctalia 用户模板（上游没有 eza / fish）。
     # 放在 ~/.config/noctalia/templates/ 下：Noctalia 的 input_path 相对配置目录解析，
     # template 的注册见下方 settings.theme.templates.user。
@@ -134,13 +108,6 @@ in
               };
             };
           };
-        };
-        wallpaper = {
-          # picker 面板按此目录列图，不写则回落到 XDG Pictures（多一层目录）
-          directory = wallpaperRoot;
-          # 默认壁纸：新机器或状态里没有选择时生效。已有选择的主机要让它生效，
-          # 跑一次 noctalia msg wallpaper-set <path>（见 docs/manager.md）
-          default.path = defaultWallpaper;
         };
         # bar 布局：这四项可以声明式 —— 它们没有密钥（明文 API key 在 state 的
         # [plugin_settings."coder/deepseek_usage"] 段里，与本组无关）。bar 的其余键
