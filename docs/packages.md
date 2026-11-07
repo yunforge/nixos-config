@@ -8,12 +8,12 @@
 
 ## 清单
 
-版本核对于 2026-11-05（当日全部升到上游最新）。
+版本核对于 2026-11-07（当日全部升到上游最新）。
 
 | 属性名 | 上游 | 钉法 | 当前钉住 | 上游最新 | 状态 |
 |--------|------|------|----------|----------|------|
-| `babry` | [kregonia/babry](https://github.com/kregonia/babry) | tag | `v0.1.7` | `v0.1.7` | 最新 |
-| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.3029` | `v0.1.3029` | 最新 |
+| `babry` | [kregonia/babry](https://github.com/kregonia/babry) | tag | `v0.1.8` | `v0.1.8` | 最新 |
+| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.3212` | `v0.1.3212` | 最新 |
 | `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.5.1` | `2026.11.5.1` | 最新 |
 | `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.3` | `0.9.3` | 最新（nixpkgs 已移除，见下） |
 | `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |

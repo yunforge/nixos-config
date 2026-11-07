@@ -43,7 +43,7 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "babry";
-  version = "0.1.7";
+  version = "0.1.8";
 
   src = fetchFromGitHub {
     owner = "kregonia";
@@ -53,13 +53,13 @@ rustPlatform.buildRustPackage rec {
     # 直接拿 `nix store prefetch-file` 的 tar 哈希或裸 fetchzip 默认值会失配
     # （后者与 stripRoot=false 等价，会把 archive 里的顶层目录多留一层，
     # 导致 buildRustPackage 在 vendor 阶段找不到 Cargo.lock）。
-    hash = "sha256-LtkyPE0k7/BwwVIC24m9/psoEeyRcxGQA+NqPmp7ib8=";
+    hash = "sha256-P+M5c4X4F/oGDOgCa/lKr0Vcr8BPNt0udAIY9Hp0DKc=";
   };
 
   # 上游把 Cargo.lock 一并提交（CI 也用 --locked 构建），buildRustPackage 默认
   # 就从 src 里读它。cargoHash 只钉住 vendored 依赖的哈希，与 magpie 的
   # vendorHash 同理：只在 Cargo.toml / Cargo.lock 变动时才需要重算。
-  cargoHash = "sha256-pxr3YNW98f8AiHgHoP6IXQTX2k7K4wyWT8QJ4qjgp7U=";
+  cargoHash = "sha256-2siPOUtfHPvKBKzg96q61T4TlQMd3tdBkTl70yoR1ws=";
 
   # 上游 CI 的 Linux 构建依赖（.github/workflows/cargo-linux-multiarch.yml）：
   # build-essential pkg-config libfontconfig-dev libxkbcommon-dev libwayland-dev。
