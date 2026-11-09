@@ -8,12 +8,12 @@
 
 ## 清单
 
-版本核对于 2026-11-07（当日全部升到上游最新）。
+版本核对于 2026-11-10（当日全部升到上游最新）。
 
 | 属性名 | 上游 | 钉法 | 当前钉住 | 上游最新 | 状态 |
 |--------|------|------|----------|----------|------|
-| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.3212` | `v0.1.3212` | 最新 |
-| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.5.1` | `2026.11.5.1` | 最新 |
+| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.3449` | `v0.1.3449` | 最新 |
+| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.9.1` | `2026.11.9.1` | 最新 |
 | `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.3` | `0.9.3` | 最新（nixpkgs 已移除，见下） |
 | `dalibre` | [djyde/dalibre](https://github.com/djyde/dalibre) | release 资产（tar.gz） | `0.2.2` | `0.2.2` | 最新（unfree：上游无 LICENSE 文件） |
 | `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
@@ -96,12 +96,12 @@ nix flake prefetch --json github:<owner>/<repo>/<tag 或 rev> | jq -r .hash
 ### tag 钉法（`magpie`）
 
 ```nix
-version = "0.1.1296";   # ① 改版本
+version = "0.1.3449";   # ① 改版本
 ```
 
 ```bash
 # ② src 哈希
-nix flake prefetch --json github:yetone/magpie/v0.1.1296 | jq -r .hash
+nix flake prefetch --json github:yetone/magpie/v0.1.3449 | jq -r .hash
 ```
 
 - `vendorHash`（magpie）只在 `go.mod`+`go.sum` 变化时需要重算，同样填
