@@ -85,7 +85,7 @@ sudo nix-collect-garbage --delete-old
 nix store optimise
 ```
 
-> **「更新系统」= 刷 flake 输入 + 升自维护包。** `pkgs/` 里的包（babry、mactahoe、
+> **「更新系统」= 刷 flake 输入 + 升自维护包。** `pkgs/` 里的包（mactahoe、
   magpie、windows-vm-media 等）版本钉在仓库内，`nix flake update` 带不动它们。
 > 清单与按包升级步骤见 [`docs/packages.md`](docs/packages.md)。
 

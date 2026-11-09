@@ -12,7 +12,6 @@
 
 | 属性名 | 上游 | 钉法 | 当前钉住 | 上游最新 | 状态 |
 |--------|------|------|----------|----------|------|
-| `babry` | [kregonia/babry](https://github.com/kregonia/babry) | tag | `v0.1.8` | `v0.1.8` | 最新 |
 | `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.3212` | `v0.1.3212` | 最新 |
 | `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.5.1` | `2026.11.5.1` | 最新 |
 | `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.3` | `0.9.3` | 最新（nixpkgs 已移除，见下） |
@@ -37,7 +36,6 @@ v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb�
 
 | 包 | 装在哪 |
 |----|--------|
-| `babry` | `modules/home-manager/gui/apps/linux/utilities.nix`（`Mod+P` / `Mod+Ctrl+P`，见 `docs/niri.md`） |
 | `magpie` | 同上（desktop/laptop 桌面版）；`magpie-cli` 在 `hosts/wsl/default.nix` |
 | `mcpp-m` | `modules/home-manager/dev/languages/cpp.nix`（所有 Linux 主机 + macbook） |
 | `flclash` | `modules/home-manager/gui/apps/linux/media.nix`（代理客户端，取代 clash-verge-rev） |
@@ -62,7 +60,7 @@ nix flake update
 # 3. 验证
 nix fmt
 nix flake check
-nix build --dry-run .#babry .#magpie .#magpie-cli .#mcpp-m .#flclash \
+nix build --dry-run .#magpie .#magpie-cli .#mcpp-m .#flclash \
   .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum .#windows-vm-media
 nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 ```
@@ -73,7 +71,7 @@ nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 ## 查上游最新版本
 
 ```bash
-# 打 tag 的仓库（babry / magpie / MacTahoe-*）
+# 打 tag 的仓库（magpie / MacTahoe-*）
 git ls-remote --tags --refs https://github.com/<owner>/<repo> \
   | sed 's#.*refs/tags/##' | sort -V | tail -3
 
@@ -93,7 +91,7 @@ git ls-remote https://github.com/<owner>/<repo> HEAD
 nix flake prefetch --json github:<owner>/<repo>/<tag 或 rev> | jq -r .hash
 ```
 
-### tag 钉法（`babry`、`magpie`）
+### tag 钉法（`magpie`）
 
 ```nix
 version = "0.1.1296";   # ① 改版本
@@ -104,8 +102,8 @@ version = "0.1.1296";   # ① 改版本
 nix flake prefetch --json github:yetone/magpie/v0.1.1296 | jq -r .hash
 ```
 
-- `cargoHash`（babry）/ `vendorHash`（magpie）只在 `Cargo.lock` / `go.mod`+`go.sum`
-  变化时需要重算，同样填 `lib.fakeHash` 跑一次构建，取报错里的 `got:`。
+- `vendorHash`（magpie）只在 `go.mod`+`go.sum` 变化时需要重算，同样填
+  `lib.fakeHash` 跑一次构建，取报错里的 `got:`。
 - **不要**用 `magpie update` / `mcpp self update`：它们会替换自己的二进制，store 只读必然失败。
 
 ### release 资产（`mcpp-m`）
@@ -183,10 +181,6 @@ nix store prefetch-file --json \
 
 ## 坑
 
-- **babry 的 `save_dir` 要 0.1.4 起才生效**（0.1.1 不读 `config.toml`）。升级时别降版本，
-  详见 `docs/quirks.md`。
-- **babry `doCheck = false`**：上游测试要系统字体、且像素断言本身不稳定；上游 CI 也只
-  `cargo build`。修好后恢复 check，见 `pkgs/babry/default.nix` 注释。
 - **magpie 有两个产物**（`gui` 参数）：`magpie` 与 `magpie-cli` 同源同哈希，升版本改一处即可；
   桌面文件与自启由 HM 托管，见 `docs/quirks.md` 的「magpie 升级后 GUI 仍起来旧版本」。
 - **主题升级要看 `docs/themes.md`**：GTK/Qt/图标三套必须同源，niri 装饰色与 Noctalia

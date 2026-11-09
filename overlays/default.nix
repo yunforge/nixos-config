@@ -46,12 +46,6 @@ final: prev: {
   magpie = prev.callPackage ../pkgs/magpie { };
   magpie-cli = prev.callPackage ../pkgs/magpie { gui = false; };
 
-  # babry：懂边界的 Wayland 截图工具（上游 kregonia/babry，nixpkgs 未收录）。
-  # 全机唯一的截图工具（CV 智能选区 + 标注 + 贴图，键位 Mod+P / Mod+Ctrl+P），
-  # 取代此前的 Snipaste 与 niri 自带 screenshot 动作；运行时依赖
-  #（grim/wl-copy/notify-send）由包内 wrapProgram 钉进 PATH。
-  babry = prev.callPackage ../pkgs/babry { };
-
   # flclash：基于 ClashMeta 的代理客户端（上游 chen08209/FlClash）。
   # nixpkgs 2026-08-17 以「用户少 + 无人维护」为由把它从 master 移除
   # （26.05 分支里还留着 0.8.92），本仓库的 nixpkgs 跟 master，故自维护一份。

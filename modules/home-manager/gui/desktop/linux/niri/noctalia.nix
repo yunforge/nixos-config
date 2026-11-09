@@ -63,6 +63,21 @@ in
       settings = {
         shell = {
           font_family = lib.mkForce myLib.theme.fontSans;
+
+          # 截图：全机唯一入口是 Noctalia 自带的截图（binds/system.kdl 的
+          # Mod+P / Mod+Ctrl+P）。这里只钉与默认行为不同的两项：
+          #  - annotate：每次截图都先过内置标注器，Done 才落盘/复制
+          #    （与 babry 时期的「截图即进编辑器」一致）；
+          #  - directory：沿用 ~/Pictures/screenshots（~ 由 Noctalia 展开，
+          #    目录不存在时自建）。默认的空值会存到 XDG 图片目录根下。
+          # 其余键（格式、剪贴板、冻结屏幕、指针等）保持上游默认。
+          # ⚠️ 运行时 ~/.local/state/noctalia/settings.toml 里已有
+          # [shell.screenshot] 段时会覆盖这里，首次生效需删掉那段再
+          # `noctalia msg config-reload`（或直接在 GUI 里改一次）。
+          screenshot = {
+            annotate = true;
+            directory = "~/Pictures/screenshots";
+          };
         };
         theme = {
           mode = "dark";

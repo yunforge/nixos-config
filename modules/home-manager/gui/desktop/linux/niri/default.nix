@@ -208,6 +208,52 @@ let
         done
   '';
 
+  # Mod+Shift+P 窗口截图：niri 截窗口 → Noctalia 标注器
+  #
+  # 为什么不直接 `noctalia msg screenshot-window`：Noctalia 的窗口截图要求合成器
+  # 支持 ext-image-copy-capture-v1 + ext-foreign-toplevel-image-capture-source-manager-v1，
+  # 而 niri 26.04 两者都没有（实测返回 "window capture is not available on this
+  # compositor"；niri 二进制里也 grep 不到这两个协议）。niri 自己的
+  # `screenshot-window` 动作走内部渲染，能截。
+  #
+  # 于是这里分两步：先让 niri 截到临时目录，再交给 Noctalia 的标注器（与区域/
+  # 全屏截图同一条链路），Done 后由 Noctalia 写进 ~/Pictures/screenshots 并复制
+  # 到剪贴板。临时文件在脚本退出时删掉 —— `noctalia msg annotate <文件>` 会在
+  # 返回前把图读进内存，之后再删不影响编辑器。
+  #
+  # niri 的截图是异步的（PNG 编码在子线程），IPC 返回时文件可能还没写完，
+  # 故轮询到文件大小连续两次不变再继续；超时则报错退出。
+  niriScreenshotWindow = pkgs.writeShellScriptBin "niri-screenshot-window" ''
+    set -u
+    tmpdir="$(${pkgs.coreutils}/bin/mktemp -d)"
+    trap '${pkgs.coreutils}/bin/rm -rf "$tmpdir"' EXIT
+    shot="$tmpdir/window.png"
+
+    ${pkgs.niri}/bin/niri msg action screenshot-window \
+      --write-to-disk true --path "$shot" >/dev/null 2>&1 || {
+        ${pkgs.libnotify}/bin/notify-send -u critical "截图失败" "niri 未能执行窗口截图"
+        exit 1
+      }
+
+    prev=-1
+    for _ in $(${pkgs.coreutils}/bin/seq 100); do
+      cur="$(${pkgs.coreutils}/bin/stat -c %s "$shot" 2>/dev/null || echo 0)"
+      if [ "$cur" -gt 0 ] && [ "$cur" = "$prev" ]; then break; fi
+      prev="$cur"
+      ${pkgs.coreutils}/bin/sleep 0.05
+    done
+
+    if [ ! -s "$shot" ]; then
+      ${pkgs.libnotify}/bin/notify-send -u critical "截图失败" "窗口截图文件未生成"
+      exit 1
+    fi
+
+    ${pkgs.noctalia}/bin/noctalia msg annotate "$shot" >/dev/null 2>&1 || {
+      ${pkgs.libnotify}/bin/notify-send -u critical "截图失败" "Noctalia 标注器未能打开"
+      exit 1
+    }
+  '';
+
 in
 {
   imports = [
@@ -249,6 +295,7 @@ in
 
     home.packages = [
       niriCloseAll
+      niriScreenshotWindow
     ];
   };
 }

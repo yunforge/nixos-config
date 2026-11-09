@@ -65,23 +65,28 @@ Niri 配置分两半，`Mod` = `Super`（Windows 键）：
 
 ## 截图
 
-2026-10-15 起截图统一走 **babry**（Wayland 原生、CV 智能选区；nixpkgs 未收录，自维护见 `pkgs/babry`）。
-niri 自带的 `screenshot` / `screenshot-screen` / `screenshot-window` 三个动作不再绑定，
-也没有第二个截图软件 —— 编辑器要求全屏打开的窗口规则见 `config/windowrules.kdl`。
+截图走 **Noctalia 自带截图**（不再安装第三方截图工具）。截图先进入内置标注器，
+Done 后同时存盘到 `~/Pictures/screenshots` 并复制到剪贴板；标注器内 `Ctrl+C`
+只复制、`Ctrl+S` 只存盘、`Esc` 取消。设置声明在 `niri/noctalia.nix` 的
+`settings.shell.screenshot`。
 
 | 快捷键 | 功能 |
 |--------|------|
-| `Mod` + `P` | 区域截图（悬停吸附到窗口/面板/控件，滚轮换层级，单击确认，拖动精修） |
-| `Mod` + `Ctrl` + `P` | 全屏截图（`babry --screen`，截完直接进编辑器） |
+| `Mod` + `P` | 区域截图（拖拽选区，然后进入标注器） |
+| `Mod` + `Ctrl` + `P` | 整屏截图（当前显示器，然后进入标注器） |
+| `Mod` + `Shift` + `P` | 当前窗口截图（然后进入标注器） |
 
-编辑器内按键：`Ctrl+S` 存盘、`Ctrl+C` 复制到剪贴板、`Ctrl+Z` / `Ctrl+Shift+Z` 撤销重做、`Esc` 取消；
-工具栏图钉把选区钉成屏幕贴图。存盘目录由 `~/.config/babry/config.toml` 的 `save_dir`
-指定（声明在 `modules/home-manager/gui/apps/linux/utilities.nix`，当前为 `~/Pictures/screenshots`，
-不存在时由 babry 自建）—— 不写这份配置就会回落到 `XDG_PICTURES_DIR`，PNG 直接堆在 `~/Pictures` 根下。
-niri 的 `screenshot-path`（`config.kdl`）已随 niri 自带截图动作一并删除。
+`Mod+Shift+P` 走 `niri-screenshot-window` 而不是 `noctalia msg screenshot-window`：
+Noctalia 的窗口截图要求合成器支持 `ext-image-copy-capture-v1`，niri 26.04 未实现
+（实测报 "window capture is not available on this compositor"）。该脚本先用 niri
+自带的 `screenshot-window` 截到临时文件，再交给 Noctalia 标注器，因此三条截图键的
+后续流程（标注、存盘、复制）完全一致。见 `niri/default.nix`。
 
-> 原来 `Mod` + `Shift` + `P` 的「窗口截图」不再单独占键：babry 的智能选区本就把窗口当成
-> 一个层级，滚轮即可切到窗口/全屏。
+标注器内无修饰键工具：`m` 移动、`b` 画笔、`h` 高亮、`l` 直线、`a` 箭头、`s` 矩形、
+`o` 圆、`t` 文字、`n` 编号、`u` 模糊；`P` 切换是否包含鼠标指针。
+
+> 运行时 `~/.local/state/noctalia/settings.toml` 里的 `[shell.screenshot]` 会覆盖
+> Nix 默认值；首次生效需删掉那段再 `noctalia msg config-reload`。
 
 ## 系统与会话
 
