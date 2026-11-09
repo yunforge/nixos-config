@@ -246,8 +246,8 @@ in
       layout = "us";
     };
 
-    # 防火墙
-    networking.firewall.allowedTCPPorts = [ 22 ];
+    # 防火墙（3425：Magpie 网关，供局域网客户端使用）
+    networking.firewall.allowedTCPPorts = [ 22 3425 ];
 
     # 系统级包
     environment.systemPackages = with pkgs; [
