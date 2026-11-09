@@ -204,20 +204,36 @@
 
       packages =
         let
-          # 把 overlay 直接应用到 legacyPackages，得到自定义包的属性集
-          customPkgs =
+          overlay = import ./overlays { inherit inputs; };
+
+          # overlay 定义的属性名（取 attrNames 不会求值各包的 value）。
+          # 只挑这些名字，**不要**对整个 pkgs 做 filterAttrs —— 那会强制求值
+          # nixpkgs 里每个包（含求值即报错的 pseudo-package），与自维护包无关。
+          customNames =
             system:
-            (import ./overlays { inherit inputs; }) nixpkgs.legacyPackages.${system}
-              nixpkgs.legacyPackages.${system};
+            builtins.attrNames (overlay nixpkgs.legacyPackages.${system} nixpkgs.legacyPackages.${system});
+
+          # 必须开 allowUnfree：dalibre 上游没有 LICENSE 文件（README 只列第三方
+          # 许可），按 nixpkgs 约定判为 unfree；系统侧由 core 模块的
+          # nixpkgs.config.allowUnfree 放行，而本输出用的是裸 nixpkgs 实例，
+          # 不放行会让 `nix build .#dalibre` 与 nix flake check 求值失败。
+          importPkgs =
+            system:
+            import nixpkgs {
+              inherit system;
+              config.allowUnfree = true;
+              overlays = [ overlay ];
+            };
         in
         myLib.forAllSystems (
           system:
           let
-            pkgs = nixpkgs.legacyPackages.${system};
+            pkgs = importPkgs system;
+            custom = lib.genAttrs (customNames system) (name: pkgs.${name});
           in
           # 按各包 meta.platforms 过滤（如 windows-vm-media 仅 linux），
           # 避免在不支持的平台上评估必败的包
-          lib.filterAttrs (_: pkg: lib.meta.availableOn pkgs.stdenv.hostPlatform pkg) (customPkgs system)
+          lib.filterAttrs (_: pkg: lib.meta.availableOn pkgs.stdenv.hostPlatform pkg) custom
         );
 
       # ==========================================

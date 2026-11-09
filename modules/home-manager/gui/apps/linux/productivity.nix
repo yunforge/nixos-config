@@ -59,6 +59,7 @@ in
     home.packages = with pkgs; [
       zotero
       anki
+      dalibre # calibre 书库管理器（自维护包，见 pkgs/dalibre）
       xmind
       siyuan # 笔记软件
       obsidianNoUpdater # 笔记软件（pkgs.obsidian 关掉内置更新器，见上方 let 块）

@@ -15,6 +15,7 @@
 | `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.3212` | `v0.1.3212` | 最新 |
 | `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.5.1` | `2026.11.5.1` | 最新 |
 | `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.3` | `0.9.3` | 最新（nixpkgs 已移除，见下） |
+| `dalibre` | [djyde/dalibre](https://github.com/djyde/dalibre) | release 资产（tar.gz） | `0.2.2` | `0.2.2` | 最新（unfree：上游无 LICENSE 文件） |
 | `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit（tag 指向） | `839848b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-kvantum` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde) | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 最新 |
@@ -39,6 +40,7 @@ v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb�
 | `magpie` | 同上（desktop/laptop 桌面版）；`magpie-cli` 在 `hosts/wsl/default.nix` |
 | `mcpp-m` | `modules/home-manager/dev/languages/cpp.nix`（所有 Linux 主机 + macbook） |
 | `flclash` | `modules/home-manager/gui/apps/linux/media.nix`（代理客户端，取代 clash-verge-rev） |
+| `dalibre` | `modules/home-manager/gui/apps/linux/productivity.nix`（calibre 书库管理器） |
 | `mactahoe-*` | `gui/desktop/linux/themes/default.nix`、`themes/variants.nix`、`modules/nixos/desktop/gdm.nix` |
 | `windows-vm-media` | `modules/nixos/virtualization`（`mySystem.virtualization`） |
 
@@ -60,7 +62,7 @@ nix flake update
 # 3. 验证
 nix fmt
 nix flake check
-nix build --dry-run .#magpie .#magpie-cli .#mcpp-m .#flclash \
+nix build --dry-run .#magpie .#magpie-cli .#mcpp-m .#flclash .#dalibre \
   .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum .#windows-vm-media
 nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 ```
@@ -150,6 +152,32 @@ nix hash convert --hash-algo sha256 --to sri <hex>
   404 失败，照报错改 `url` 即可。
 - 升级只改 `version` + 两个哈希，**不需要**重算别的东西（不走源码构建，没有
   pubspec.lock / vendorHash 那三份钉子）。
+
+### release 资产（tar.gz，`dalibre`）
+
+与 `flclash` 同型：上游发预编译 tar.gz + `SHA256SUMS`，只取 Linux 的两个：
+
+```nix
+version = "0.2.2";
+
+sources = {
+  x86_64-linux  = { asset = "amd64"; hash = "sha256-…"; };
+  aarch64-linux = { asset = "arm64"; hash = "sha256-…"; };
+};
+```
+
+```bash
+# ① 上游 SHA256SUMS（十六进制）转 SRI
+curl -sL https://github.com/djyde/dalibre/releases/download/v<版本>/SHA256SUMS \
+  | grep 'linux-\(amd64\|arm64\)\.tar\.gz'
+nix hash convert --hash-algo sha256 --to sri <hex>
+```
+
+- 资产名规则是 `dalibre-<版本>-linux-<amd64|arm64>.tar.gz`。
+- 升级只改 `version` + 两个哈希。tar.gz 内是平铺文件（无顶层目录），
+  包内用 `sourceRoot = "."` 处理，换打包方式时留意。
+- **不要**用应用内的「检查更新 / 安装更新」：它把新版本写回可执行文件所在目录，
+  store 只读必然失败（与 magpie 同一个坑）。
 
 ### commit 钉法（`mactahoe-*`）
 

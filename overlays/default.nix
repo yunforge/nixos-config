@@ -46,6 +46,12 @@ final: prev: {
   magpie = prev.callPackage ../pkgs/magpie { };
   magpie-cli = prev.callPackage ../pkgs/magpie { gui = false; };
 
+  # dalibre：calibre 书库的轻量原生管理器（上游 djyde/dalibre，nixpkgs 未收录）。
+  # 预编译 Go 二进制，GTK3 栈全靠 dlopen，故包内用 autoPatchelf 的
+  # runtimeDependencies 写 RPATH；Glance（书内网页预览）要 WebKitGTK 4.0，
+  # nixpkgs 已移除，该功能不可用（懒加载，不影响其余部分）。
+  dalibre = prev.callPackage ../pkgs/dalibre { };
+
   # flclash：基于 ClashMeta 的代理客户端（上游 chen08209/FlClash）。
   # nixpkgs 2026-08-17 以「用户少 + 无人维护」为由把它从 master 移除
   # （26.05 分支里还留着 0.8.92），本仓库的 nixpkgs 跟 master，故自维护一份。

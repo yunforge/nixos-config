@@ -48,6 +48,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | Obsidian / 思源笔记 | 笔记 |
 | Typora | Markdown 写作 |
 | Zotero | 文献管理 |
+| Dalibre | calibre 书库管理器（原生 Go 程序，直接读写 calibre 库；自维护包见 `pkgs/dalibre`。书内网页预览 Glance 依赖 WebKitGTK 4.0，nixpkgs 已移除该版本，故不可用） |
 | Anki | 记忆卡片 |
 | XMind | 思维导图 |
 | Pot | 划词翻译（Alt+T / Alt+I / Alt+X） |
