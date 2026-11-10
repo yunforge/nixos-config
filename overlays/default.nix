@@ -52,6 +52,11 @@ final: prev: {
   # nixpkgs 已移除，该功能不可用（懒加载，不影响其余部分）。
   dalibre = prev.callPackage ../pkgs/dalibre { };
 
+  # misterdownloadmanager：Rust 写的下载管理器（上游 anefzaoui/misterdownloadmanager，
+  # nixpkgs 未收录）。取上游预编译 deb，四个可执行文件必须同在 $out/bin：
+  # GUI 用 current_exe 的同级路径找浏览器 Native Messaging Host（见包内注释）。
+  misterdownloadmanager = prev.callPackage ../pkgs/misterdownloadmanager { };
+
   # pulse：系统活动监视器（上游 egoist/pulse-feedback，nixpkgs 未收录）。
   # 预编译 Go 二进制，GTK3 栈全靠 dlopen，故包内用 autoPatchelf 的
   # runtimeDependencies 写 RPATH；WebKitGTK 4.1 只给「关于 / 更新说明」内嵌页用

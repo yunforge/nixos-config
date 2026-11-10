@@ -66,6 +66,7 @@ in
       foliate # eBook阅读器
       gapless # 本地音乐播放器
       xunlei-uos # 迅雷
+      misterdownloadmanager # 下载管理器（Rust，自维护包，见 pkgs/misterdownloadmanager）
       qview # 图片查看
       disktree # 磁盘使用情况树状图
       logisim-evolution

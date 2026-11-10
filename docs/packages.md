@@ -17,6 +17,7 @@
 | `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.3` | `0.9.3` | 最新（nixpkgs 已移除，见下） |
 | `dalibre` | [djyde/dalibre](https://github.com/djyde/dalibre) | release 资产（tar.gz） | `0.2.2` | `0.2.2` | 最新（unfree：上游无 LICENSE 文件） |
 | `pulse` | [egoist/pulse-feedback](https://github.com/egoist/pulse-feedback) | release 资产（tar.gz） | `0.1.29` | `0.1.29` | 最新（unfree：只有反馈仓库、无 LICENSE 文件） |
+| `misterdownloadmanager` | [anefzaoui/misterdownloadmanager](https://github.com/anefzaoui/misterdownloadmanager) | release 资产（deb） | `0.5.2` | `0.5.2` | 最新（上游仅发 x86_64-linux 的 Linux 资产） |
 | `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit（tag 指向） | `839848b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-kvantum` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde) | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 最新 |
@@ -43,6 +44,7 @@ v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb�
 | `flclash` | `modules/home-manager/gui/apps/linux/media.nix`（代理客户端，取代 clash-verge-rev） |
 | `dalibre` | `modules/home-manager/gui/apps/linux/productivity.nix`（calibre 书库管理器） |
 | `pulse` | `modules/home-manager/gui/apps/linux/utilities.nix`（系统活动监视器，取代 mission-center） |
+| `misterdownloadmanager` | `modules/home-manager/gui/apps/linux/utilities.nix`（下载管理器） |
 | `mactahoe-*` | `gui/desktop/linux/themes/default.nix`、`themes/variants.nix`、`modules/nixos/desktop/gdm.nix` |
 | `windows-vm-media` | `modules/nixos/virtualization`（`mySystem.virtualization`） |
 
@@ -65,7 +67,8 @@ nix flake update
 nix fmt
 nix flake check
 nix build --dry-run .#magpie .#magpie-cli .#mcpp-m .#flclash .#dalibre .#pulse \
-  .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum .#windows-vm-media
+  .#misterdownloadmanager .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum \
+  .#windows-vm-media
 nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 ```
 
@@ -201,6 +204,33 @@ nix store prefetch-file --json \
   别删 `nativeBuildInputs` 里那一行。
 - **不要**用应用内的「检查更新」：mygo 更新器把新版本写回可执行文件所在目录，
   store 只读必然失败（与 magpie / dalibre 同一个坑）。
+
+### release 资产（deb，`misterdownloadmanager`）
+
+与 `flclash` 同型：上游发预编译 deb + `SHA256SUMS.txt`，目前只有 x86_64-linux：
+
+```nix
+version = "0.5.2";
+
+sources = {
+  x86_64-linux = { hash = "sha256-…"; };
+};
+```
+
+```bash
+# ① 上游 SHA256SUMS.txt（十六进制）转 SRI
+curl -sL https://github.com/anefzaoui/misterdownloadmanager/releases/download/v<版本>/SHA256SUMS.txt \
+  | grep 'linux-x86_64\.deb'
+nix hash convert --hash-algo sha256 --to sri <hex>
+```
+
+- 资产名规则是 `MisterDownloadManager-<版本>-linux-x86_64.deb`。
+- 升级只改 `version` + 哈希。
+- **四个可执行文件必须留在 `$out/bin`**：GUI 用
+  `current_exe().with_file_name("misterdownloadmanager-nmhost")` 找浏览器
+  Native Messaging Host，挪到 libexec 会让扩展连不上。
+- **不要**用应用内的「检查更新 / 登录时启动」：两者都把绝对 store 路径写回
+  可执行文件/自启目录，升级被 GC 后失效（与 magpie / dalibre 同一个坑）。
 
 ### commit 钉法（`mactahoe-*`）
 
