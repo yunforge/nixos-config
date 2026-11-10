@@ -52,6 +52,12 @@ final: prev: {
   # nixpkgs 已移除，该功能不可用（懒加载，不影响其余部分）。
   dalibre = prev.callPackage ../pkgs/dalibre { };
 
+  # pulse：系统活动监视器（上游 egoist/pulse-feedback，nixpkgs 未收录）。
+  # 预编译 Go 二进制，GTK3 栈全靠 dlopen，故包内用 autoPatchelf 的
+  # runtimeDependencies 写 RPATH；WebKitGTK 4.1 只给「关于 / 更新说明」内嵌页用
+  # （懒加载，缺了不影响主界面）。自更新在 store 里必然失败，升级改包的 version。
+  pulse = prev.callPackage ../pkgs/pulse { };
+
   # flclash：基于 ClashMeta 的代理客户端（上游 chen08209/FlClash）。
   # nixpkgs 2026-08-17 以「用户少 + 无人维护」为由把它从 master 移除
   # （26.05 分支里还留着 0.8.92），本仓库的 nixpkgs 跟 master，故自维护一份。

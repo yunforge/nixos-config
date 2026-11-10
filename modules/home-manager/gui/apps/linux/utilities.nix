@@ -36,7 +36,7 @@ in
       file-roller
       papers
       gnome-text-editor
-      mission-center # 图形化任务中心
+      pulse # 系统活动监视器（进程 / CPU / 内存 / GPU / 磁盘 / 网络 / 能耗）
       foliate # eBook阅读器
       gapless # 本地音乐播放器
       xunlei-uos # 迅雷

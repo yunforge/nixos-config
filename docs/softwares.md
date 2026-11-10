@@ -64,7 +64,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | OBS Studio | 录屏 / 直播 |
 | Noctalia 自带截图 | 全机唯一的截图工具（区域 / 整屏 / 窗口 + 内置标注器，`Mod+P` / `Mod+Ctrl+P` / `Mod+Shift+P`；同时进剪贴板并存到 `~/Pictures/screenshots`，见 `docs/niri.md`） |
 | PicGo | 剪贴板图片上传图床 |
-| Mission Center / btop / fastfetch | 系统监控 |
+| Pulse / btop / fastfetch | 系统监控（Pulse 取代 Mission Center：原生 Go 程序，进程 / CPU 分 P·E 核 / 内存与压力 / GPU 引擎 / 磁盘 / 网络与逐应用流量 / 电池与能耗，另有菜单栏托盘项；自维护包见 `pkgs/pulse`） |
 | ddcutil（配合 Noctalia） | 显示器亮度控制 |
 | qView / Papers / Foliate | 看图 / PDF / 电子书 |
 | LocalSend | 局域网文件传输 |

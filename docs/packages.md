@@ -16,6 +16,7 @@
 | `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.9.1` | `2026.11.9.1` | 最新 |
 | `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.3` | `0.9.3` | 最新（nixpkgs 已移除，见下） |
 | `dalibre` | [djyde/dalibre](https://github.com/djyde/dalibre) | release 资产（tar.gz） | `0.2.2` | `0.2.2` | 最新（unfree：上游无 LICENSE 文件） |
+| `pulse` | [egoist/pulse-feedback](https://github.com/egoist/pulse-feedback) | release 资产（tar.gz） | `0.1.29` | `0.1.29` | 最新（unfree：只有反馈仓库、无 LICENSE 文件） |
 | `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit（tag 指向） | `839848b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-kvantum` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde) | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 最新 |
@@ -41,6 +42,7 @@ v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb�
 | `mcpp-m` | `modules/home-manager/dev/languages/cpp.nix`（所有 Linux 主机 + macbook） |
 | `flclash` | `modules/home-manager/gui/apps/linux/media.nix`（代理客户端，取代 clash-verge-rev） |
 | `dalibre` | `modules/home-manager/gui/apps/linux/productivity.nix`（calibre 书库管理器） |
+| `pulse` | `modules/home-manager/gui/apps/linux/utilities.nix`（系统活动监视器，取代 mission-center） |
 | `mactahoe-*` | `gui/desktop/linux/themes/default.nix`、`themes/variants.nix`、`modules/nixos/desktop/gdm.nix` |
 | `windows-vm-media` | `modules/nixos/virtualization`（`mySystem.virtualization`） |
 
@@ -62,7 +64,7 @@ nix flake update
 # 3. 验证
 nix fmt
 nix flake check
-nix build --dry-run .#magpie .#magpie-cli .#mcpp-m .#flclash .#dalibre \
+nix build --dry-run .#magpie .#magpie-cli .#mcpp-m .#flclash .#dalibre .#pulse \
   .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum .#windows-vm-media
 nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 ```
@@ -178,6 +180,27 @@ nix hash convert --hash-algo sha256 --to sri <hex>
   包内用 `sourceRoot = "."` 处理，换打包方式时留意。
 - **不要**用应用内的「检查更新 / 安装更新」：它把新版本写回可执行文件所在目录，
   store 只读必然失败（与 magpie 同一个坑）。
+
+### release 资产（tar.gz，`pulse`）
+
+与 `dalibre` 同型（预编译 Go 单文件 + 平铺 tar.gz），差别是**上游不发 `SHA256SUMS`**，
+哈希直接对资产取：
+
+```bash
+nix store prefetch-file --json \
+  https://github.com/egoist/pulse-feedback/releases/download/v<版本>/pulse-<版本>-linux-amd64.tar.gz \
+  | jq -r .hash
+# arm64 同理，把 amd64 换成 arm64
+```
+
+- 资产名规则是 `pulse-<版本>-linux-<amd64|arm64>.tar.gz`；查最新版本读
+  `https://github.com/egoist/pulse-feedback/releases/latest/download/update-linux-amd64.json`
+  的 `version` 字段（也是应用内更新器读的那份清单）。
+- 升级只改 `version` + 两个哈希。
+- **patchelf 必须用 `patchelfUnstable`**（见 `docs/quirks.md` 的 Pulse 条目），
+  别删 `nativeBuildInputs` 里那一行。
+- **不要**用应用内的「检查更新」：mygo 更新器把新版本写回可执行文件所在目录，
+  store 只读必然失败（与 magpie / dalibre 同一个坑）。
 
 ### commit 钉法（`mactahoe-*`）
 
