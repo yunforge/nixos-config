@@ -22,6 +22,32 @@ let
       --set GST_PLUGIN_SYSTEM_PATH_1_0 ""
     '';
   };
+
+  # Pulse 的「App 内存占用 / App CPU 占用」只按 /proc/<pid>/exe 的 basename 去
+  # 匹配桌面条目的 Exec 程序名，不看窗口 app_id / StartupWMClass，也没有按进程名
+  # 直接找图标的回退（实测：把 niri.png 放进主题，Pulse 从不打开它）。Nix 包装
+  # 脚本恰好会改掉可执行文件名，于是这些应用在卡片上全是齿轮图标：
+  #
+  #   Edge     exe=msedge               条目 Exec=microsoft-edge-stable
+  #   Ghostty  exe=.ghostty-wrapped     条目 Exec=ghostty
+  #   niri     exe=niri                 无应用条目（只有 wayland-sessions），也没有图标
+  #   Noctalia exe=.noctalia-wrapped    无应用条目
+  #   FlClash  exe=FlClashCore（内核子进程）无应用条目
+  #   magpie   exe=magpie-bun（插件宿主）  无应用条目
+  #   Zen / CLion / Typora / 腾讯会议    exe 与条目 Exec 的 basename 不同
+  #
+  # 修法：给每个这样的应用补一条 NoDisplay 别名条目，Exec 写成运行时的 exe
+  # basename、Icon 指向它自己的图标。别名条目不会出现在启动器里、也不会被执行，
+  # 只是给 Pulse 查表用（实测 msedge / ghostty / niri / FlClashCore / magpie-bun
+  # / noctalia 六项均从齿轮变成真图标）。见 docs/quirks.md 的 Pulse 条目。
+  #
+  # 注意：exe basename 由 nixpkgs 的包装方式决定，升级后若包装改名，这里会静默
+  # 失配（退回齿轮），照 `readlink -f /proc/<pid>/exe` 的结果改即可。
+  niri-icon = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/YaLTeR/niri/v26.04/docs/wiki/logo/niri-icon.svg";
+    # niri 仓库只在文档目录里放 logo，nixpkgs 的 niri 包不带图标
+    hash = "sha256-0RUtBQ1QkUPpfUUva0iJVQIXR0QzQZ39Zd5L7hPLp5A=";
+  };
 in
 {
   options.myHome.gui.apps.utilities.enable = lib.mkOption {
@@ -51,6 +77,33 @@ in
     # `note <文件>`：用 GNOME 文本编辑器打开；无参数时直接开一个空文档。
     # 只在本模块（Linux 桌面工作站）里定义，server / wsl / macbook 不会继承。
     home.shellAliases.note = "${pkgs.gnome-text-editor}/bin/gnome-text-editor";
+
+    # Pulse 的图标别名条目（为什么需要见上方 let 块注释）：
+    # 键 = 运行时 exe 的 basename，值 = 该应用自己的图标名（绝对路径亦可）。
+    # 全是 NoDisplay，不进启动器、不被点开，只供 Pulse 查表。
+    xdg.desktopEntries =
+      lib.mapAttrs'
+        (
+          exe: icon:
+          lib.nameValuePair "pulse-alias-${lib.replaceStrings [ "." ] [ "dot-" ] exe}" {
+            name = exe;
+            exec = exe;
+            inherit icon;
+            noDisplay = true;
+          }
+        )
+        {
+          msedge = "microsoft-edge";
+          ".ghostty-wrapped" = "com.mitchellh.ghostty";
+          niri = "${niri-icon}";
+          ".noctalia-wrapped" = "noctalia";
+          FlClashCore = "flclash"; # FlClash 内核，没有自己的条目
+          magpie-bun = "magpie"; # magpie 的 bun 插件宿主
+          ".clion-wrapped" = "clion";
+          zen = "zen-browser"; # 条目 Exec=zen-beta，运行时是 zen
+          Typora = "typora"; # 条目 Exec=typora，运行时大小写不同
+          wemeetapp = "wemeet"; # 条目 Exec=wemeet
+        };
 
     # magpie 的桌面文件。上游 internal/gui/scheme_linux.go 的 registerScheme()
     # 首次运行时会往 ~/.local/share/applications/magpie.desktop 写一份，把当时
