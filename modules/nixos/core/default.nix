@@ -181,7 +181,45 @@ in
       (final: prev: {
         msime-fcitx5 =
           let
-            msimePkgs = inputs.msime.overlays.default final prev;
+            # msime 0.16.0 的 Cargo.lock 新增两个 git 依赖：llama-cpp-2 /
+            # llama-cpp-sys-2（git 源 utilityai/llama-cpp-rs，其子模块指向
+            # ggml-org/llama.cpp）与 tauri-nspanel。上游 nix 打包没给
+            # outputHashes，crane 便在 hash == null 时退回 builtins.fetchGit
+            # { submodules = true; }——求值期联网、非固定输出，且 Nix 对子模块
+            # 用 allRefs 抓全部 ref：llama.cpp 有 2.8 万个 ref（1.9 万 PR +
+            # 8463 tag），实测 600 MB、经代理中途 eof 断开，主机 rebuild 直接
+            # 失败在求值阶段。补上 outputHashes 后 crane 改走 pkgs.fetchgit
+            # （浅抓 pin 住的 rev、固定输出、进 store 可缓存），求值期不再联网。
+            # 哈希由 nix-prefetch-git --fetch-submodules 实算，升级 msime 后
+            # Cargo.lock 的 rev 变了要重算（命令见 docs/quirks.md）。
+            # 上游补上 outputHashes 后整段可删。
+            msimeGitOutputHashes = {
+              "git+https://github.com/utilityai/llama-cpp-rs.git?rev=0364f5da1c6a6ee37f507031f116ce4a09b28594#0364f5da1c6a6ee37f507031f116ce4a09b28594" =
+                "sha256-7jI4+6tJ6s69ojMeqUbDHbbUfmlMbnecpvWrTM7iLEM=";
+              "git+https://github.com/ahkohd/tauri-nspanel?rev=c9ec2130422200f0863b23dfdad02b133a529b07#c9ec2130422200f0863b23dfdad02b133a529b07" =
+                "sha256-cyv+i5uhtHNO5YmKnT/fmRO7dT3F9+K/js7ToxZh5DA=";
+            };
+            msimeCrane = inputs.msime.inputs.crane // {
+              mkLib =
+                p:
+                (inputs.msime.inputs.crane.mkLib p).overrideScope (
+                  _craneFinal: cranePrev: {
+                    vendorCargoDeps =
+                      args:
+                      cranePrev.vendorCargoDeps (
+                        args // { outputHashes = msimeGitOutputHashes // (args.outputHashes or { }); }
+                      );
+                  }
+                );
+            };
+            # 与 inputs.msime.overlays.default 等价（同一份 platforms/linux/nix
+            # 的 packages），只把 crane 换成带 outputHashes 的那份。
+            msimePkgs =
+              (import (inputs.msime.outPath + "/platforms/linux/nix") {
+                pkgs = final;
+                crane = msimeCrane;
+                rust-overlay = inputs.msime.inputs.rust-overlay;
+              }).packages;
             # 上游 nix 打包全靠 lib.fileset 白名单选源码（default.nix 的 cargoSources、
             # desktop.nix 的前端 src 等），而 2026-10-24/25 的提交让 crates 与 packages/ui
             # 引用了白名单外的根目录文件：plugins/phrase_table/latex-symbols/symbols.tsv
@@ -247,7 +285,10 @@ in
     };
 
     # 防火墙（3425：Magpie 网关，供局域网客户端使用）
-    networking.firewall.allowedTCPPorts = [ 22 3425 ];
+    networking.firewall.allowedTCPPorts = [
+      22
+      3425
+    ];
 
     # 系统级包
     environment.systemPackages = with pkgs; [
