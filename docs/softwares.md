@@ -75,7 +75,6 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | qView / Papers / Foliate | 看图 / PDF / 电子书 |
 | LocalSend | 局域网文件传输 |
 | 欧陆词典 | 查词 |
-| 迅雷（xunlei-uos） | 下载 |
 | Mister Download Manager | 下载管理器（Rust 原生，支持浏览器集成 / BT / 视频站点；自维护包见 `pkgs/misterdownloadmanager`） |
 | Logisim Evolution | 数字电路模拟 |
 | file-roller / Nautilus | 压缩 / 文件管理（Nautilus 右键「在 Ghostty 中打开」，文件夹与空白处均有一级入口，见 `gui/apps/linux/nautilus.nix`） |

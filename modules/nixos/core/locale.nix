@@ -62,7 +62,7 @@
   # 不写 subpixel.lcdfilter：LCD 滤镜只对次像素渲染有意义，rgba = none 时它是空转，
   # 而它的默认值本来就是 "default"（即上游默认，不替换任何 conf.d 软链）。
 
-  # 中文回退加固：部分国产 Qt 应用（迅雷、欧陆词典等）对 fontconfig
+  # 中文回退加固：部分国产 Qt 应用（欧陆词典等）对 fontconfig
   # 的逐字回退依赖不可靠，若命中的字体缺字则直接渲染成方块。defaultFonts
   # 把全量覆盖的 Noto CJK 排进无衬线链第二位——缺字先落**中性无衬线**的
   # Noto，而不是楷体风格的文楷；常见中文家族名的逐名兜底见下方 localConf。
