@@ -8,14 +8,14 @@
 
 ## 清单
 
-版本核对于 2026-11-10（当日全部升到上游最新）。
+版本核对于 2026-11-14（当日全部升到上游最新）。
 
 | 属性名 | 上游 | 钉法 | 当前钉住 | 上游最新 | 状态 |
 |--------|------|------|----------|----------|------|
-| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.3449` | `v0.1.3449` | 最新 |
-| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.9.1` | `2026.11.9.1` | 最新 |
+| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.4079` | `v0.1.4079` | 最新 |
+| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.12.1` | `2026.11.12.1` | 最新 |
 | `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.3` | `0.9.3` | 最新（nixpkgs 已移除，见下） |
-| `dalibre` | [djyde/dalibre](https://github.com/djyde/dalibre) | release 资产（tar.gz） | `0.2.2` | `0.2.2` | 最新（unfree：上游无 LICENSE 文件） |
+| `dalibre` | [djyde/dalibre](https://github.com/djyde/dalibre) | release 资产（tar.gz） | `0.6.0` | `0.6.0` | 最新（unfree：上游无 LICENSE 文件） |
 | `pulse` | [egoist/pulse-feedback](https://github.com/egoist/pulse-feedback) | release 资产（tar.gz） | `0.1.29` | `0.1.29` | 最新（unfree：只有反馈仓库、无 LICENSE 文件） |
 | `misterdownloadmanager` | [anefzaoui/misterdownloadmanager](https://github.com/anefzaoui/misterdownloadmanager) | release 资产（deb） | `0.5.2` | `0.5.2` | 最新（上游仅发 x86_64-linux 的 Linux 资产） |
 | `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
