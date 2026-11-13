@@ -29,6 +29,11 @@
   stdenvNoCC,
   fetchurl,
   autoPatchelfHook,
+  # 必须用 patchelfUnstable（0.19.x）：nixpkgs 默认的 0.15.2 改写 0.6.0 这个 Go
+  # 二进制时会把 DYNAMIC/INTERP 挪进第一个 R E 的 PT_LOAD（PT_DYNAMIC 指向不可写
+  # 映射），ld.so 在 dl_main 里直接 SIGSEGV_ACCERR。0.5.x 布局不同、侥幸无害。
+  # 见 docs/quirks.md（与 pulse 同根因）。
+  patchelfUnstable,
   makeDesktopItem,
   copyDesktopItems,
   imagemagick,
@@ -102,6 +107,9 @@ stdenvNoCC.mkDerivation {
 
   nativeBuildInputs = [
     autoPatchelfHook
+    # 放在 hook 之后即可：它把 $out/bin 里的 patchelf 覆盖成 0.19.2，
+    # auto-patchelf 执行时取到的是这一份。
+    patchelfUnstable
     copyDesktopItems
     imagemagick
   ];
