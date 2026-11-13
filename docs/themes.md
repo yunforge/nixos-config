@@ -14,7 +14,7 @@
 **真源只有一个**：Noctalia 的 theme mode。它带两个执行者：
 
 1. **Noctalia 自己**（`theme.templates`，见下一节）—— 换调色板 / 切亮暗时，它按当前调色板
-   重新渲染所有跟随文件（ghostty 主题、btop 主题、niri 装饰、yazi flavor、eza、fish）。
+   重新渲染所有跟随文件（btop 主题、niri 装饰、yazi flavor、eza、fish）。
 2. **`theme-apply`**（`modules/home-manager/gui/desktop/linux/themes/variants.nix`）—— 只管 Noctalia 不接管的
    那几个面：GTK3/GTK4/图标/Qt/Kvantum（保持 MacTahoe）与 niri 概览底色。做法是把两套变体都
    生成到 `~/.config/theme-variants/`，脚本把活文件软链指到当前模式、写 dconf
@@ -29,7 +29,7 @@
 | GTK4 的主题本体 | 一份**模式无关**的 `gtk.css`（浅色整份包在 `@media (prefers-color-scheme: light)` 里） | color-scheme 一变就重算，无需重开 |
 | niri 装饰色（焦点环 / 标签指示器 / 插入提示 / 最近窗口高亮） | Noctalia builtin `niri` 模板写 `~/.config/niri/noctalia.kdl` | niri watch 到即重载 |
 | niri 概览底色 | `theme-apply` 翻 `niri-colors/overview.kdl` 软链 | niri watch 到即重载 |
-| ghostty | Noctalia builtin `ghostty` 模板写 `~/.config/ghostty/themes/noctalia` | **不重选**：新开窗口/分屏，或 `ctrl+shift+,` |
+| ghostty | **不跟随**：固定内置暗色主题 `Catppuccin Frappe`（见 `docs/ghostty.md`） | 改主题要 `ctrl+shift+,` 或新开窗口 |
 | btop | Noctalia builtin `btop` 模板写 `themes/noctalia.theme` | 下次启动生效 |
 | yazi | Noctalia community `yazi` 模板写 `flavors/noctalia.yazi/*` | — |
 | eza / fish | 本仓库用户模板（见下节） | fish 新开 shell 生效 |
@@ -64,7 +64,7 @@ Noctalia 是配色的**唯一真源**：`customPalettes.mactahoe` 一份调色�
 
 | 类别 | 启用项 | 产物 |
 |---|---|---|
-| `builtin_ids` | `ghostty` `btop` `niri` | 各自的 `themes/noctalia` / `noctalia.kdl` |
+| `builtin_ids` | `btop` `niri` | `themes/noctalia.theme` / `noctalia.kdl` |
 | `community_ids` | `yazi` | `~/.config/yazi/flavors/noctalia.yazi/` |
 | `user` | `eza` `fish` | 本仓库自带模板，见下 |
 
@@ -85,12 +85,13 @@ ghostty / btop / yazi 同源，所以 `ls`（eza）与 shell 语法高亮（fish
   `{{ colors.terminal_* }}` 会让整份渲染失败（报 `template error(s); output not written`）。
   注释里只写 `colors.terminal_*`。
 
-**双写者问题与解法**：builtin 模板的 `apply.sh` 会**就地改写应用主配置**（ghostty 的
-`theme =`、btop 的 `color_theme =`、yazi 的 `[flavor]`），而这些文件在本仓库是 HM 的只读 store
+**双写者问题与解法**：builtin 模板的 `apply.sh` 会**就地改写应用主配置**（btop 的
+`color_theme =`、yazi 的 `[flavor]`），而这些文件在本仓库是 HM 的只读 store
 软链 → 写它会报「只读文件系统」。解法是**让 HM 直接把最终值写进配置**
-（`theme = "noctalia"`、`color_theme = "noctalia"`、`[flavor] = noctalia`）：apply.sh 检测到已是
+（`color_theme = "noctalia"`、`[flavor] = noctalia`）：apply.sh 检测到已是
 目标值就什么都不做（它的 `cmp` / `grep` 判等成立）。新增跟随面时按同一套路：HM 写最终值，
-apply.sh 只负责首渲。
+apply.sh 只负责首渲。ghostty 因此退出了这套机制（模板已摘除，固定内置暗色主题，见
+`docs/ghostty.md`）。
 
 ## 主题栈
 
@@ -274,10 +275,12 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 | 层 | 家族 | 元 |
 |---|---|---|
 | 壳层：niri 装饰 + GTK + Qt + Noctalia bar | macOS 中性灰 + 单一强调色 `#0088FF` | MacTahoe-Dark 的 `gtk-4.0/gtk.css` |
-| 工作区：终端 + 编辑器 + shell + 文件管理器 + 系统监控 | 暗 Catppuccin Frappe / 亮 Catppuccin Latte | **Noctalia 调色板的 `terminal` 色槽**；ghostty、Neovim、yazi、btop、eza、fish 多处同源。例外：fastfetch 的 10 阶渐变取自 **logo 的官方双色**（见「fastfetch」一节） |
+| 工作区：终端 + 编辑器 + shell + 文件管理器 + 系统监控 | 暗 Catppuccin Frappe / 亮 Catppuccin Latte | **Noctalia 调色板的 `terminal` 色槽**；ghostty（固定内置 Frappe）、Neovim、yazi、btop、eza、fish 多处同源。例外：fastfetch 的 10 阶渐变取自 **logo 的官方双色**（见「fastfetch」一节） |
 
 > 工作区一族现在也由 Noctalia 的 `terminal` 色槽统一供色：暗色块填 Frappe、亮色块填 Latte，
-> 亮暗切换时整族一起换（ghostty/btop/yazi/eza/fish 由 Noctalia 模板渲染，nvim/tmux/fastfetch 随终端或自行跟随）。
+> 亮暗切换时整族一起换（btop/yazi/eza/fish 由 Noctalia 模板渲染，nvim/tmux/fastfetch 随终端或自行跟随）。
+> **ghostty 是例外**：它固定用内置的 `Catppuccin Frappe`（值就是 `dark.terminal` 那份），
+> 不参与亮暗切换 —— 见 `docs/ghostty.md`。
 > **亮色块必须显式填 `terminal`**：Noctalia 在色块缺 `terminal` 时自行推导，实测推导把绿色槽给成了蓝色
 > （`mactahoe` 只填 `dark.terminal` 时，亮色渲染出 `palette2 = #0076df`）。
 

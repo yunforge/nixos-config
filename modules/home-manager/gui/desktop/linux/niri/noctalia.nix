@@ -90,9 +90,9 @@ in
           custom_palette = lib.mkForce "mactahoe";
 
           # 模板：Noctalia 是配色的唯一真源，它按当前调色板渲染各应用的主题文件。
-          # 各应用的主配置里已写好最终值（ghostty theme = "noctalia"、btop color_theme
-          # = "noctalia"、yazi [flavor] = noctalia），所以模板的 apply.sh 检测到已是
-          # 目标值即不写，不会去动那些 HM 只读软链。
+          # 各应用的主配置里已写好最终值（btop color_theme = "noctalia"、
+          # yazi [flavor] = noctalia），所以模板的 apply.sh 检测到已是目标值即不写，
+          # 不会去动那些 HM 只读软链。终端不在此列：ghostty 用内置暗色主题。
           #
           # ⚠️ 运行时 ~/.local/state/noctalia/settings.toml 里若已有 [theme.templates]
           # 段，会**覆盖**这里（与上面 bar.default 同一个坑）。首次生效需把运行时那段
@@ -101,9 +101,14 @@ in
             # 只列本仓库实际用的：gtk3/gtk4/qt 故意不启用 —— GTK/Qt 保持
             # MacTahoe（自打包完整主题），见 docs/themes.md。starship 本机没装也不在
             # 配置里，故不列。
+            #
+            # 不列 ghostty：终端主题固定为内置的 Catppuccin Frappe（见
+            # gui/apps/shared/ghostty.nix）。原先的 builtin 模板会把 ghostty 配置里的
+            # theme 改写成 "noctalia"（HM 只读软链，报「只读文件系统」），而且默认会话
+            # 已是 Plasma、Noctalia 不在跑，渲染出的 ~/.config/ghostty/themes/noctalia
+            # 会停在最后一次的亮/暗状态上。
             builtin_ids = [
               "btop"
-              "ghostty"
               "niri" # niri 窗口装饰跟随（写 ~/.config/niri/noctalia.kdl）
             ];
             # 社区模板只启用实测安全的：yazi 的 apply.sh 把 [flavor] 改成 noctalia，

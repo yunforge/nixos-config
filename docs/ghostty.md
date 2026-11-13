@@ -13,18 +13,25 @@ Kitty 样式拖尾」：光标移动时在上一位置与当前位置之间拖�
 `TRAIL_MAX_OPACITY`（拖尾最大不透明度，默认 0.35）。
 改动后 `ctrl+shift+,`（reload config）或新窗口即可看到。
 
-## 亮/暗跟随
+## 主题
 
-一个选项写两态：
+固定暗色，用 ghostty 自带的 **Catppuccin Frappe**：
 
-    theme = light:Catppuccin Latte,dark:Catppuccin Frappe
+    theme = "Catppuccin Frappe"
 
-ghostty 按「当前桌面主题」选，读的正是 `theme-apply` 在写的 dconf
-`org.gnome.desktop.interface color-scheme`（见 `docs/themes.md` 的真源一段），
-所以**新窗口天然跟随**，不需要登记软链、也不需要信号。两个主题 ghostty 自带。
+它就是仓库工作区一族（Catppuccin Frappe）的那套 16 色，与 Noctalia 调色板
+`dark.terminal` 色槽同值，所以终端与 nvim / yazi / btop / eza / fish 仍是同一套配色。
 
-⚠️ 已在运行的窗口不重选主题（亮暗在启动时确定）：按 `ctrl+shift+,`（reload config）
-或新开/新分屏即可。实测记录见本次改动的提交信息。
+**不再由 Noctalia 渲染**（builtin `ghostty` 模板已从
+`modules/home-manager/gui/desktop/linux/niri/noctalia.nix` 的 `builtin_ids` 摘掉）。两个原因：
+
+1. 那个模板的 `apply.sh` 会把 `theme =` 就地改写回 `noctalia`，而配置在本仓库是 HM 的
+   只读 store 软链（报「只读文件系统」）；
+2. 默认会话已切到 Plasma，Noctalia 不在跑，渲染出的
+   `~/.config/ghostty/themes/noctalia` 会停在最后一次的亮/暗状态上（实测停在浅色 Nord）。
+
+⚠️ 已在运行的窗口不重读主题（ghostty 无外部 reload 入口）：按 `ctrl+shift+,`（reload config）
+或新开窗口/分屏即可。
 
 ## 窗口装饰与磨砂玻璃
 

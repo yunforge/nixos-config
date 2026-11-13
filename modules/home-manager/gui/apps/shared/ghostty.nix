@@ -7,10 +7,10 @@
 # Ghostty 的包在 nixpkgs 仅支持 Linux（meta.platforms 全是 linux），故 macOS 上
 # 不能也不必走 HM 装包——配置同一份，安装方式按平台分开。
 #
-# 主题：`theme = "noctalia"`，由 Noctalia 统一管理（见 gui/desktop/linux/niri/noctalia.nix
-# 的 builtin "ghostty" 模板）。Noctalia 把当前调色板渲染成 ~/.config/ghostty/themes/noctalia，
-# 换主题/切亮暗时自动重渲。运行中的窗口不重读配置（ghostty 无外部 reload 入口），
-# 新窗口/分屏天然跟随。其它取值（字体、内置着色器、quick terminal、shell 集成等）见各条注释。
+# 主题：`theme = "Catppuccin Frappe"`，ghostty 自带、固定暗色。不再由 Noctalia 渲染
+# （builtin "ghostty" 模板已在 gui/desktop/linux/niri/noctalia.nix 里摘掉，理由见那里）。
+# 运行中的窗口不重读配置（ghostty 无外部 reload 入口），改完按 ctrl+shift+, 或新开窗口。
+# 其它取值（字体、内置着色器、quick terminal、shell 集成等）见各条注释。
 {
   lib,
   config,
@@ -37,12 +37,12 @@ in
       # 配置共享，安装方式按平台分开（HM 模块文档推荐的用法）。
       package = lib.mkIf (!pkgs.stdenv.hostPlatform.isLinux) null;
       settings = {
-        # 主题由 Noctalia 统一管理（gui/desktop/linux/niri/noctalia.nix 启用 builtin "ghostty" 模板）：
-        # Noctalia 把当前调色板渲染成 ~/.config/ghostty/themes/noctalia，其 apply.sh 会把本键
-        # 改成 "noctalia"。这里先写好最终值，apply.sh 检测到已是目标值即不写 —— 于是对 HM 的
-        # 只读软链没有任何写操作（否则实测报「只读文件系统」）。亮/暗由调色板切换带出。
-        # ghostty 无外部 reload 入口，新窗口/分屏天然跟随。
-        theme = "noctalia";
+        # 固定暗色主题，ghostty 自带。与仓库工作区一族（Catppuccin Frappe）同源：
+        # Noctalia 调色板的 dark.terminal 色槽填的就是这套 16 色。
+        # 不再由 Noctalia 的 builtin "ghostty" 模板渲染 —— 那会把本键改写回 "noctalia"
+        # （对 HM 只读软链报「只读文件系统」，且默认会话切到 Plasma 后 Noctalia 不在跑，
+        # 渲染出的主题文件会停在旧模式上）。故模板已从 noctalia.nix 的 builtin_ids 摘除。
+        theme = "Catppuccin Frappe";
 
         # === 字体与度量 ===
         font-family = [
