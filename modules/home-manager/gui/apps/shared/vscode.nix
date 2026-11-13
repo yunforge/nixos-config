@@ -31,7 +31,7 @@ in
   config = lib.mkIf (cfg.enable && guiCfg.enable) {
     programs.vscode = {
       enable = true;
-      # macOS 由 Homebrew cask 安装，HM 只管用户配置（与 ghostty 同一模式）
+      # macOS 由 Homebrew cask 安装，HM 只管用户配置（跨平台共享的独一份）
       package = lib.mkIf (!pkgs.stdenv.hostPlatform.isLinux) null;
     };
   };

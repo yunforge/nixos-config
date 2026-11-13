@@ -188,7 +188,7 @@ let
               [ "$(readlink "$1" 2>/dev/null)" = "$2" ] || ln -sfn "$2" "$1"
             }
 
-            # 本模块自己那五个 + 各层登记进来的（ghostty / btop / …）：case 同时把模式相关的
+            # 本模块自己那五个 + 各层登记进来的（fastfetch / nvim）：case 同时把模式相关的
             # 取值（dconf 的 scheme 与 gtk/icon 主题名）定下来
             case "$mode" in
               dark)
@@ -240,10 +240,6 @@ let
               echo "theme-apply: dconf 写入未生效（color-scheme 回读为 $got）—— 查 GIO_EXTRA_MODULES 里的 dconf 模块" >&2
               exit 1
             fi
-
-            # ghostty 不需要这里的信号：它的 theme 写成「亮:主题,暗:主题」一对，
-            # 由 ghostty 自己按桌面主题选（读的正是上面写的 dconf color-scheme），
-            # 新窗口天然跟随。其它 TUI（btop 等）无热重载，下次启动生效。
     '';
   };
 in

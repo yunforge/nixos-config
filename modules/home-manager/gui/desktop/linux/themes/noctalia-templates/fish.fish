@@ -2,7 +2,7 @@
 # 注册处：modules/home-manager/gui/desktop/linux/niri/noctalia.nix 的 theme.templates.user.fish
 # 部署到 ~/.config/fish/conf.d/noctalia-colors.fish，登录时被 fish 自动 source。
 # 占位符 colors.terminal_* 取自当前 Noctalia 调色板的 terminal 16 色，
-# 与 ghostty / btop / yazi 同源。
+# 与 btop / yazi 同源。
 # 用 hex_stripped（不带 #）：fish 的 set_color 只认裸十六进制或命名色，
 # 给它 rgb_csv（如 64,160,43）会报 "set_color: 未知颜色"。
 #

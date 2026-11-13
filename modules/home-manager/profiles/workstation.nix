@@ -3,7 +3,7 @@
 # 组合关系（详见 docs/architecture.md）：
 #   公共用户环境（common：shell / 编辑器 / CLI·TUI 工具）
 #   + 语言工具链（dev）
-#   + 跨平台 GUI 应用（ghostty / vscode）
+#   + 跨平台 GUI 应用（vscode）
 #   + Linux 专属 GUI 应用（浏览器 / 通讯 / 媒体 / 开发 / 嵌入式 …）
 #   + Linux 桌面会话（Niri / Noctalia / 主题 / 输入法 / MIME / WinApps）
 #

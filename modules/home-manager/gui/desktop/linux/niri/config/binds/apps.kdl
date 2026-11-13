@@ -14,14 +14,9 @@ binds {
     XF86MonBrightnessDown   allow-when-locked=true hotkey-overlay-title="亮度-"     { spawn-sh "noctalia msg brightness-down"; }
 
     // 应用快捷方式
-    Mod+Return         hotkey-overlay-title="终端"   { spawn "ghostty"; }
+    Mod+Return         hotkey-overlay-title="终端"   { spawn "konsole"; }
     Mod+Shift+Return   hotkey-overlay-title="浏览器（Microsoft Edge）" { spawn "microsoft-edge-stable"; }
     Mod+E       hotkey-overlay-title="文件管理器"   { spawn "nautilus"; }
-    // btop 单独指定 class，才能命中 windowrules.kdl 里按 app-id="btop" 定义的浮动规则
-    // （ghostty 的 class 选项就是 Wayland 的 app_id）
-    // （alacritty 时代 app-id 恒为 "Alacritty"，这条规则实际从未生效）
-    Mod+Shift+M hotkey-overlay-title="系统监控"     { spawn "ghostty" "--class=btop" "-e" "btop"; }
-
 
     // Pot 划词翻译（Wayland 下没有可用的全局热键，只能打它的本地 HTTP API）
     //

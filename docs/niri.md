@@ -12,10 +12,9 @@ Niri 配置分两半，`Mod` = `Super`（Windows 键）：
 | 快捷键 | 功能 |
 |--------|------|
 | `Mod` + `Space` | Noctalia 应用启动器 |
-| `Mod` + `Return` | 终端（Ghostty） |
+| `Mod` + `Return` | 终端（Konsole） |
 | `Mod` + `Shift` + `Return` | 浏览器（Microsoft Edge） |
 | `Mod` + `E` | 文件管理器（Nautilus） |
-| `Mod` + `Shift` + `M` | 系统监控（btop，浮动窗口） |
 | `Alt` + `T` | Pot 划词翻译 |
 | `Alt` + `I` | Pot 输入翻译 |
 | `Alt` + `X` | Pot 截屏翻译（OCR） |
@@ -104,6 +103,6 @@ Noctalia 的窗口截图要求合成器支持 `ext-image-copy-capture-v1`，niri
 ## 窗口规则（自动行为）
 
 - **最大化打开**：VSCode、Logisim、Brave、Zotero
-- **浮动打开（居中，统一 900×623，比例 13:9）**：Fcitx5 配置、PicGo、btop、qView、LocalSend、微信、QQ、Telegram、Discord、欧陆词典、gnome-text-editor、Pot（含其偏好面板）、magpie、Anki、gapless、FlClash、disktree、bilibili。尺寸取自 Omarchy `Super + O`（float & pin）的 1300×900 比例 —— 取舍见 `windowrules.kdl` 注释。客户端可自选尺寸（微信实测 900×720），规则保证的是初始尺寸
+- **浮动打开（居中，统一 900×623，比例 13:9）**：Fcitx5 配置、PicGo、qView、LocalSend、微信、QQ、Telegram、Discord、欧陆词典、gnome-text-editor、Pot（含其偏好面板）、magpie、Anki、gapless、FlClash、disktree、bilibili。尺寸取自 Omarchy `Super + O`（float & pin）的 1300×900 比例 —— 取舍见 `windowrules.kdl` 注释。客户端可自选尺寸（微信实测 900×720），规则保证的是初始尺寸
 - **微信额外禁止全屏**（`open-fullscreen false`）：XWayland 的 satellite 会把「尺寸等于某块输出」的窗口判成全屏，从而盖掉浮动预设 —— 根因与移除条件见 `docs/quirks.md`
 - 全局默认平铺，圆角 8px（`geometry-corner-radius`，原为 24，理由见 `docs/themes.md`）

@@ -35,7 +35,6 @@ in
     # 只保留 Plasma 桌面本体与必要的集成组件（机制：plasma6 模块把这些放在
     # optionalPackages，用 environment.plasma6.excludePackages 按包名剔除）。
     environment.plasma6.excludePackages = with pkgs.kdePackages; [
-      konsole # 终端 → Ghostty
       baloo-widgets
       gwenview # 图片查看 → qView
       okular # 文档/PDF → Papers

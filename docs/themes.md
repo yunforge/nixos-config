@@ -29,7 +29,6 @@
 | GTK4 的主题本体 | 一份**模式无关**的 `gtk.css`（浅色整份包在 `@media (prefers-color-scheme: light)` 里） | color-scheme 一变就重算，无需重开 |
 | niri 装饰色（焦点环 / 标签指示器 / 插入提示 / 最近窗口高亮） | Noctalia builtin `niri` 模板写 `~/.config/niri/noctalia.kdl` | niri watch 到即重载 |
 | niri 概览底色 | `theme-apply` 翻 `niri-colors/overview.kdl` 软链 | niri watch 到即重载 |
-| ghostty | **不跟随**：固定内置暗色主题 `Catppuccin Frappe`（见 `docs/ghostty.md`） | 改主题要 `ctrl+shift+,` 或新开窗口 |
 | btop | Noctalia builtin `btop` 模板写 `themes/noctalia.theme` | 下次启动生效 |
 | yazi | Noctalia community `yazi` 模板写 `flavors/noctalia.yazi/*` | — |
 | eza / fish | 本仓库用户模板（见下节） | fish 新开 shell 生效 |
@@ -71,7 +70,7 @@ Noctalia 是配色的**唯一真源**：`customPalettes.mactahoe` 一份调色�
 **用户模板**（上游没有 eza / fish）放在 `modules/home-manager/gui/desktop/linux/themes/noctalia-templates/`，
 经 `xdg.configFile` 部署到 `~/.config/noctalia/templates/`，`input_path` 相对 `~/.config/noctalia/`
 解析。占位符 `{{ colors.terminal_*.default.* }}` 取自当前调色板的 `terminal` 16 色，与
-ghostty / btop / yazi 同源，所以 `ls`（eza）与 shell 语法高亮（fish）跟终端是同一套色。
+btop / yazi 同源，所以 `ls`（eza）与 shell 语法高亮（fish）跟工作区是同一套色。
 
 两个实测踩到的点：
 
@@ -90,8 +89,7 @@ ghostty / btop / yazi 同源，所以 `ls`（eza）与 shell 语法高亮（fish
 软链 → 写它会报「只读文件系统」。解法是**让 HM 直接把最终值写进配置**
 （`color_theme = "noctalia"`、`[flavor] = noctalia`）：apply.sh 检测到已是
 目标值就什么都不做（它的 `cmp` / `grep` 判等成立）。新增跟随面时按同一套路：HM 写最终值，
-apply.sh 只负责首渲。ghostty 因此退出了这套机制（模板已摘除，固定内置暗色主题，见
-`docs/ghostty.md`）。
+apply.sh 只负责首渲。
 
 ## 主题栈
 
@@ -125,7 +123,7 @@ apply.sh 只负责首渲。ghostty 因此退出了这套机制（模板已摘除
 - 标签指示器在列右侧，圆角 2px（3px 宽的条，半径 ≥ 半宽就是胶囊，不超过窗口圆角）；**仅当列进入 tabbed 显示模式（`Mod+W`）时出现**
 - 概览缩放 0.50，背景暗 `#242424` / 亮 `#FFFFFF`
 - `recent-windows` 高亮框圆角 8px（与窗口圆角同档；Omarchy 无对应项）
-- 模糊 `passes 4 / offset 5.0 / saturation 1.10`；终端（ghostty / btop）`opacity 0.85`，取值按亮壁纸下的文字对比定，见 `frosted-glass.kdl`
+- 模糊 `passes 4 / offset 5.0 / saturation 1.10`；终端 `opacity 0.85`，取值按亮壁纸下的文字对比定，见 `frosted-glass.kdl`
 - 窗口阴影由合成器提供（`shadow { on }`，参数由 MacTahoe 自己的 CSD 阴影反推，见下）
 - 窗口开/关动画 220ms / 180ms（退场比入场快；scale 0.96→1.0 + 淡入，不用自定义波纹 shader）
 
@@ -172,7 +170,7 @@ shadow {
 推导过程写在 `modules/home-manager/gui/desktop/linux/niri/default.nix` 的注释里。三个要点：
 
 - **不会叠成两层**。niri 文档：设了 `prefer-no-csd` 与/或 `geometry-corner-radius` 之后，*“These will also remove client-side shadows if the window draws any.”* 而且无论 GTK 是否响应 `prefer-no-csd`（保留 CSD / 放弃 CSD），结论都一致：要么自绘阴影被裁、合成器补上，要么本来就没有
-- `draw-behind-window` 保持默认 `false`——文档说只有"niri 不知道 CSD 圆角"时才需要 `true`；我们给了 `geometry-corner-radius`，niri 自己知道圆角，也就不会在半透明窗口（ghostty 0.85）里透出一圈暗影
+- `draw-behind-window` 保持默认 `false`——文档说只有"niri 不知道 CSD 圆角"时才需要 `true`；我们给了 `geometry-corner-radius`，niri 自己知道圆角，也就不会在半透明窗口（磨砂玻璃的终端）里透出一圈暗影
 - 阴影跟随 `geometry-corner-radius` 绘制（现为 8px），天然与窗口同心
 
 仍可选的另一条路：改回字面 macOS 值 16，并按 concentricity 把上表里 ≥ 18px 的选择器用 `gtk.gtk{3,4}.extraCss` 一并下移。
@@ -275,12 +273,10 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 | 层 | 家族 | 元 |
 |---|---|---|
 | 壳层：niri 装饰 + GTK + Qt + Noctalia bar | macOS 中性灰 + 单一强调色 `#0088FF` | MacTahoe-Dark 的 `gtk-4.0/gtk.css` |
-| 工作区：终端 + 编辑器 + shell + 文件管理器 + 系统监控 | 暗 Catppuccin Frappe / 亮 Catppuccin Latte | **Noctalia 调色板的 `terminal` 色槽**；ghostty（固定内置 Frappe）、Neovim、yazi、btop、eza、fish 多处同源。例外：fastfetch 的 10 阶渐变取自 **logo 的官方双色**（见「fastfetch」一节） |
+| 工作区：终端 + 编辑器 + shell + 文件管理器 + 系统监控 | 暗 Catppuccin Frappe / 亮 Catppuccin Latte | **Noctalia 调色板的 `terminal` 色槽**；Neovim、yazi、btop、eza、fish 多处同源。例外：fastfetch 的 10 阶渐变取自 **logo 的官方双色**（见「fastfetch」一节） |
 
 > 工作区一族现在也由 Noctalia 的 `terminal` 色槽统一供色：暗色块填 Frappe、亮色块填 Latte，
 > 亮暗切换时整族一起换（btop/yazi/eza/fish 由 Noctalia 模板渲染，nvim/tmux/fastfetch 随终端或自行跟随）。
-> **ghostty 是例外**：它固定用内置的 `Catppuccin Frappe`（值就是 `dark.terminal` 那份），
-> 不参与亮暗切换 —— 见 `docs/ghostty.md`。
 > **亮色块必须显式填 `terminal`**：Noctalia 在色块缺 `terminal` 时自行推导，实测推导把绿色槽给成了蓝色
 > （`mactahoe` 只填 `dark.terminal` 时，亮色渲染出 `palette2 = #0076df`）。
 
@@ -294,13 +290,13 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 
 细节全在 `assets/fastfetch/nixos-01.jsonc` 的注释里，两个结论：
 
-- **logo 是图片（type=kitty，Kitty graphics protocol），不是字符图也不是内置 logo。**
+- **logo 是图片（type=sixel），不是字符图也不是内置 logo。**
   内置 logo 不可着色（实测 `--logo-color-1..9` 完全无效）；半块字符图时代（44 列 × 20 行、
-  官方双色 `#5277C3` / `#7EBAE4`）在字符格分辨率下无损但边缘阶梯。Kitty 协议按真像素画
-  （logo 区 44 列 × 20 行在 Ghostty 里约 440×400 px），抗锯齿平滑、保留官方双色渐变。
-  Ghostty 只支持 Kitty graphics protocol（没有 sixel、没实现 iTerm2 OSC 1337），而
-  fastfetch 的 `auto` 不会自动协商图片协议（auto = 先 builtin 再 file），所以必须写死
-  `type: "kitty"`。源图：`nixos-artwork` 的 `logo/nix-snowflake-colours.svg` →
+  官方双色 `#5277C3` / `#7EBAE4`）在字符格分辨率下无损但边缘阶梯。Sixel 协议按真像素画
+  （logo 区 44 列 × 20 行约 440×400 px），抗锯齿平滑、保留官方双色渐变。
+  终端换 Konsole（2026-11-14）后选 sixel：Konsole 稳定版支持 sixel（22.04 起），kitty
+  图形协议残缺，而 fastfetch 的 `auto` 不会自动协商图片协议（auto = 先 builtin 再 file），
+  所以必须写死 `type: "sixel"`。源图：`nixos-artwork` 的 `logo/nix-snowflake-colours.svg` →
   `rsvg-convert -w 1024 -h 1024` 透明底 PNG → `assets/fastfetch/logo/nixos_snowflake.png`，
   由 `common/tools/default.nix` 部署（不区分亮/暗、不登记进 switchTargets）。
   `width` / `height` 以字符为单位占位 44 列 × 20 行，模块列位置与字符图时代一致。
@@ -321,13 +317,13 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 - **宽度预算 ≲ 102 列**（半屏终端），实测最长 **102 列**（最长行来自模块区，不是 logo）。历史上是 133 列：分组横线原来是
   10 段 × 7 字符（横线自己就有 70 列）+ 43 列的手绘 logo。收的过程：横线改 10 段 × 2 字符；
   logo 一度换成 32 列的鲸鱼（90 列），换回 43 列的手绘 NixOS 图后又嫌它「从两边往中间扁」，
-  现在是 Kitty 协议画的官方矢量图（`logo.width` 占位 44 列，见上面 logo 一节）；模块格式只留有效字段（`os` 名字+版本、`disk` 不留文件系统类型、
+  现在是图片协议画的官方矢量图（`logo.width` 占位 44 列，见上面 logo 一节）；模块格式只留有效字段（`os` 名字+版本、`disk` 不留文件系统类型、
   `localip` 不留 MAC、`display` 分辨率+刷新率、`packages` 改 `nix: A+B`）；模块清单也砍了
   一批（Board / Sound / BIOS / Packages / Processes / Term Font / BT Radio / WiFi / DNS /
   Public IP / 日期时间 / 运行时长）。
   量法：`fastfetch --pipe -c assets/fastfetch/nixos-01.jsonc` 后取最长行。注意管道环境
-  Kitty 协议必然不可用，logo 永远走内置 ASCII 回退（比 44 列占位窄），所以管道量到的是
-  宽度**下界**；真实 44 列占位只在 Ghostty 窗口里体现。
+  图片协议必然不可用，logo 永远走内置 ASCII 回退（比 44 列占位窄），所以管道量到的是
+  宽度**下界**；真实 44 列占位只在支持图片协议的终端窗口里体现。
   信息头（键名）改成中文，按显示宽度手工补空格到 8 列 —— fastfetch 不会自己对齐 CJK。
   分组收敛成三组：**硬件 / 软件 / 网络**（原来的 Time 组只剩「系统年龄」一行，并进软件组）。
   用量相关的三行（memory / swap / 两块 disk）统一成 `已用 / 总量 (百分比)`，**没有进度条**：

@@ -1,7 +1,7 @@
 # eza 主题模板 —— 由 Noctalia 渲染
 # 注册处：modules/home-manager/gui/wm/noctalia.nix 的 theme.templates.user.eza
 # 占位符 colors.terminal_* 取自当前 Noctalia 调色板的 terminal 16 色，
-# 与 ghostty / btop / yazi 同源，故目录列表的配色和终端一致。
+# 与 btop / yazi 同源，故目录列表的配色和工作区一致。
 # eza 的 color_from_str 只认带 "#" 的 6/3 位十六进制，裸十六进制会被静默丢弃
 # （回落成 None），故一律用 hex（带 #）。
 filekinds:

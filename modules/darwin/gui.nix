@@ -53,13 +53,12 @@ in
 
       # Homebrew 4.x 起 cask 已并入核心 tap，无需额外 tap homebrew/cask
       # GUI 应用
-      # ghostty / vscode：用户配置由 HM 的 modules/home-manager/gui/apps/shared/
-      # 跨平台共享，程序本体在 macOS 侧由这里的 cask 安装（Linux 走 HM 装包）；
+      # vscode：用户配置由 HM 的 modules/home-manager/gui/apps/shared/ 跨平台共享，
+      # 程序本体在 macOS 侧由这里的 cask 安装（Linux 走 HM 装包）；
       # 与「工具配置共享 ≠ 安装方式相同」的分层约定一致。
       # brave 不在此列：Linux 侧 brave 已于 2026-11-03 从 nixpkgs 移除（硬 throw），
       # 本仓库统一改为 ~/Apps 自维护，macOS 侧也不再由 brew cask 安装。
       casks = [
-        "ghostty"
         "visual-studio-code"
         "obsidian"
       ];

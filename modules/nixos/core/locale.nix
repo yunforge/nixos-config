@@ -40,7 +40,7 @@
     maple-mono.NormalNL-NF-CN-unhinted # 等宽字体（CN 变体）
     maple-mono.NormalNL-NF-unhinted # 等宽字体（非 CN 变体，补充）
     noto-fonts-color-emoji # Emoji 字体
-    lxgw-wenkai # 霞鹜文楷：ghostty 的 CJK 回退（含 Mono 变体）与显式文楷请求
+    lxgw-wenkai # 霞鹜文楷：显式文楷请求；等宽上下文的 CJK 回退见下方 localConf
   ];
 
   # ── 字形渲染：灰度 + 不 hinting（macOS 自 Mojave 起就是这套）────────────
@@ -121,9 +121,8 @@
 
       <!-- 等宽上下文的中文回退要用 LXGW WenKai **Mono**（比例版会破中文对齐），
            再兜 Noto Sans Mono CJK SC 补全量覆盖。fontconfig 无法从任意家族名判断
-           「这是等宽请求」，只能逐名列举：泛 monospace 与默认等宽家族（ghostty
-           自己显式配了 WenKai Mono，不依赖这条）。必须放在下面那条全局 append
-           之前，让 Mono 变体排在比例版前面。 -->
+           「这是等宽请求」，只能逐名列举：泛 monospace 与默认等宽家族。必须放在
+           下面那条全局 append 之前，让 Mono 变体排在比例版前面。 -->
       <match target="pattern">
         <test qual="any" name="family">
           <string>monospace</string>

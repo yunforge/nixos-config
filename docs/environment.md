@@ -8,7 +8,7 @@
 |----|------|------|
 | common | `modules/home-manager/common/` | 所有主机共享：shell / editors / 命令行工具 / AI 工具（`common/ai/`） |
 | dev | `modules/home-manager/dev/languages/` | 语言工具链（Go / Node / Rust / Python / C++ / 其它 LSP） |
-| gui/apps/shared | `modules/home-manager/gui/apps/shared/` | 跨平台 GUI 应用配置（Ghostty / VSCode） |
+| gui/apps/shared | `modules/home-manager/gui/apps/shared/` | 跨平台 GUI 应用配置（VSCode） |
 | platform | `modules/home-manager/platform/` | 平台专属用户级适配（Linux 的 XDG 用户目录） |
 
 各设备的用户环境由角色 profile 组合（`modules/home-manager/profiles/`）：

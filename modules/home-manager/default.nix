@@ -4,7 +4,7 @@
 #   common/   跨平台公共配置（shell / 编辑器 / CLI·TUI 工具）
 #   dev/      语言工具链（与普通 CLI 分离：是否安装完整工具链由角色决定）
 #   gui/      GUI 应用与 Linux 桌面会话
-#             - apps/shared/   跨平台 GUI 应用配置（ghostty / vscode）
+#             - apps/shared/   跨平台 GUI 应用配置（vscode）
 #             - apps/linux/    Linux 专属 GUI 应用
 #             - desktop/linux/ Linux 桌面会话（niri / noctalia / 主题 / 输入法）
 #   platform/ 平台专属适配（linux / darwin）

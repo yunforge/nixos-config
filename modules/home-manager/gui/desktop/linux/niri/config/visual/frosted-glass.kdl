@@ -9,7 +9,7 @@
 
 // 全局：所有窗口声明启用模糊。
 // 注意这本身不产生任何视觉效果——不透明窗口没有东西可以"透"。
-// 实际生效的只有下面显式给了 opacity < 1 的窗口（ghostty / btop），
+// 实际生效的只有下面显式给了 opacity < 1 的窗口（终端），
 // 以及 Noctalia 的 layer 面（layer-rule 对本段 window-rule 无效，需单独声明）。
 // 保留这条规则的意义：以后新增的半透明窗口不必重复声明 blur/xray。
 window-rule {
@@ -20,12 +20,12 @@ window-rule {
 }
 
 // --- 终端模拟器：磨砂玻璃的黄金场景 ---
-// btop 窗口由 ghostty 以 --class=btop 启动（见 binds/apps.kdl），单独列出
 //
 // opacity 取 0.80：这是「玻璃好看」与「文字可读」的取舍，而它是可量化的。opacity 作用在
 // **整个窗口**上（niri 文档：“applied to every surface of the window”），所以窗口背后永远
-// 是“0.8×底色 + 0.2×模糊后的壁纸”。ghostty / btop 的底色是 Frappe base #303446，主文字是
-// Frappe text #C6D0F5；取**当前壁纸**最亮 5% 区域（模糊 + saturation 1.10 只会更亮，即
+// 是“0.8×底色 + 0.2×模糊后的壁纸”。推导时终端底色取 Catppuccin Frappe base #303446、主文字
+// Frappe text #C6D0F5（Ghostty 时代；终端换 Konsole 后底色随其配色方案，数值未重推）；
+// 取**当前壁纸**最亮 5% 区域（模糊 + saturation 1.10 只会更亮，即
 // 最坏情况）实测 #DFD0CD，据此算：
 //
 //     opacity   合成后的底色   对比度      判定
@@ -33,7 +33,7 @@ window-rule {
 //       0.80    #535361       4.94:1   ✅ ← 取这个
 //       0.75    #5C5B68       4.37:1   ⚠️ 低于 AA(4.5)
 //
-// 为什么不让 ghostty 自己只压背景（它确实能让文字保持不透明）：量过，暗区背后
+// 为什么不让终端自己只压背景（Ghostty 确实能做到文字保持不透明）：量过，暗区背后
 // 0.8×#303446 = #2A2E3F，与纯 #303446 几乎无差 —— 玻璃“显形”靠的是文字连同底色一起透到
 // 壁纸上，只透明背景就没效果了。另外 niri 的 opacity 对已开着的窗口即时生效，应用自己的
 // 背景透明度得重开才生效。完整取舍见 docs/themes.md。
@@ -42,7 +42,9 @@ window-rule {
 // （差一点），而换成暗调壁纸时 0.70 乃至 0.65 都还很安全、玻璃感明显得多——想要“一眼看得出
 // 是玻璃”，正确做法是配暗壁纸（见 docs/themes.md）。
 window-rule {
-    match app-id=r#"^(ghostty|com\.mitchellh\.ghostty|btop)$"#
+    // Konsole 的 Wayland app_id 取自其 desktopFileName（org.kde.konsole）；
+    // 兜底写上裸名。rebuild 后用 `niri msg windows` 实测，不一致就照实测改。
+    match app-id=r#"^(org\.kde\.konsole|konsole)$"#
     opacity 0.80
     background-effect {
         blur true

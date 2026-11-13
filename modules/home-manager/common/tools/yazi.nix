@@ -35,9 +35,10 @@ in
           max_height = 2000;
         };
       };
-      # ghostty 走 Kitty 图形协议（yazi 的驱动选择按终端 brand 走，它认不认 ghostty
-      # 这一项我没验证）；ueberzugpp 作为 GNOME 终端 / WSLg 等无图形协议终端的兜底
-      # （nixpkgs 的 yazi wrapper 不带它，图片会空白），所以两者都留着。
+      # 终端换 Konsole（2026-11-14）后：Konsole 稳定版支持 sixel、kitty 图形协议
+      # 残缺；yazi 的驱动选择按终端 brand 走，它在 Konsole 下能否走图形协议我没
+      # 验证。ueberzugpp 作为无图形协议可用时的兜底（nixpkgs 的 yazi wrapper 不带
+      # 它，图片会空白），所以两者都留着。
       extraPackages = lib.optional pkgs.stdenv.hostPlatform.isLinux pkgs.ueberzugpp;
       # 主题由 Noctalia 统一管理（gui/desktop/linux/niri/noctalia.nix 启用 community "yazi" 模板）：
       # Noctalia 写到 ~/.config/yazi/flavors/noctalia.yazi/{flavor.toml,tmtheme.xml}，其 apply.sh

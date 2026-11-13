@@ -24,7 +24,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 
 | 组件 | 软件 |
 |------|------|
-| 终端模拟器 | Ghostty（Catppuccin Frappe/Latte，跟随桌面亮暗）、Tern（手动装到 `~/Apps/Tern`） |
+| 终端模拟器 | Konsole（`utilities.nix` 装包）、Tern（手动装到 `~/Apps/Tern`） |
 | Shell | Fish（含大量自定义别名） |
 | 终端复用器 | tmux（Omarchy 按键布局，见 `docs/tmux.md`） |
 | 终端文件管理器 | Yazi（`y`） |
@@ -77,7 +77,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | 欧陆词典 | 查词 |
 | Mister Download Manager | 下载管理器（Rust 原生，支持浏览器集成 / BT / 视频站点；自维护包见 `pkgs/misterdownloadmanager`） |
 | Logisim Evolution | 数字电路模拟 |
-| file-roller / Nautilus | 压缩 / 文件管理（Nautilus 右键「在 Ghostty 中打开」，文件夹与空白处均有一级入口，见 `gui/apps/linux/nautilus.nix`） |
+| file-roller / Nautilus | 压缩 / 文件管理 |
 
 ## 游戏
 
@@ -107,7 +107,7 @@ darwin 上是 launchd agent）定期 `tldr --update`。缓存缺失时首次调�
 | Maple Mono NF（CN） | 等宽 / 代码 |
 | HarmonyOS Sans SC | 界面无衬线 |
 | CupertinoIcons | mpv 的 uosc 界面图标（随 `gui/apps/mpv` 落到 `~/.local/share/fonts`，名字在 uosc 的 Lua 里写死、字形是 Flutter Cupertino Icons 的私有区码位，故必须自带；同目录还有一支上游的 `uosc_textures.ttf` 在本 fork 里已无调用点，不安装） |
-| LXGW WenKai（霞鹜文楷） | 终端/编辑器的 CJK 回退（ghostty 配 Mono 变体）与显式文楷请求 |
+| LXGW WenKai（霞鹜文楷） | 等宽上下文的 CJK 回退（localConf 逐名兜底）与显式文楷请求 |
 | Noto Sans CJK SC | 缺字兜底：谚文、罕用汉字；等宽场景走 Noto Sans Mono CJK SC（`fonts.packages` 显式安装，不依赖默认包集） |
 | Noto Serif CJK SC | 衬线链主字体（对位 macOS Songti SC；拉丁字形即 Source Serif 血统，故不单装 Source Serif Pro） |
 | Noto Color Emoji | Emoji |

@@ -29,7 +29,6 @@ let
   # 脚本恰好会改掉可执行文件名，于是这些应用在卡片上全是齿轮图标：
   #
   #   Edge     exe=msedge               条目 Exec=microsoft-edge-stable
-  #   Ghostty  exe=.ghostty-wrapped     条目 Exec=ghostty
   #   niri     exe=niri                 无应用条目（只有 wayland-sessions），也没有图标
   #   Noctalia exe=.noctalia-wrapped    无应用条目
   #   FlClash  exe=FlClashCore（内核子进程）无应用条目
@@ -38,8 +37,8 @@ let
   #
   # 修法：给每个这样的应用补一条 NoDisplay 别名条目，Exec 写成运行时的 exe
   # basename、Icon 指向它自己的图标。别名条目不会出现在启动器里、也不会被执行，
-  # 只是给 Pulse 查表用（实测 msedge / ghostty / niri / FlClashCore / magpie-bun
-  # / noctalia 六项均从齿轮变成真图标）。见 docs/quirks.md 的 Pulse 条目。
+  # 只是给 Pulse 查表用（实测 msedge / niri / FlClashCore / magpie-bun
+  # / noctalia 五项均从齿轮变成真图标）。见 docs/quirks.md 的 Pulse 条目。
   #
   # 注意：exe basename 由 nixpkgs 的包装方式决定，升级后若包装改名，这里会静默
   # 失配（退回齿轮），照 `readlink -f /proc/<pid>/exe` 的结果改即可。
@@ -65,6 +64,10 @@ in
       pulse # 系统活动监视器（进程 / CPU / 内存 / GPU / 磁盘 / 网络 / 能耗）
       foliate # eBook阅读器
       gapless # 本地音乐播放器
+      # 终端（2026-11-14 起，替代已移除的 Ghostty）：只装包不写配置 —— laptop 无
+      # Plasma 会话，不能依赖 plasma6 模块带出 konsole；desktop 的 Plasma 侧也有
+      # 一份，同包不冲突
+      kdePackages.konsole
       misterdownloadmanager # 下载管理器（Rust，自维护包，见 pkgs/misterdownloadmanager）
       qview # 图片查看
       disktree # 磁盘使用情况树状图
@@ -94,7 +97,6 @@ in
         )
         {
           msedge = "microsoft-edge";
-          ".ghostty-wrapped" = "com.mitchellh.ghostty";
           niri = "${niri-icon}";
           ".noctalia-wrapped" = "noctalia";
           FlClashCore = "flclash"; # FlClash 内核，没有自己的条目

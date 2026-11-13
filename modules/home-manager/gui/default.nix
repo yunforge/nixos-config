@@ -1,7 +1,7 @@
 # GUI 用户层聚合入口
 #
 # 分层：
-#   apps/shared/    跨平台 GUI 应用配置（Ghostty / VSCode）——MacBook 也导入这层
+#   apps/shared/    跨平台 GUI 应用配置（VSCode）——MacBook 也导入这层
 #   apps/linux/     Linux 专属 GUI 应用——仅工作站
 #   desktop/linux/  Linux 桌面会话（Niri / Noctalia / 主题 / 输入法 / MIME / WinApps）
 #

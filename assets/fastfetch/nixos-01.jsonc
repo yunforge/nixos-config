@@ -1,9 +1,9 @@
 {
   "logo": {
-    // 用图片 logo（type=kitty，Kitty graphics protocol）。Ghostty 只支持这一种图片协议
-    // （没有 sixel、没实现 iTerm2 OSC 1337），而 fastfetch 的 auto 不会自动协商图片协议
-    // （auto = 先 builtin 再 file），所以图片协议必须写死。
-    // 收益：logo 区 44 列 × 20 行在 Ghostty 里约 440×400 px，真图是抗锯齿平滑曲线、
+    // 用图片 logo（type=sixel）。终端换 Konsole（2026-11-14）后：Konsole 稳定版
+    // 支持 sixel（22.04 起），kitty 图形协议残缺；而 fastfetch 的 auto 不会自动
+    // 协商图片协议（auto = 先 builtin 再 file），所以图片协议必须写死。
+    // 收益：logo 区 44 列 × 20 行约 440×400 px（随终端字号），真图是抗锯齿平滑曲线、
     // 保留官方双色渐变；半块字符图时代只有 44×40 的像素格、边缘阶梯。
     // 源图：官方 nix-snowflake-colours.svg 经 rsvg-convert -w 1024 -h 1024 的透明底 PNG
     // （配方见 docs/themes.md 的 fastfetch 一节），由 home-manager 部署成普通文件。
@@ -14,7 +14,7 @@
     // 这句 source 两份 jsonc 相同。
     // width/height 单位是字符，占位 44 列 × 20 行（模块列位置与字符图时代一致）；
     // 这两个选项只对图片 logo 有效。
-    "type": "kitty",
+    "type": "sixel",
     "source": "~/.config/fastfetch/logo/nixos_snowflake.png",
     "width": 44,
     "height": 20,

@@ -163,10 +163,9 @@ window-rule {
 // 要么不命中，所以这里不需要像原来那样为「同 app-id 的第二个窗口」留覆盖规则
 // （Pot 的翻译窗与 Config 面板原先正是两条同 app-id 的规则）。
 window-rule {
-    // 输入法设置 / 图床上传 / 系统监控 / 看图 / 传文件
+    // 输入法设置 / 图床上传 / 看图 / 传文件
     match app-id="(?i)fcitx5"
     match app-id="(?i)picgo"
-    match app-id="(?i)btop"
     match app-id="(?i)qview"
     match app-id="(?i)localsend"
     // 消息

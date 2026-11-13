@@ -103,7 +103,7 @@ let
         // draw-behind-window 保持默认的 false：文档说因为 niri 不知道 CSD 圆角
         // 才需要 true 来遮住方形角的伪影；而我们给了 geometry-corner-radius，
         // niri 自己知道圆角，不需要“画到窗口后面”，也就不会在半透明窗口
-        // （ghostty 0.85）里透出一圈暗影。
+        // （磨砂玻璃的终端，0.80）里透出一圈暗影。
         //
         // 取值由 MacTahoe 自己的 CSD 阴影反推（gtk-4.0/gtk.css 的 window.csd）：
         //     0  3px  6px rgba(0,0,0,.15)

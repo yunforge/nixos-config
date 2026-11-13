@@ -97,7 +97,7 @@ nix store optimise
 ## 我的配置
 
 - Shell：[Fish](https://github.com/fish-shell/fish-shell)
-- 终端：[Ghostty](https://ghostty.org/)、[Tern](https://stencil.so/tern)（手动装到 `~/Apps/Tern`）
+- 终端：[Konsole](https://konsole.kde.org/)、[Tern](https://stencil.so/tern)（手动装到 `~/Apps/Tern`）
 - 终端复用：[tmux](https://github.com/tmux/tmux)
 - 终端文件管理：[Yazi](https://github.com/sxyazi/yazi)（`y`）
 - 编辑器：[Neovim](https://github.com/neovim/neovim)、[VSCode](https://code.visualstudio.com/)、

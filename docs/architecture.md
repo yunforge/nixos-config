@@ -23,7 +23,7 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
 │     ├─ common/            # 公共用户环境：shell / editors / tools（所有主机）
 │     ├─ dev/               # 语言工具链（languages/）
 │     ├─ gui/
-│     │  ├─ apps/shared/    # 跨平台 GUI 应用配置（Ghostty / VSCode）
+│     │  ├─ apps/shared/    # 跨平台 GUI 应用配置（VSCode）
 │     │  ├─ apps/linux/     # Linux 专属 GUI 应用
 │     │  └─ desktop/linux/  # Linux 桌面会话（niri / themes / mimeapps / winapps）
 │     ├─ platform/          # 平台专属适配（linux.nix / darwin.nix）
@@ -78,7 +78,7 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
   （Go / Node / Rust / Python / C++ / 其它 LSP）。与普通 CLI 分层：
   是否安装完整工具链由角色决定（`myHome.dev.enable`）。
 - **gui**（`modules/home-manager/gui/`）：
-  - `apps/shared/`：跨平台 GUI 应用**配置**（Ghostty / VSCode）。
+  - `apps/shared/`：跨平台 GUI 应用**配置**（VSCode）。
     配置共享，安装方式按平台分开：Linux 走 HM 的 `programs.<name>` 装包，
     macOS 走 `modules/darwin/gui.nix` 的 Homebrew casks（HM 侧 `package = null`）。
   - `apps/linux/`：Linux 专属 GUI 应用（浏览器 / 通讯 / 媒体 / mpv /
@@ -152,7 +152,7 @@ virtualization / proxy）由角色与 `desktop.enable` 的聚合默认值给出�
 |------|----------|----------|
 | Fish / tmux / Neovim / bat / ripgrep … | 所有主机 | HM 的 `programs.<name>`（各模块自行过滤 Linux 专属工具） |
 | 语言工具链 | workstation / server / wsl / macbook | HM `home.packages`（Linux 专属工具按平台过滤） |
-| Ghostty / VSCode 用户配置 | Linux 工作站 + MacBook | Linux：HM 装包；macOS：Homebrew cask（HM 侧 `package = null`） |
+| VSCode 用户配置 | Linux 工作站 + MacBook | Linux：HM 装包；macOS：Homebrew cask（HM 侧 `package = null`） |
 | Linux GUI 应用 | 仅 Linux 工作站 | HM `home.packages` |
 | Niri / Noctalia / 主题 / 输入法 | 仅 Linux 工作站 | HM 配置 + NixOS 系统模块 |
 | macOS 系统设置 / Homebrew | 仅 MacBook | `modules/darwin` |
