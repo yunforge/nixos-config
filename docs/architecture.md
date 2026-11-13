@@ -25,7 +25,7 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
 │     ├─ gui/
 │     │  ├─ apps/shared/    # 跨平台 GUI 应用配置（VSCode）
 │     │  ├─ apps/linux/     # Linux 专属 GUI 应用
-│     │  └─ desktop/linux/  # Linux 桌面会话（niri / themes / mimeapps / winapps）
+│     │  └─ desktop/linux/  # Linux 桌面会话（niri / themes / winapps）
 │     ├─ platform/          # 平台专属适配（linux.nix / darwin.nix）
 │     └─ profiles/          # 角色配置（workstation / server / wsl / macbook）
 ├─ overlays/ + pkgs/        # 自维护包的单一注入点与包本体

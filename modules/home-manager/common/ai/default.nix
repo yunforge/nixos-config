@@ -11,10 +11,11 @@
 # 都装」的行为一致。想在某台机器整体关掉 Agent 能力时用 lib.mkForce false。
 #
 # 不在本层的 Agent 相关内容（有意保留在原处，属对应子系统职责）：
-#   - `x-scheme-handler/claude-cli` 的 MIME 默认程序 → gui/desktop/linux/mimeapps.nix
-#     （claude-cli:// 深链是桌面 GUI 才需要的关联，随桌面会话门控更自然）
 #   - agent-browser / Playwright 的 Chrome 共享库 → modules/nixos/core/default.nix
 #     的 programs.nix-ld.libraries（系统级 nix-ld 补齐，不是用户态包）
+#
+# `claude-cli://` 深链的 MIME 默认程序不写死在仓库里（桌面默认应用统一由
+# 桌面「默认应用」设置自行管理）；该 handler 是唯一候选时深链仍能打开。
 {
   lib,
   config,

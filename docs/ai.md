@@ -33,8 +33,10 @@
 
 | 内容 | 位置 | 不搬的理由 |
 |------|------|-----------|
-| `x-scheme-handler/claude-cli` → `claude-code-url-handler.desktop` | `gui/desktop/linux/mimeapps.nix` | `claude-cli://` 深链是桌面 GUI 关联，随 `myHome.desktop.enable` 门控更自然 |
 | agent-browser / Playwright 的 Chrome 共享库 | `modules/nixos/core/default.nix` 的 `programs.nix-ld.libraries` | 系统级 nix-ld 补齐，不是用户态包；非 HM 层 |
+
+注：`claude-cli://` 深链的 MIME 默认程序不写死在仓库里（桌面默认应用统一由
+桌面「默认应用」设置自行管理，不随 AI 层声明）。
 
 ## 尚未纳入仓库的 Agent 配置（$HOME 下、被 .gitignore 忽略）
 
