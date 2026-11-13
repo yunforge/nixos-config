@@ -50,6 +50,9 @@
         bar = false;
       }
     ];
+    # 与 laptop 的真实差异：这台额外提供 KDE Plasma 6 会话（与 niri 并存，
+    # 登录默认进入 Plasma），见 modules/nixos/desktop/plasma.nix。laptop 保持纯 niri。
+    desktop.plasma.enable = true;
     # 与 laptop 的真实差异：这台是游戏机，开 Steam
     desktop.steam.enable = true;
     # NVIDIA 由主机显式开启（hardware 域的聚合默认值不含它）

@@ -66,6 +66,7 @@ in
     ./gdm.nix
     ./env.nix
     ./niri
+    ./plasma.nix
     ./distrobox.nix
     ./steam.nix
   ];

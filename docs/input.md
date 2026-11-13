@@ -128,6 +128,27 @@ displays=$(fcitx5-diagnose | grep -c 'Group \[x11::0\]')   # 微信等 X11 客�
 
 要改键位就用 fcitx5 的 GUI 配置（`kdePackages.fcitx5-configtool`），改动会保留。
 
+## KDE Plasma 会话下的自启
+
+niri 与 KDE Plasma 两个会话对 fcitx5 的启动方式不同，`modules/nixos/desktop/plasma.nix`
+为 KDE 会话覆盖了 XDG autostart：
+
+- **KDE（Wayland）**：KWin 的输入法后端只承认**由它自己拉起**的 fcitx——启动时按
+  `kwinrc` 的 `[Wayland] InputMethod`（本机已指向 `org.fcitx.Fcitx5.desktop`）以
+  `QProcess` 启动并给一条专用 `WAYLAND_SOCKET`，只有这条连接能承担 input-method-v2
+  角色，text-input 上下文才送得到 fcitx。因此 `plasma.nix` 把
+  `/etc/xdg/autostart/org.fcitx.Fcitx5.desktop` 覆盖成「`XDG_CURRENT_DESKTOP=KDE`
+  时直接退出」，交给 KWin 拉起。否则（让 systemd 单元先起普通实例）应用就只剩英文：
+  实测 fcitx 端 `Group [wayland:] has 0 InputContext(s)`、`fcitx5-remote` 恒为 0，
+  而 KWin `VirtualKeyboard.active=true`。
+- **niri**：仍由 systemd 单元 `app-org.fcitx.Fcitx5@autostart.service` 托管（覆盖后的
+  Exec 在非 KDE 会话里 `exec fcitx5`），`systemctl --user restart` 与 journal 照旧。
+
+> [!NOTE]
+> KDE 会话里 fcitx5 是 KWin 的子进程，不在 `app-…@autostart.service` 名下：看日志用
+> `journalctl --user -b | grep fcitx`；重启用「系统设置 → 虚拟键盘 → 重新选择 Fcitx 5」
+> 或重新登录——`systemctl --user restart app-…@autostart.service` 在 KDE 下不会重启它。
+
 ## 管理
 
 ```bash
@@ -137,7 +158,7 @@ fcitx5-diagnose
 
 - fcitx5 配置目录：`~/.config/fcitx5`
 - 水杉的用户数据与词库：`~/.local/share/msime`
-- fcitx5 由 systemd 用户单元 `app-org.fcitx.Fcitx5@autostart.service` 自启（xdg-autostart 生成，
+- fcitx5 由 systemd 用户单元 `app-org.fcitx.Fcitx5@autostart.service` 自启（niri 等非 KDE 会话；KDE 会话由 KWin 在 startSession 拉起，见「KDE Plasma 会话下的自启」；xdg-autostart 生成，
   在 graphical-session.target 之后拉起，Wayland/X11 连接就绪）；niri 的 `startup.kdl` 不再 spawn
   fcitx5（曾与之抢 DBus 名，spawn 实例赢、单元 217ms 让位，导致下面的 restart 命令失效）
 - XWayland 应用输入法由 `wrapQtXWayland` 按应用注入的变量接管（Qt5 应用无 XIM 支持，必须 wrap，如 WPS），其余 X11 应用走 XIM

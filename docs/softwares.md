@@ -10,9 +10,15 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | 组件 | 软件 |
 |------|------|
 | 窗口管理器（desktop / laptop） | [Niri](https://github.com/YaLTeR/niri) - Wayland 平铺合成器 |
+| 桌面环境（desktop，GDM 会话可切换） | KDE Plasma 6（Wayland）；默认登录进 Plasma，niri 仍可选 |
 | Shell（桌面外壳） | [Noctalia](https://github.com/noctalia-dev/noctalia-shell) - 启动器 / 控制中心 / 壁纸 / 锁屏 |
 | 显示管理器 | GDM |
 | 输入法 | Fcitx5 + Rime（万象拼音） |
+
+> **KDE 自带应用已裁剪**：`modules/nixos/desktop/plasma.nix` 用 `environment.plasma6.excludePackages`
+> 剔除了与下方应用功能重复的 KDE 自带程序（Dolphin、Konsole、Kate、Gwenview、Okular、Elisa、
+> Ark、KHelpCenter、ffmpegthumbs、krdp、qrca、discover、额外壁纸等），只保留 KWin / plasmashell /
+> systemsettings 等桌面本体，以及 fcitx5 依赖的虚拟键盘组件。要恢复某个 KDE 应用，从该列表里删掉即可。
 
 ## 终端
 
