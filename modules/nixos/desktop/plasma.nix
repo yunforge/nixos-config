@@ -36,11 +36,7 @@ in
     # optionalPackages，用 environment.plasma6.excludePackages 按包名剔除）。
     environment.plasma6.excludePackages = with pkgs.kdePackages; [
       konsole # 终端 → Ghostty
-      dolphin # 文件管理器 → Nautilus
-      dolphin-plugins
       baloo-widgets
-      kate # 文本编辑器 → VS Code / Zed / Typora / GNOME 文本编辑器
-      ktexteditor
       gwenview # 图片查看 → qView
       okular # 文档/PDF → Papers
       elisa # 音乐播放 → Gapless
