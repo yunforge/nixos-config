@@ -28,7 +28,6 @@ let
   # 直接找图标的回退（实测：把 niri.png 放进主题，Pulse 从不打开它）。Nix 包装
   # 脚本恰好会改掉可执行文件名，于是这些应用在卡片上全是齿轮图标：
   #
-  #   Edge     exe=msedge               条目 Exec=microsoft-edge-stable
   #   niri     exe=niri                 无应用条目（只有 wayland-sessions），也没有图标
   #   Noctalia exe=.noctalia-wrapped    无应用条目
   #   FlClash  exe=FlClashCore（内核子进程）无应用条目
@@ -37,8 +36,8 @@ let
   #
   # 修法：给每个这样的应用补一条 NoDisplay 别名条目，Exec 写成运行时的 exe
   # basename、Icon 指向它自己的图标。别名条目不会出现在启动器里、也不会被执行，
-  # 只是给 Pulse 查表用（实测 msedge / niri / FlClashCore / magpie-bun
-  # / noctalia 五项均从齿轮变成真图标）。见 docs/quirks.md 的 Pulse 条目。
+  # 只是给 Pulse 查表用（实测 niri / FlClashCore / magpie-bun
+  # / noctalia 四项均从齿轮变成真图标）。见 docs/quirks.md 的 Pulse 条目。
   #
   # 注意：exe basename 由 nixpkgs 的包装方式决定，升级后若包装改名，这里会静默
   # 失配（退回齿轮），照 `readlink -f /proc/<pid>/exe` 的结果改即可。
@@ -96,7 +95,6 @@ in
           }
         )
         {
-          msedge = "microsoft-edge";
           niri = "${niri-icon}";
           ".noctalia-wrapped" = "noctalia";
           FlClashCore = "flclash"; # FlClash 内核，没有自己的条目
