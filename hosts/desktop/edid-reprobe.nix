@@ -173,6 +173,13 @@ let
       # 本屏，本身就说明该屏 DDC 已成功读出 EDID（身份串来自 EDID），无需再探
       # VCP——多显示器下 getvcp 不带 --bus 只摸默认 display，而 --bus 要抓
       # detect 报的瞬时总线号，本机 NVIDIA 的 i2c 总线号在两次探测间会漂移，有竞态。
+      #
+      # 必须带 --disable-dynamic-sleep：本服务是系统单元，环境里没有 HOME，而
+      # ddcutil 3.x 默认开启动态睡眠，启动时要按 $HOME/.cache/ddcutil 定位统计文件，
+      # 定位不到就以 rc=1 退出且 stdout 为空（日志只有 "Unable to determine dynamic
+      # sleep cache file name"）。2026-11-15 实测就是因此就绪判定永不成立、4K EDID
+      # 一直不注入，KDE 下 DP-3 停在 640x480。关掉后同一环境 detect 立刻正常列出两屏；
+      # 本服务每次上电只跑几轮，静态睡眠的额外耗时无关紧要。
       deadline=$(($($date +%s) + ${toString readyTimeout}))
       rounds=0
       while :; do
@@ -181,7 +188,7 @@ let
           return 0
         }
 
-        if $ddc detect --brief 2>/dev/null | $grep -qF "$expected_panel"; then
+        if $ddc --disable-dynamic-sleep detect --brief 2>/dev/null | $grep -qF "$expected_panel"; then
           break
         fi
 
