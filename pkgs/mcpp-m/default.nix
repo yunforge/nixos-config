@@ -40,21 +40,21 @@
   writeShellScriptBin,
 }:
 let
-  version = "2026.11.12.1";
+  version = "2026.11.17.1";
 
   # 上游只发这三个平台的预编译包；其余平台显式报错，别指望它悄悄退化到别的架构
   sources = {
     x86_64-linux = {
       asset = "linux-x86_64";
-      hash = "sha256-yU/tRyrWCJQ7GaNHdY2jGjRb3+FW7P1OU53NlY2Dx6c=";
+      hash = "sha256-ERW2QR27sqa62dLwPcQ66Py4U18WHRJNu4frapzUbDE=";
     };
     aarch64-linux = {
       asset = "linux-aarch64";
-      hash = "sha256-4ThCm1h2NoG5DTpNlVTYlPeLDqNsM1bCx1wt9BOxyEo=";
+      hash = "sha256-XToIyxdgywYdYU1TDGruIAHDpWB7Fl0IG/Lv2ou4OxI=";
     };
     aarch64-darwin = {
       asset = "macosx-arm64";
-      hash = "sha256-tutw0KUQM7ndtm0UjPFpVvNTqsQplLpFd8rZWa3nwAY=";
+      hash = "sha256-YsHCAh6pfI16qscgN6ILCROmkrkz+bfXYHuVyYkQS9A=";
     };
   };
 

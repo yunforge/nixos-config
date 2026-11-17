@@ -54,16 +54,16 @@
   libglvnd,
 }:
 let
-  version = "0.6.0";
+  version = "0.6.1";
 
   sources = {
     x86_64-linux = {
       asset = "amd64";
-      hash = "sha256-LwsM4ATDx0XlJsx+6YjDO4sUcHpEEcxToJCpPk0xoks=";
+      hash = "sha256-7FPnmEsTC/uWbOcErGxvyMIA4umidqHazPNstMdCER8=";
     };
     aarch64-linux = {
       asset = "arm64";
-      hash = "sha256-uzbZwKOjcArHZXUARgQWBPsdGx4YYLzSX/8oR8h6yUM=";
+      hash = "sha256-QsWAJIs/f1SMPyEcLvBvVe/qHDvwGoa9EaqyzbYKi9g=";
     };
   };
 
