@@ -128,20 +128,11 @@ in
 
     # fastfetch 亮/暗两套：只有配置 jsonc 一份变体（亮色那份的 10 阶渐变是**重算**的，
     # Latte 底色上 blue 只有 4.34:1，达不到 AA，改用 subtext1 → mauve 两个端点插值，
-    # 算据写在那个文件的注释里），由 theme-apply 翻软链。logo 不在这条轴上：官方双色
-    # （深蓝 #5277C3 + 浅蓝 #7EBAE4）在两种底色上都成立，只部署一份普通文件。
+    # 算据写在那个文件的注释里），由 theme-apply 翻软链。logo 不在这条轴上：用 fastfetch
+    # 内置的 NixOS 字符图（不可着色、随终端前景色），两份 jsonc 相同，不再部署图片。
     home.file = {
       ".config/fastfetch/config.jsonc" = {
         source = ../../../../assets/fastfetch/nixos-01.jsonc;
-        force = true;
-      };
-      # fastfetch 的 logo：官方双色雪花的透明底 PNG（nix-snowflake-colours.svg 经
-      # rsvg-convert -w 1024 -h 1024），jsonc 里用 Kitty graphics protocol 画
-      # （type=kitty，width/height 占位 44 列 × 20 行）。tmux / SSH 等协议不可用环境
-      # fastfetch 静默回退内置 NixOS ASCII。logo 不区分亮/暗，只部署一份普通文件；
-      # force=true 会在激活时把旧的 theme-variants 软链替换成普通文件。
-      ".config/fastfetch/logo/nixos_snowflake.png" = {
-        source = ../../../../assets/fastfetch/logo/nixos_snowflake.png;
         force = true;
       };
 
