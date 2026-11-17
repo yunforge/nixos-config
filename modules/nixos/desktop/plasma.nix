@@ -1,6 +1,6 @@
 # KDE Plasma 6 桌面环境 — 系统级配置
 #
-# 与 niri 并存：二者各自注册一个登录会话，在 GDM 的会话菜单里可切换。
+# 与 niri 并存：二者各自注册一个登录会话，在 SDDM 的会话菜单里可切换。
 # 选项就近定义在实现模块（与 niri/default.nix 同构）；某台主机是否启用
 # 由 hosts/ 写例外，能力聚合模块不给默认值。
 {
@@ -28,7 +28,7 @@ in
 
   config = lib.mkIf (cfg.enable && desktopCfg.enable) {
     # 安装 Plasma 6（Wayland 会话）。它会把 plasma-workspace 的会话加入
-    # services.displayManager.sessionPackages，与 niri 的会话合并注册到 GDM。
+    # services.displayManager.sessionPackages，与 niri 的会话合并注册到 SDDM。
     services.desktopManager.plasma6.enable = true;
 
     # KDE 默认会装一大堆自家应用。本仓库已有等价工具，这里按包名排除重复/用不到的，
@@ -98,11 +98,20 @@ in
     # drop-in 用最小 PATH 覆盖掉它，KWin 找不到 Xwayland 会静默挂起 —— 表现就是进 KDE
     # 后黑屏（实测：minimal PATH 下 `kwin_wayland_wrapper --virtual` 无输出、rc=124；
     # 加上 `:/run/current-system/sw/bin` 即正常启动）。故关掉默认 PATH，让单元继续继承
-    # 会话 PATH；drop-in 里只保留 XCURSOR_SIZE。
+    # 会话 PATH；drop-in 里只保留 KWin 自己的变量。
+    #
+    # `KWIN_DRM_NO_DIRECT_SCANOUT=1`：KWin 6.8 在 NVIDIA 上反复尝试 direct scanout，
+    # 交换链缓冲区分配失败时会在「直扫」与「合成」两条管线之间来回切换，表现为外接屏
+    # 亮度/伽马快速闪烁，日志同步刷 `Failed to allocate a graphics buffer for a
+    # swapchain`（KDE bug 527184；本机 6.8.2 + 595.112.07 仍复现）。关掉直扫强制走
+    # 合成管线可同时消除闪烁与报错，代价是少一条省电路径。
     systemd.user.services."plasma-kwin_wayland" = {
       overrideStrategy = "asDropin";
       enableDefaultPath = false;
-      environment.XCURSOR_SIZE = "24";
+      environment = {
+        XCURSOR_SIZE = "24";
+        KWIN_DRM_NO_DIRECT_SCANOUT = "1";
+      };
     };
   };
 }

@@ -10,9 +10,9 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | 组件 | 软件 |
 |------|------|
 | 窗口管理器（desktop / laptop） | [Niri](https://github.com/YaLTeR/niri) - Wayland 平铺合成器 |
-| 桌面环境（desktop，GDM 会话可切换） | KDE Plasma 6（Wayland）；默认登录进 Plasma，niri 仍可选 |
+| 桌面环境（desktop，SDDM 会话可切换） | KDE Plasma 6（Wayland）；默认登录进 Plasma，niri 仍可选 |
 | Shell（桌面外壳） | [Noctalia](https://github.com/noctalia-dev/noctalia-shell) - 启动器 / 控制中心 / 壁纸 / 锁屏 |
-| 显示管理器 | GDM |
+| 显示管理器 | SDDM（Wayland greeter；Plasma 主机用 kwin 合成器，其余用 weston kiosk） |
 | 输入法 | Fcitx5 + Rime（万象拼音） |
 
 > **KDE 自带应用已裁剪**：`modules/nixos/desktop/plasma.nix` 用 `environment.plasma6.excludePackages`

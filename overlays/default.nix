@@ -29,10 +29,11 @@ final: prev: {
   # classicui-XCBUI 绘制（不经 gtk3/fcitxtheme.cpp 的 client-side popover），
   # 无消费场景；上游亦拒收此修复（PR #44）。根因记录见 docs/quirks.md。
 
-  # 自打包主题（nixpkgs 未收录）：MacTahoe GTK / 图标主题 / Kvantum(Qt) 主题
+  # 自打包主题（nixpkgs 未收录）：MacTahoe GTK / 图标主题 / Kvantum(Qt) / SDDM 登录主题
   mactahoe-gtk-theme = prev.callPackage ../pkgs/mactahoe-gtk-theme { };
   mactahoe-icon-theme = prev.callPackage ../pkgs/mactahoe-icon-theme { };
   mactahoe-kvantum = prev.callPackage ../pkgs/mactahoe-kvantum { };
+  mactahoe-sddm-theme = prev.callPackage ../pkgs/mactahoe-sddm-theme { };
 
   # mcpp：C++23 模块优先的构建工具（上游 mcpp-community/mcpp）。
   # 名字不能省成 `mcpp`：nixpkgs 的 mcpp 是 Matsui 的 C 预处理器，同名不同物

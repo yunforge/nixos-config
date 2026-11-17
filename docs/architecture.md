@@ -13,7 +13,7 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
 │  ├─ nixos/                # NixOS 系统层
 │  │  ├─ core/              # 真正通用的系统基础（引导 / Nix / 用户 / SSH / locale）
 │  │  ├─ hardware/          # 硬件能力（蓝牙 / 音频 / 网络 / MCU / NVIDIA）
-│  │  ├─ desktop/           # Linux 桌面能力（GDM / Niri / 输入法 / Distrobox / Steam）
+│  │  ├─ desktop/           # Linux 桌面能力（SDDM / Niri / 输入法 / Distrobox / Steam）
 │  │  ├─ networking/        # 代理（本机 / 客户机转发）
 │  │  ├─ virtualization/    # QEMU/KVM 虚拟化
 │  │  └─ profiles/          # 角色配置（workstation / server / wsl）

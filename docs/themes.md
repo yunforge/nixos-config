@@ -87,7 +87,7 @@ Nix 里的空列表。停用时必须把运行时那段删一次，再 `noctalia
 | 图标 | **MacTahoe-dark** | 自定义打包图标（`pkgs/mactahoe-icon-theme`），为深色背景设计 |
 | 光标 | **Bibata-Modern-Classic** | 24px，XWayland 亦生效（软链到 `~/.local/share/icons`）；Bibata 只内嵌 16/20/22/24/28/32/40/… 整数档。**另有一份 `icons/default` 指向同一主题**：XWayland 上的 Qt5（微信）会退到字面量 `default`，缺它即回落 X 核心字体光标，见 `docs/quirks.md`。KDE 会话由 `plasma.nix` 单独把 KWin 的 `XCURSOR_SIZE` 覆盖为 24（全局值是给 niri/X11 翻倍用的 48），见 `docs/quirks.md` |
 | Qt | **Adwaita 原生**（`platformTheme`） | Kvantum 于 2026-11-17 停用：`qt.style.name = null`，不再导出全局 `QT_STYLE_OVERRIDE`；原因见 `docs/quirks.md`（Kirigami 白字压白底）。`pkgs/mactahoe-kvantum` 与 kvconfig 切换惰性保留，见下文 |
-| GDM 登录界面 | MacTahoe | 本仓库不再装 GNOME 会话，只留 GDM 做登录器；其 greeter 用的 gnome-shell 由 GDM 自己的闭包提供，靠 overlay 覆盖 `gnome-shell-theme.gresource` 换肤，**字体 / 图标 / 光标**也一并声明（不然 greeter 会退回 Adwaita 默认），全部在 `modules/nixos/desktop/gdm.nix` |
+| SDDM 登录界面 | MacTahoe | 登录器换成 SDDM（Wayland greeter，不装 X server）；greeter 主题用自打包的 `mactahoe-sddm-theme`（`MacTahoe-Dark`），它仿 KDE Breeze，需把 `plasma-workspace` / `libplasma` / `plasma5support` / `kirigami` / `qt5compat` / `qtsvg` 放进 `services.displayManager.sddm.extraPackages` 供 greeter 的 QML 导入路径解析（否则黑屏 / 白屏），光标声明 `CursorTheme=Bibata-Modern-Classic`。全部在 `modules/nixos/desktop/sddm.nix` |
 | Niri 装饰配色 | **niri 内置默认** | Noctalia 不再渲染 `~/.config/niri/noctalia.kdl`；HM 只留结构项（宽度、几何、阴影），见下文 |
 | Niri 概览底色 | MacTahoe 同源 | `niri-colors/overview.kdl`，暗 `#242424` / 亮 `#FFFFFF`（Noctalia 的 niri 模板不管这一项） |
 | Noctalia Shell | **自定义调色板 `mactahoe`** | `customPalettes.mactahoe`，色值与 GTK/Qt 同源；界面字体 HarmonyOS Sans SC。**仅调色板归 Nix，bar 布局归 GUI**；只影响状态栏/面板，不再渲染应用主题，见下文 |
@@ -273,7 +273,7 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 
 **“选中 / 活动”的归属**（这是决定，不是默认）：壳层的蓝只标**壳层控件**（按钮、输入框焦点、niri 标签指示器）；工作区里“选中”一律用 Catppuccin 的强调色 **mauve** —— 终端选区与编辑器同源。终端光标是唯一例外，保持 rosewater（Catppuccin 对终端光标的约定，光标不是“选中”）。理由：终端选区与光标会**同屏出现**，rosewater 与 mauve 一暖粉一冷紫，分属两套会让它们看着来自不同系统。
 
-选这个组合的理由：一是 GTK/GDM/图标/自打包已经全部在 MacTahoe 上，二是“macOS 壳 + 低饱和冷调工作区”比单纯的全局 Catppuccin 更有辨识度。
+选这个组合的理由：一是 GTK/SDDM/图标/自打包已经全部在 MacTahoe 上，二是“macOS 壳 + 低饱和冷调工作区”比单纯的全局 Catppuccin 更有辨识度。
 
 **定调：以应用层为主体。** bar 应当退到背景里，而不是与窗口争主体。这条决定了下面 Noctalia 一节的取舍。
 
@@ -444,7 +444,7 @@ GUI 会把自己的 `[bar.default.monitor.*]` 写进 state，那时起就以 GUI
 - **niri 自绘的浮层**（快捷键 overlay、截图 UI、退出确认对话框）：**配不了**。实测 `hotkey-overlay {}` / `screenshot-ui {}` / `ui {}` 三个节点都被 `niri validate` 拒绝——niri 的配置里没有给它们的颜色入口。它们的观感是 niri 自己的，改不了，也不必惦记。
 - **Windows / RemoteApp 窗口与 Steam 的内部 UI**：只有**外框**是我们的—— 8px 圆角与合成器阴影由 niri 统一绘制，所以它们与其它窗口的框架一致；窗口内部的标题栏、配色、控件全是它们自己的。这是“覆盖不了”，不是“没覆盖”。
 
-（第四个面——GDM 登录界面——是**认领**的：字体 / 图标 / 光标都声明在 `modules/nixos/desktop/gdm.nix`，与桌面会话共用一套。）
+（第四个面——SDDM 登录界面——是**认领**的：外观由自打包 `mactahoe-sddm-theme` 主题 + `CursorTheme` 声明在 `modules/nixos/desktop/sddm.nix`，与桌面会话共用 MacTahoe 色系。）
 
 ## 相关命令
 ```bash

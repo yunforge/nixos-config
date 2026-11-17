@@ -1,7 +1,7 @@
 # 角色配置（系统层）：NixOS 服务器
 #
 # 与工作站的区别：
-#   - 不启用桌面（mySystem.desktop.enable 保持关闭，GDM / Niri / 输入法 /
+#   - 不启用桌面（mySystem.desktop.enable 保持关闭，SDDM / Niri / 输入法 /
 #     音视频栈全部不加载）
 #   - 硬件只保留服务器相关项（默认全关，由具体主机按需开启，
 #     如某台服务器需要 WiFi 或音频再单独打开）

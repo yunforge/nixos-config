@@ -16,7 +16,7 @@ in
   # mySystem 选项命名空间 — 各主机通过设置这些选项来声明启用的功能
   options.mySystem = {
     hardware.enable = lib.mkEnableOption "硬件支持（蓝牙、音频、网络）";
-    desktop.enable = lib.mkEnableOption "桌面环境（GDM、Niri、GNOME）";
+    desktop.enable = lib.mkEnableOption "桌面环境（SDDM、Niri、Plasma）";
     virtualization.enable = lib.mkEnableOption "QEMU/KVM 虚拟化";
     # 本机 flake 仓库路径（autoUpgrade / git safe.directory 用）。默认假设仓库
     # 在主用户 Projects 目录下（所有主机的既有布局）；机器布局不同时覆盖此项，

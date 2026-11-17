@@ -1,4 +1,4 @@
-# 桌面环境系统级模块（GDM、环境变量、窗口管理器）
+# 桌面环境系统级模块（SDDM、环境变量、窗口管理器）
 # 仅在 mySystem.desktop.enable = true 时生效
 {
   lib,
@@ -63,7 +63,7 @@ in
 
   imports = [
     ./boot.nix
-    ./gdm.nix
+    ./sddm.nix
     ./env.nix
     ./niri
     ./plasma.nix

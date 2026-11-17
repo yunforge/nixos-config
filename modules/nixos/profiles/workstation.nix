@@ -3,7 +3,7 @@
 # 组合关系（与 modules/home-manager/profiles/workstation.nix 对应）：
 #   系统基础（core：引导 / Nix / 用户 / SSH / locale）
 #   + 硬件能力（蓝牙 / 音频 / 网络 / MCU；NVIDIA 由主机按硬件显式开启）
-#   + 桌面能力（GDM / Niri / 输入法 / 虚拟化 / 代理）
+#   + 桌面能力（SDDM / Niri / 输入法 / 虚拟化 / 代理）
 #
 # 主机（hosts/desktop、hosts/laptop）只声明真实差异：硬件、显示器、
 # 驱动与主机专属修复。服务器 / WSL 不导入本文件，因此不会被动继承

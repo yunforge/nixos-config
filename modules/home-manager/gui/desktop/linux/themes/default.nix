@@ -40,7 +40,7 @@ in
         name = myLib.theme.cursor;
         # 24：Bibata 的箭头比 macOS 原版更撑满画布。切回 1.5 倍缩放前的取值
         # （2 倍缩放下曾降到 20）。改这一个数不够 —— 光标的尺寸是**多处各写一份**
-        # （niri 的 cursor.kdl、GTK 的 variants.nix、XWayland 的 env.nix、GDM 的 gdm.nix），
+        # （niri 的 cursor.kdl、GTK 的 variants.nix、XWayland 的 env.nix、SDDM 的 sddm.nix），
         # 改就一起改。
         size = 24;
       };

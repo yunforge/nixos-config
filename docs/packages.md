@@ -21,6 +21,7 @@
 | `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit（tag 指向） | `839848b`（tag `2026-09-10`） | 同一 commit | 最新 |
 | `mactahoe-kvantum` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde) | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 最新 |
+| `mactahoe-sddm-theme` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde)（子目录 `sddm/`） | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 最新 |
 | `windows-vm-media` | virtio-win（nixpkgs）+ WinApps `oem/` | 跟随 flake 输入 | — | — | 不手工升级 |
 
 各包的**为什么这么打包**写在 `pkgs/<包名>/default.nix` 文件头，这里不重复。
@@ -45,7 +46,7 @@ v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb�
 | `dalibre` | `modules/home-manager/gui/apps/linux/productivity.nix`（calibre 书库管理器） |
 | `pulse` | `modules/home-manager/gui/apps/linux/utilities.nix`（系统活动监视器，取代 mission-center） |
 | `misterdownloadmanager` | `modules/home-manager/gui/apps/linux/utilities.nix`（下载管理器） |
-| `mactahoe-*` | `gui/desktop/linux/themes/default.nix`、`themes/variants.nix`、`modules/nixos/desktop/gdm.nix` |
+| `mactahoe-*` | `gui/desktop/linux/themes/default.nix`、`themes/variants.nix`、`modules/nixos/desktop/sddm.nix`（`mactahoe-sddm-theme`） |
 | `windows-vm-media` | `modules/nixos/virtualization`（`mySystem.virtualization`） |
 
 不在本清单里的东西：nixpkgs 里的一切（跟着 `nix flake update` 走）、flake inputs
@@ -67,7 +68,7 @@ nix flake update
 nix fmt
 nix flake check
 nix build --dry-run .#magpie .#magpie-cli .#mcpp-m .#flclash .#dalibre .#pulse \
-  .#misterdownloadmanager .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum \
+  .#misterdownloadmanager .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum .#mactahoe-sddm-theme \
   .#windows-vm-media
 nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 ```
@@ -247,7 +248,7 @@ git log -1 --format=%ci <rev>   # 取日期填 version
 - `mactahoe-gtk-theme` / `mactahoe-icon-theme` 有日期 tag：`rev` 填 **tag 指向的 commit**
   （`git ls-remote --tags --refs` 直接给出 rev），`version` 填该 tag 名（两者现在一致）。
   早期曾出现 `version = "2026-08-07"` 而 tag 叫 `2026-08-08` 的一天偏差，现在按 tag 名写即可。
-- `mactahoe-kvantum` 上游没有 tag，跟 main HEAD。
+- `mactahoe-kvantum` / `mactahoe-sddm-theme` 上游（MacTahoe-kde）没有 tag，跟 main HEAD；两者同源同 rev，升级一处即可。
 
 ### 跟随 flake 输入（`windows-vm-media`）
 
