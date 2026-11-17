@@ -89,33 +89,22 @@ in
       };
     };
 
-    # btop：终端系统监控。此前只装包、零配置，于是它跑在自带的 Default 主题上
-    # （终端里多出第 4 套配色）。这里补主题。
+    # btop：终端系统监控。主题用 btop 自带的 Default：
+    # Noctalia 已不再统一渲染各应用主题（2026-11-17），不再生成
+    # ~/.config/btop/themes/noctalia.theme。要换主题就改 color_theme 为
+    # share/btop/themes/ 下的名字（如 onedark、tokyo-night）。
     #
-    # theme_background 的更正：当时写“置 True 会让 btop 自画不透明底，使
-    # frosted-glass.kdl 的 opacity 与模糊完全无从体现”——这是错的。niri 的
-    # opacity 作用在**整个窗口**上（文档：“applied to every surface of the
-    # window”），与窗口里面画不画底无关，磨砂效果一直都在。
-    # 而且本主题的 theme[main_bg] = #303446 在 Ghostty（Catppuccin Frappe）时代
-    # 恰好等于终端背景色，两种取值是**视觉空操作**；终端换 Konsole 后等价前提
-    # 不再成立。
-    # 保留 false 的真实理由：让 btop 的背景始终跟随终端，而不是把 #303446
-    # 再硬编码一份——以后改终端主题的背景色时不会两者脱节。
+    # theme_background 保持 false：让 btop 的背景始终跟随终端，而不是把某个
+    # 主题的 main_bg 再硬编码一份——以后改终端主题的背景色时不会两者脱节。
     programs.btop = {
       # 包由本模块提供，故上面 home.packages 里不再列 btop
       enable = true;
       settings = {
-        # 主题由 Noctalia 统一管理（gui/desktop/linux/niri/noctalia.nix 启用 builtin "btop" 模板）：
-        # Noctalia 把当前调色板渲染成 ~/.config/btop/themes/noctalia.theme，其 apply.sh 会把这个
-        # 键改成 "noctalia"。这里先写好最终值，apply.sh 检测到已是目标值即不写 —— 于是对 HM 的
-        # 只读软链没有任何写操作（否则实测报「只读文件系统」）。亮/暗由调色板切换带出。
-        color_theme = "noctalia";
+        color_theme = "Default";
         # btop 内嵌配置说明：set to False if you want terminal background
         # transparency
         theme_background = false;
       };
-      # 不能用 programs.btop.themes：那个选项写出的软链不允许被覆盖（HM 的 checkLinkTargets
-      # 会判成外来文件而整份激活失败）。主题文件交给 Noctalia。
     };
 
     myHome.appearance.switchTargets = [

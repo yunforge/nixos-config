@@ -12,8 +12,8 @@ let
   niriConfigPath = "${config.home.homeDirectory}/Projects/nixos-config/modules/home-manager/gui/desktop/linux/niri/config";
 
   # ── 概览底色 ────────────────────────────────────────────────────────────
-  # niri 装饰颜色现已全部交给 Noctalia（builtin "niri" 模板 → noctalia.kdl），
-  # HM 只保留它**不接管**的一项：概览（overview）的工作区底色。
+  # niri 装饰颜色不再由外部渲染（Noctalia 模板已停用，2026-11-17），用 niri 内置默认；
+  # HM 侧只显式维护概览（overview）的工作区底色。
   # 取自 GTK/Qt 侧同一来源 MacTahoe：暗色 view_bg #242424、亮色 view_bg #FFFFFF
   # （share/themes/MacTahoe-{Dark,Light}/gtk-4.0/gtk.css 的 @define-color）。
   shell = {
@@ -24,10 +24,8 @@ let
   };
 
   # 生成的 layout.kdl：**只留结构**（间距、焦点环宽度、标签指示器几何、阴影参数），
-  # 颜色全部删掉 —— 那些键由 noctalia.kdl 提供（niri 合并两个 layout{} 段）。
-  # 曾在这里维护的 MacTahoe 取色（焦点环发丝线 / 标签指示器 / 插入提示 / 最近窗口
-  # 高亮）连同取舍理由一并移到 Noctalia 调色板的 mPrimary / mError 等语义角色，
-  # 见 modules/home-manager/gui/desktop/linux/niri/noctalia.nix 的 customPalettes.mactahoe。
+  # 不写颜色 —— Noctalia 的 niri 模板已停用（2026-11-17），这些键改用 niri 内置默认
+  # （焦点环 active #7fc8ff / inactive #505050）。要固定配色就在此重新加 color 键。
   mkLayout = ''
     // niri 窗口布局配置
     // https://niri-wm.github.io/niri/Configuration%3A-Layout.html
@@ -57,7 +55,7 @@ let
         //              laptop 1.25 倍 = 1.25 → 取整 1 物理（更细，仍是一条线）
         //   width 2 → desktop 3 物理，已经明显粗于发丝线
         //           （laptop 2.5 → 取整 2 或 3）
-        // 颜色（active/inactive/urgent）由 noctalia.kdl 提供，见 config.kdl 末尾。
+        // 颜色用 niri 内置默认（Noctalia 不再写 noctalia.kdl）。
         focus-ring {
             on          // 开启焦点环
             width 1     // desktop 1.5 倍 → 取整 2 物理像素（发丝线）
@@ -69,7 +67,7 @@ let
         }
 
         // 标签指示器：仅当列进入 tabbed 显示模式时出现（Mod+W）
-        // 颜色（active/inactive/urgent）由 noctalia.kdl 提供。
+        // 颜色用 niri 内置默认。
         tab-indicator {
             on
             place-within-column // 指示器绘制列内部
@@ -83,7 +81,7 @@ let
             corner-radius 2 // 指示器圆角半径
         }
 
-        // 窗口插入提升：颜色由 noctalia.kdl 提供。
+        // 窗口插入提升：颜色用 niri 内置默认。
         insert-hint {
             on
         }
@@ -147,7 +145,7 @@ let
         open-delay-ms 150
 
         highlight {
-            // 焦点预览的高亮框的颜色由 noctalia.kdl 提供。
+            // 焦点预览的高亮框颜色用 niri 内置默认。
             padding 30
             // 8：与窗口圆角同档（按阶梯取 ≤ 窗口圆角）
             corner-radius 8

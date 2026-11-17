@@ -43,14 +43,6 @@ in
   };
 
   config = lib.mkIf (cfg.enable && desktopCfg.enable) {
-    # 本仓库自带的 Noctalia 用户模板（上游没有 eza / fish）。
-    # 放在 ~/.config/noctalia/templates/ 下：Noctalia 的 input_path 相对配置目录解析，
-    # template 的注册见下方 settings.theme.templates.user。
-    xdg.configFile = {
-      "noctalia/templates/eza.yml".source = ../themes/noctalia-templates/eza.yml;
-      "noctalia/templates/fish.fish".source = ../themes/noctalia-templates/fish.fish;
-    };
-
     programs.noctalia = {
       enable = true;
 
@@ -89,38 +81,15 @@ in
           source = lib.mkForce "custom";
           custom_palette = lib.mkForce "mactahoe";
 
-          # 模板：Noctalia 是配色的唯一真源，它按当前调色板渲染各应用的主题文件。
-          # 各应用的主配置里已写好最终值（btop color_theme = "noctalia"、
-          # yazi [flavor] = noctalia），所以模板的 apply.sh 检测到已是目标值即不写，
-          # 不会去动那些 HM 只读软链。
-          #
-          # ⚠️ 运行时 ~/.local/state/noctalia/settings.toml 里若已有 [theme.templates]
-          # 段，会**覆盖**这里（与上面 bar.default 同一个坑）。首次生效需把运行时那段
-          # 删一次再 `noctalia msg config-reload`；之后归本模块管。
+          # 模板渲染已于 2026-11-17 停用：Noctalia 不再把调色板写进各应用的主题文件。
+          # 各应用改用自带/终端配色 —— eza（ls）与 fish 跟随终端 ANSI 16 色，
+          # btop 用自带 Default，yazi 用自带默认 flavor，niri 装饰用内置默认色。
+          # 这里显式留空，防止 HM 模块的默认模板重新启用。
+          # ⚠️ 运行时 ~/.local/state/noctalia/settings.toml 里若仍有 [theme.templates]
+          # 段，会**覆盖**这里；需把运行时那段删一次再 `noctalia msg config-reload`。
           templates = {
-            # 只列本仓库实际用的：gtk3/gtk4/qt 故意不启用 —— GTK/Qt 保持
-            # MacTahoe（自打包完整主题），见 docs/themes.md。starship 本机没装也不在
-            # 配置里，故不列。
-            builtin_ids = [
-              "btop"
-              "niri" # niri 窗口装饰跟随（写 ~/.config/niri/noctalia.kdl）
-            ];
-            # 社区模板只启用实测安全的：yazi 的 apply.sh 把 [flavor] 改成 noctalia，
-            # 主配置里已是该值 → 不写。其它社区模板（fastfetch/bat/…）的 apply.sh 可能
-            # 改写 HM 只读的配置文件，逐个核实后再加，见 docs/themes.md。
-            community_ids = [ "yazi" ];
-            # 上游没有 eza / fish 模板，用本仓库自带的用户模板补上（见下方
-            # noctalia/templates/ 的部署）。input_path 相对 ~/.config/noctalia/ 解析。
-            user = {
-              eza = {
-                input_path = "templates/eza.yml";
-                output_path = "$XDG_CONFIG_HOME/eza/theme.yml";
-              };
-              fish = {
-                input_path = "templates/fish.fish";
-                output_path = "$XDG_CONFIG_HOME/fish/conf.d/noctalia-colors.fish";
-              };
-            };
+            builtin_ids = [ ];
+            community_ids = [ ];
           };
         };
         # bar 布局：这四项可以声明式 —— 它们没有密钥（明文 API key 在 state 的

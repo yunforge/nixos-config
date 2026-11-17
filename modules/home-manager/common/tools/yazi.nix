@@ -1,5 +1,5 @@
 # Yazi — 终端文件管理器
-# 主题由 Noctalia 统一管理（community "yazi" 模板），不再 vendored 上游 flavor。
+# 主题用 yazi 自带的默认 flavor（Noctalia 不再统一渲染各应用主题）。
 {
   lib,
   config,
@@ -40,15 +40,6 @@ in
       # 验证。ueberzugpp 作为无图形协议可用时的兜底（nixpkgs 的 yazi wrapper 不带
       # 它，图片会空白），所以两者都留着。
       extraPackages = lib.optional pkgs.stdenv.hostPlatform.isLinux pkgs.ueberzugpp;
-      # 主题由 Noctalia 统一管理（gui/desktop/linux/niri/noctalia.nix 启用 community "yazi" 模板）：
-      # Noctalia 写到 ~/.config/yazi/flavors/noctalia.yazi/{flavor.toml,tmtheme.xml}，其 apply.sh
-      # 会把本段改成 dark/light = "noctalia"。这里先写好最终值，apply.sh 检测到已是目标值即不写。
-      theme = {
-        flavor = {
-          light = "noctalia";
-          dark = "noctalia";
-        };
-      };
     };
   };
 }

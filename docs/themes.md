@@ -1,20 +1,21 @@
 # 主题与外观
 
-配置位置：`modules/home-manager/gui/desktop/linux/niri/noctalia.nix`（**Noctalia 调色板 + 模板声明，配色的唯一真源**）+ `modules/home-manager/gui/desktop/linux/themes/noctalia-templates/`（eza / fish 模板）+ `modules/home-manager/gui/desktop/linux/themes/variants.nix`（GTK/Qt/图标 的亮暗接线与 `theme-apply`）+ `modules/home-manager/gui/desktop/linux/themes/default.nix`（Qt/GTK）+ `modules/home-manager/gui/desktop/linux/niri/default.nix`（Niri 结构与非配色项）。
+配置位置：`modules/home-manager/gui/desktop/linux/niri/noctalia.nix`（**Noctalia 调色板；模板已停用**）+ `modules/home-manager/gui/desktop/linux/themes/noctalia-templates/`（历史 eza / fish 模板，未注册）+ `modules/home-manager/gui/desktop/linux/themes/variants.nix`（GTK/Qt/图标 的亮暗接线与 `theme-apply`）+ `modules/home-manager/gui/desktop/linux/themes/default.nix`（Qt/GTK）+ `modules/home-manager/gui/desktop/linux/niri/default.nix`（Niri 结构与非配色项）。
 
 整个桌面有**两套外观**，真源是 Noctalia 的 theme mode（状态栏那个主题图标，`noctalia msg theme-mode-toggle`）：
 切一下，壳层（macOS 中性灰 + 单一强调色）与工作区（Catppuccin）各自在亮/暗两态之间换，而
-「壳层冷中性 / 工作区低饱和」这些约定不变。**所有跟随配色的面都由 Noctalia 按当前调色板渲染**
-（终端、状态栏/面板、niri 装饰、yazi、btop、eza、fish，见「Noctalia 统一渲染各应用主题」一节），
-只有 GTK/Qt/图标仍走 `theme-apply` 翻软链的老机制（它们保持 MacTahoe）。下面几节里的具体取值
-都是**暗色那一套**，亮色的对应值见各文件自己的注释。
+「壳层冷中性 / 工作区低饱和」这些约定不变。**Noctalia 只负责自己的状态栏/面板调色板**；
+各应用的主题文件自 2026-11-17 起不再由它渲染（eza/fish 跟随终端 ANSI，btop/yazi 用自带主题，
+niri 用内置默认色，见「Noctalia 不再渲染应用主题」一节）。GTK/Qt/图标仍走 `theme-apply`
+翻软链的老机制（它们保持 MacTahoe）。下面几节里的具体取值都是**暗色那一套**，亮色的对应值
+见各文件自己的注释。
 
 ## 亮/暗切换
 
 **真源只有一个**：Noctalia 的 theme mode。它带两个执行者：
 
-1. **Noctalia 自己**（`theme.templates`，见下一节）—— 换调色板 / 切亮暗时，它按当前调色板
-   重新渲染所有跟随文件（btop 主题、niri 装饰、yazi flavor、eza、fish）。
+1. **Noctalia 自己**（`theme.templates`，见下节）—— 只切换状态栏/面板的调色板；模板列表已清空，
+   不再渲染各应用的主题文件（2026-11-17）。
 2. **`theme-apply`**（`modules/home-manager/gui/desktop/linux/themes/variants.nix`）—— 只管 Noctalia 不接管的
    那几个面：GTK3/GTK4/图标/Qt/Kvantum（保持 MacTahoe）与 niri 概览底色。做法是把两套变体都
    生成到 `~/.config/theme-variants/`，脚本把活文件软链指到当前模式、写 dconf
@@ -27,11 +28,11 @@
 |---|---|---|
 | GTK3/GTK4、图标、Qt/Kvantum | `theme-apply` 翻软链 + 写 dconf | GTK 多数要重开（Qt/Kvantum 也要） |
 | GTK4 的主题本体 | 一份**模式无关**的 `gtk.css`（浅色整份包在 `@media (prefers-color-scheme: light)` 里） | color-scheme 一变就重算，无需重开 |
-| niri 装饰色（焦点环 / 标签指示器 / 插入提示 / 最近窗口高亮） | Noctalia builtin `niri` 模板写 `~/.config/niri/noctalia.kdl` | niri watch 到即重载 |
+| niri 装饰色（焦点环 / 标签指示器 / 插入提示 / 最近窗口高亮） | 已删除 `noctalia.kdl`，用 niri 内置默认色（`include` 为 optional） | niri watch 到即重载 |
 | niri 概览底色 | `theme-apply` 翻 `niri-colors/overview.kdl` 软链 | niri watch 到即重载 |
-| btop | Noctalia builtin `btop` 模板写 `themes/noctalia.theme` | 下次启动生效 |
-| yazi | Noctalia community `yazi` 模板写 `flavors/noctalia.yazi/*` | — |
-| eza / fish | 本仓库用户模板（见下节） | fish 新开 shell 生效 |
+| btop | 自带 `Default` 主题（`color_theme = "Default"`） | 下次启动生效 |
+| yazi | 自带默认 flavor（未配置 `theme.flavor`） | — |
+| eza / fish | 跟随终端 ANSI 16 色（删除 Noctalia 生成文件后） | fish 新开 shell 生效 |
 | fastfetch config | 登记进 `myHome.appearance.switchTargets`，翻软链（logo 用内置字符图，不区分亮/暗） | 下次启动生效 |
 | nvim | 翻一份 `mode.lua`，`theme.lua` 据此设 `vim.o.background`，catppuccin `flavour="auto"` | 要重进（或 `:colorscheme catppuccin`） |
 | tmux | 颜色全用 ANSI 名称，配色由终端提供 | 随终端自动跟 |
@@ -53,43 +54,28 @@
   （OSC 10/11）自己选，两态仍是 Catppuccin（与终端 16 色同源），亮/暗照样跟。
   **已知边界**：stdout 不是终端时（管道、fzf 的 Ctrl-T 预览）bat 不做探测，会回落自带默认
   主题（Monokai）—— 与跟随无关，是 bat 自身行为；要固定主题就显式 `--theme=` 或设
-  `BAT_THEME`。旧社区模板若还开着，建议在 Noctalia 模板面板里关掉。
+  `BAT_THEME`。模板渲染已停用（见下节），无需再处理。
 
-## Noctalia 统一渲染各应用主题
+## Noctalia 不再渲染应用主题（2026-11-17）
 
-Noctalia 是配色的**唯一真源**：`customPalettes.mactahoe` 一份调色板含 `dark` / `light` 两个色块，
-切 mode 就是换生效的色块，Noctalia 随即把所有跟随文件重渲一遍。声明在
-`modules/home-manager/gui/desktop/linux/niri/noctalia.nix` 的 `settings.theme.templates`：
+`settings.theme.templates` 已清空（`builtin_ids` / `community_ids` 都是 `[]`）。Noctalia 现在
+只负责自己的状态栏/面板调色板，不再向任何应用写主题文件。各面当前的行为：
 
-| 类别 | 启用项 | 产物 |
-|---|---|---|
-| `builtin_ids` | `btop` `niri` | `themes/noctalia.theme` / `noctalia.kdl` |
-| `community_ids` | `yazi` | `~/.config/yazi/flavors/noctalia.yazi/` |
-| `user` | `eza` `fish` | 本仓库自带模板，见下 |
+| 面 | 现在跟谁 |
+|---|---|
+| `ls`（eza） | 删除 `~/.config/eza/theme.yml` 后，eza 回落到内置主题（ANSI 颜色名），跟随终端 16 色 |
+| fish 语法高亮 | 删除 `~/.config/fish/conf.d/noctalia-colors.fish` 后，用 fish 内置主题，跟随终端 16 色 |
+| btop | `color_theme = "Default"`（自带主题） |
+| yazi | 未配置 `theme.flavor`，用自带默认主题 |
+| niri 装饰 | `~/.config/niri/noctalia.kdl` 已删除；`config.kdl` 的 `include` 是 `optional=true`，用 niri 内置默认色 |
+| fzf / glow / lazygit / tmux / ghostty / qt5ct / qt6ct | 生成的主题文件未被任何配置引用，可直接删除 |
 
-**用户模板**（上游没有 eza / fish）放在 `modules/home-manager/gui/desktop/linux/themes/noctalia-templates/`，
-经 `xdg.configFile` 部署到 `~/.config/noctalia/templates/`，`input_path` 相对 `~/.config/noctalia/`
-解析。占位符 `{{ colors.terminal_*.default.* }}` 取自当前调色板的 `terminal` 16 色，与
-btop / yazi 同源，所以 `ls`（eza）与 shell 语法高亮（fish）跟工作区是同一套色。
+模板源码（`modules/home-manager/gui/desktop/linux/themes/noctalia-templates/` 里的 eza / fish）
+仍留在仓库里但不再注册；`customPalettes.mactahoe` 的 `terminal` 色块也保留，方便以后重新启用。
 
-两个实测踩到的点：
-
-- **eza 的十六进制必须带 `#`。** eza 的 `color_from_str` 只认 `#rrggbb` / `#rgb`，裸十六进制
-  静默丢弃（回落成 `None` = 无颜色）。故模板用 `hex` 而不是 `hex_stripped`。
-- **fish 恰好相反：不能带 `#`、也不能是 `rgb_csv`。** fish 的 `set_color` 只认裸十六进制
-  （`64a02b`）或命名色，给它 `rgb_csv`（`64,160,43`）或 `#` 前缀都会在启动时报
-  `set_color: 未知颜色`。故模板用 `hex_stripped`。`fish -n` 只查语法、查不出这个，校验要靠
-  `fish_indent --ansi` 真正跑一遍高亮。
-- **模板文件里的注释不能出现 `{{ }}`。** 模板引擎把任意 `{{ … }}` 当占位符，注释里写
-  `{{ colors.terminal_* }}` 会让整份渲染失败（报 `template error(s); output not written`）。
-  注释里只写 `colors.terminal_*`。
-
-**双写者问题与解法**：builtin 模板的 `apply.sh` 会**就地改写应用主配置**（btop 的
-`color_theme =`、yazi 的 `[flavor]`），而这些文件在本仓库是 HM 的只读 store
-软链 → 写它会报「只读文件系统」。解法是**让 HM 直接把最终值写进配置**
-（`color_theme = "noctalia"`、`[flavor] = noctalia`）：apply.sh 检测到已是
-目标值就什么都不做（它的 `cmp` / `grep` 判等成立）。新增跟随面时按同一套路：HM 写最终值，
-apply.sh 只负责首渲。
+⚠️ 运行时 `~/.local/state/noctalia/settings.toml` 里的 `[theme.templates]` 段会**整体覆盖**
+Nix 里的空列表。停用时必须把运行时那段删一次，再 `noctalia msg config-reload`，否则 Noctalia
+会在下次换调色板时把这些文件重新生成一遍。
 
 ## 主题栈
 
@@ -102,9 +88,9 @@ apply.sh 只负责首渲。
 | 光标 | **Bibata-Modern-Classic** | 24px，XWayland 亦生效（软链到 `~/.local/share/icons`）；Bibata 只内嵌 16/20/22/24/28/32/40/… 整数档。**另有一份 `icons/default` 指向同一主题**：XWayland 上的 Qt5（微信）会退到字面量 `default`，缺它即回落 X 核心字体光标，见 `docs/quirks.md`。KDE 会话由 `plasma.nix` 单独把 KWin 的 `XCURSOR_SIZE` 覆盖为 24（全局值是给 niri/X11 翻倍用的 48），见 `docs/quirks.md` |
 | Qt | **Kvantum + MacTahoeDark** | `QT_STYLE_OVERRIDE=kvantum`；主题来自自打包的 `pkgs/mactahoe-kvantum`（与 GTK 侧同一个上游作者），见下文 |
 | GDM 登录界面 | MacTahoe | 本仓库不再装 GNOME 会话，只留 GDM 做登录器；其 greeter 用的 gnome-shell 由 GDM 自己的闭包提供，靠 overlay 覆盖 `gnome-shell-theme.gresource` 换肤，**字体 / 图标 / 光标**也一并声明（不然 greeter 会退回 Adwaita 默认），全部在 `modules/nixos/desktop/gdm.nix` |
-| Niri 装饰配色 | **Noctalia 调色板** | 由 builtin `niri` 模板写 `~/.config/niri/noctalia.kdl`（焦点环 / 标签指示器 / 插入提示 / 最近窗口高亮）；HM 只留结构项（宽度、几何、阴影），见下文 |
+| Niri 装饰配色 | **niri 内置默认** | Noctalia 不再渲染 `~/.config/niri/noctalia.kdl`；HM 只留结构项（宽度、几何、阴影），见下文 |
 | Niri 概览底色 | MacTahoe 同源 | `niri-colors/overview.kdl`，暗 `#242424` / 亮 `#FFFFFF`（Noctalia 的 niri 模板不管这一项） |
-| Noctalia Shell | **自定义调色板 `mactahoe`** | `customPalettes.mactahoe`，色值与 GTK/Qt/niri 同源；界面字体 HarmonyOS Sans SC。**仅调色板归 Nix，bar 布局归 GUI**，见下文 |
+| Noctalia Shell | **自定义调色板 `mactahoe`** | `customPalettes.mactahoe`，色值与 GTK/Qt 同源；界面字体 HarmonyOS Sans SC。**仅调色板归 Nix，bar 布局归 GUI**；只影响状态栏/面板，不再渲染应用主题，见下文 |
 
 ## 字体
 
@@ -118,7 +104,7 @@ apply.sh 只负责首渲。
 ## Niri 视觉细节
 
 - 窗口间距 8px（见下），单列工作区自动居中（有意为之的"专注模式"，`Mod+F` 可把单列铺满）
-- 焦点环 1px，**中性发丝线**（颜色由 Noctalia 渲染，说明见下）
+- 焦点环 1px（颜色用 niri 内置默认，Noctalia 不再渲染）
 - 窗口圆角 **8px**（`windowrules.kdl` 的 `geometry-corner-radius`），禁用边框。取值参考 Omarchy 的 8（原为 macOS 阶梯的 24），见下
 - 标签指示器在列右侧，圆角 2px（3px 宽的条，半径 ≥ 半宽就是胶囊，不超过窗口圆角）；**仅当列进入 tabbed 显示模式（`Mod+W`）时出现**
 - 概览缩放 0.50，背景暗 `#242424` / 亮 `#FFFFFF`
@@ -186,18 +172,17 @@ shadow {
 `struts`（niri wiki: Layout#struts，**正值 = 外间隙**；负值是把窗口推出屏幕外那条路，方向相反），
 但左右方向的 struts 会让侧边窗口"探头"（niri 文档明说），故未采用。
 
-### 焦点环为何是中性色，而不是强调色
+### 焦点环配色（当前用 niri 内置默认；下方是当年的中性色取舍）
 
 原来这里是 3px 的 `#0088FF`（饱和强调色），视觉上显得抢眼。
 
 **根本理由：Apple 从不把强调色放在窗口边界上。** macOS 用强调色标**控件**（按钮、输入框焦点、选中的列表行），窗口边界只靠中性发丝线（主题里就是 `rgba(255,255,255,.15)` 那一条，也是 Noctalia 调色板 `mOutline = #454545` 的来源）加阴影区分活动与否。所以那个 3px 饱和蓝边是整套改造里**唯一“不像 macOS”的地方** —— 它比任何别的元素都跳，正是因为它同时具备高饱和度和位置错误两个特点。
 
-> **归属变更**：焦点环等 niri 装饰的颜色现在由 Noctalia 渲染（builtin `niri` 模板 → `noctalia.kdl`），
-> 用调色板的语义角色而不是写死的 MacTahoe 取色 —— 焦点环取 `mOutline`（中性发丝线）、
-> 非焦点面取 `mSurface`（中性面）、紧急取 `mError`（`#ED5F5D`）。上面那段“用中性色而非强调色”
-> 的结论不变，只是取值随之从“手挑 MacTahoe 灰”变成“调色板角色”，换主题时自动跟随。
-> Nix 侧（`modules/home-manager/gui/desktop/linux/niri/default.nix`）只留结构项。下表的对比度算据是当初选
-> `#999999` 时算的，换成 `mOutline` 后量级相当。
+> **归属变更（2026-11-17）**：Noctalia 的 niri 模板已停用，`noctalia.kdl` 不再生成，
+> 焦点环等装饰颜色改用 niri 内置默认（active `#7fc8ff` / inactive `#505050`）。
+> 上面“用中性色而非强调色”的论证仍是当初的设计理由，但现在没有写死的取色；
+> Nix 侧（`modules/home-manager/gui/desktop/linux/niri/default.nix`）只留结构项。
+> 若想恢复中性发丝线，需要在该文件的 `mkLayout` 里显式加 `active-color` / `inactive-color`。
 
 **宽度取 1**：niri 把逻辑像素按缩放取整到物理像素。宽度 1 在 desktop 的 1.5 倍下为 1.5 → 取整 2 物理；laptop 的 1.25 倍下为 1.25 → 取整 1 物理（更细，仍可见）。宽度 2 在 desktop 下是 3 物理像素，已明显粗于发丝线。取整表在 `modules/home-manager/gui/desktop/linux/niri/default.nix` 的 `mkLayout`（表只此一份）。
 
@@ -355,7 +340,7 @@ audio 那组里 `sound_volume` / `volume_change_sound` / `notification_sound` �
 **职责划分（这是决定，不是妥协）**：
 
 - **调色板归 Nix**：`programs.noctalia.customPalettes.mactahoe` 写 `~/.config/noctalia/palettes/mactahoe.json`，配合 `theme.source = "custom"`。这是唯一能在版本控制里钉死“MacTahoe 中性灰 + `#0088FF`”的入口
-- **模板声明（`theme.templates`）归 Nix**：见「Noctalia 统一渲染各应用主题」。⚠️ 同 `bar.default` 的坑 —— 运行时 `settings.toml` 里若已有 `[theme.templates]` 段会**整体覆盖**这里，首次生效需把那段删一次再 `noctalia msg config-reload`
+- **模板声明（`theme.templates`）归 Nix**：已在 2026-11-17 清空（`builtin_ids` / `community_ids` 都是 `[]`），不再渲染应用主题。⚠️ 同 `bar.default` 的坑 —— 运行时 `settings.toml` 里若仍有 `[theme.templates]` 段会**整体覆盖**这里，需把那段删一次再 `noctalia msg config-reload`
 - **bar 布局的四项归 Nix**：`bar.default` 的 `background_opacity` / `start` / `center` / `end` —— 它们没有密钥，可以声明式
 - **bar 的逐屏开关归 Nix**：`[bar.default.monitor.*]` 表，见下节
 - **bar 其余键与插件配置归 GUI**：前者是 `capsule` / `enabled` / `margin_edge` 这类外观键，后者在 `settings.toml` 里且包含明文 API key（`[plugin_settings."coder/deepseek_usage"]` 的 `api_key`）。托管插件配置等于把密钥写进全局可读的 store，与当初 WinApps RDP 密码做到一半的判断一个道理，所以不做

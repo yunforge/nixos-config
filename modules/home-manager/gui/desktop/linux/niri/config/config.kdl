@@ -10,8 +10,8 @@ include "~/.config/niri-outputs/outputs.kdl"
 include "visual/animations.kdl"
 include "visual/blur.kdl"
 include "visual/frosted-glass.kdl"
-// layout.kdl：结构（间距、焦点环宽度、阴影参数…）由 HM 生成，窗口装饰**颜色**
-// 由 Noctalia 写进 noctalia.kdl（见文件末尾）。niri 把两个 layout{} 段合并。
+// layout.kdl：结构（间距、焦点环宽度、阴影参数…）由 HM 生成；窗口装饰颜色不再由
+// Noctalia 渲染（2026-11-17），用 niri 内置默认。niri 把两个 layout{} 段合并。
 include "~/.config/niri-colors/layout.kdl"
 include "visual/cursor.kdl"
 // overview.kdl：概览底色，Noctalia 的 niri 模板不管这一项，仍由 HM 按亮/暗两态生成
@@ -37,9 +37,8 @@ xwayland-satellite {
    path "xwayland-satellite"
 }
 
-// Noctalia 渲染的窗口装饰颜色（焦点环 / 标签指示器 / 插入提示 / 最近窗口高亮）。
-// 这是唯一由 Noctalia 负责的 niri 文件，**不进 git**（运行时产物，见 .gitignore）。
-// optional=true 是必须的：文件首次生成前不存在，普通 include 会让整份配置加载失败
-// （niri 对 include 既不 glob 也不容错），optional 只打一条 warn。
-// Noctalia 的 niri/apply.sh 只用正则认这一行、不改写参数，故可安全地加 optional。
+// 旧的 Noctalia 窗口装饰颜色文件（焦点环 / 标签指示器 / 插入提示 / 最近窗口高亮）。
+// 模板已停用（2026-11-17），文件不再生成，装饰色改用 niri 内置默认。
+// include 保留 optional：文件不存在时 niri 只打一条 warn；普通 include 会让整份配置
+// 加载失败（niri 对 include 既不 glob 也不容错）。
 include "noctalia.kdl" optional=true
