@@ -46,9 +46,9 @@ let
   #
   # 为什么需要它：Pot 是 Tauri 应用，全局热键走 X11 grab，Wayland 下拿不到，
   # 所以 niri 侧（wm/config/binds/apps.kdl）改为直接请求它的本地 API。但该 API
-  # 只在 Pot 进程存活时可用，而 niri 不执行 ~/.config/autostart（Pot 自己写的
-  # 自启项在这套环境里从来没生效过），于是每次按快捷键都得先确认 Pot 在跑：
-  # 没在跑就拉起来、等端口就绪、再调用。
+  # 只在 Pot 进程存活时可用；自启虽已在 config 里由 HM 声明（见 xdg.configFile），
+  # 用户仍可能手动退出 Pot，于是每次按快捷键都先确认 Pot 在跑：没在跑就拉起来、
+  # 等端口就绪、再调用。
   #
   # 端口取自 Pot 配置 ~/.config/com.pot-app.desktop/config.json 的 server_port
   # （默认 60828）；若在 Pot 设置里改了端口，这里的 PORT 要同步改。
@@ -141,5 +141,28 @@ in
     ];
 
     home.sessionVariables.TESSDATA_PREFIX = "${tesseract}/share/tessdata";
+
+    # Pot 自带的「开机自启」会把当时的**绝对 store 路径**写进
+    # ~/.config/autostart/pot.desktop——而且指向 AppImage 解出的
+    # /nix/store/…-pot-<ver>-extracted/usr/bin/pot，既绕过本文件的 libgpg-error
+    # 包装，又会在升级/GC 后路径消失，静默不自启（与 FlClash / magpie / Mister
+    # 同一个坑，见 docs/quirks.md）。改由 HM 在**同一路径**声明条目：Exec 用稳定
+    # 的命令名 `pot`（走 PATH → 当前包装器，恒指向当前版本且带 LD_LIBRARY_PATH）。
+    # 走 xdg.configFile 而非 xdg.autostart.entries，是为了让目标文件名正好是
+    # Pot 自己认的 `pot.desktop`——HM 会把这个旧的原生文件备份成 .hm-bak 再换成
+    # 符号链接，既清掉坏条目又不产生两份自启。Pot 应用内的自启开关须保持关闭，
+    # 否则它会再写回一份坏的 pot.desktop。
+    xdg.configFile."autostart/pot.desktop".text = ''
+      [Desktop Entry]
+      Type=Application
+      Version=1.0
+      Name=Pot
+      Comment=划词翻译
+      Exec=pot
+      Icon=${pot-icon}
+      Terminal=false
+      StartupNotify=false
+      X-GNOME-Autostart-enabled=true
+    '';
   };
 }
