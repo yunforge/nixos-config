@@ -17,7 +17,7 @@ niri 用内置默认色，见「Noctalia 不再渲染应用主题」一节）。
 1. **Noctalia 自己**（`theme.templates`，见下节）—— 只切换状态栏/面板的调色板；模板列表已清空，
    不再渲染各应用的主题文件（2026-11-17）。
 2. **`theme-apply`**（`modules/home-manager/gui/desktop/linux/themes/variants.nix`）—— 只管 Noctalia 不接管的
-   那几个面：GTK3/GTK4/图标/Qt/Kvantum（保持 MacTahoe）与 niri 概览底色。做法是把两套变体都
+   那几个面：GTK3/GTK4/图标/Qt（Kvantum 已停用，Qt 走 Adwaita 原生）与 niri 概览底色。做法是把两套变体都
    生成到 `~/.config/theme-variants/`，脚本把活文件软链指到当前模式、写 dconf
    （`color-scheme` / `gtk-theme` / `icon-theme` / 窗口按钮位置）；登录时跑一次，之后由 path 单元
    盯 Noctalia 的 state 目录触发（盯目录是因为它保存走 temp+rename，盯文件会漏事件）。
@@ -26,7 +26,7 @@ niri 用内置默认色，见「Noctalia 不再渲染应用主题」一节）。
 
 | 面 | 跟的方式 | 运行中的实例 |
 |---|---|---|
-| GTK3/GTK4、图标、Qt/Kvantum | `theme-apply` 翻软链 + 写 dconf | GTK 多数要重开（Qt/Kvantum 也要） |
+| GTK3/GTK4、图标、Qt | `theme-apply` 翻软链 + 写 dconf（Kvantum 的 kvconfig 仍会被切，但已不生效） | GTK 多数要重开 |
 | GTK4 的主题本体 | 一份**模式无关**的 `gtk.css`（浅色整份包在 `@media (prefers-color-scheme: light)` 里） | color-scheme 一变就重算，无需重开 |
 | niri 装饰色（焦点环 / 标签指示器 / 插入提示 / 最近窗口高亮） | 已删除 `noctalia.kdl`，用 niri 内置默认色（`include` 为 optional） | niri watch 到即重载 |
 | niri 概览底色 | `theme-apply` 翻 `niri-colors/overview.kdl` 软链 | niri watch 到即重载 |
@@ -86,7 +86,7 @@ Nix 里的空列表。停用时必须把运行时那段删一次，再 `noctalia
 | color-scheme | **dark** | `gtk.colorScheme`；写 dconf `color-scheme=prefer-dark` 与 GTK4 的 `gtk-interface-color-scheme=2`，libadwaita 依此判定深色 |
 | 图标 | **MacTahoe-dark** | 自定义打包图标（`pkgs/mactahoe-icon-theme`），为深色背景设计 |
 | 光标 | **Bibata-Modern-Classic** | 24px，XWayland 亦生效（软链到 `~/.local/share/icons`）；Bibata 只内嵌 16/20/22/24/28/32/40/… 整数档。**另有一份 `icons/default` 指向同一主题**：XWayland 上的 Qt5（微信）会退到字面量 `default`，缺它即回落 X 核心字体光标，见 `docs/quirks.md`。KDE 会话由 `plasma.nix` 单独把 KWin 的 `XCURSOR_SIZE` 覆盖为 24（全局值是给 niri/X11 翻倍用的 48），见 `docs/quirks.md` |
-| Qt | **Kvantum + MacTahoeDark** | `QT_STYLE_OVERRIDE=kvantum`；主题来自自打包的 `pkgs/mactahoe-kvantum`（与 GTK 侧同一个上游作者），见下文 |
+| Qt | **Adwaita 原生**（`platformTheme`） | Kvantum 于 2026-11-17 停用：`qt.style.name = null`，不再导出全局 `QT_STYLE_OVERRIDE`；原因见 `docs/quirks.md`（Kirigami 白字压白底）。`pkgs/mactahoe-kvantum` 与 kvconfig 切换惰性保留，见下文 |
 | GDM 登录界面 | MacTahoe | 本仓库不再装 GNOME 会话，只留 GDM 做登录器；其 greeter 用的 gnome-shell 由 GDM 自己的闭包提供，靠 overlay 覆盖 `gnome-shell-theme.gresource` 换肤，**字体 / 图标 / 光标**也一并声明（不然 greeter 会退回 Adwaita 默认），全部在 `modules/nixos/desktop/gdm.nix` |
 | Niri 装饰配色 | **niri 内置默认** | Noctalia 不再渲染 `~/.config/niri/noctalia.kdl`；HM 只留结构项（宽度、几何、阴影），见下文 |
 | Niri 概览底色 | MacTahoe 同源 | `niri-colors/overview.kdl`，暗 `#242424` / 亮 `#FFFFFF`（Noctalia 的 niri 模板不管这一项） |
@@ -203,7 +203,13 @@ shadow {
 - **`focus-ring.inactive-color` 在单显示器上永不可见**。焦点环只围绕每块显示器上的活动窗口，所以 inactive-color 只会在非焦点显示器上出现（niri wiki, Configuration: Layout）。它不是什么“非焦点窗口的描边”。
 - **`overview.backdrop-color` 的 alpha 通道会被忽略**（niri wiki, Configuration: Miscellaneous），写成 `#242424cc` 与 `#242424` 等价。
 
-## Qt：从 Adwaita 换成 Kvantum
+## Qt：从 Adwaita 换成 Kvantum（2026-11-17 已停用，本节为历史设计记录）
+
+> **现状**：`themes/default.nix` 的 `qt.style.name` 已改为 `null`，不再导出全局
+> `QT_STYLE_OVERRIDE=kvantum` —— Kvantum 会把 Kirigami/QML 应用（Spectacle 实测）
+> 渲成浅底浅字，所有会话（含 Plasma）现走 `platformTheme=adwaita`。主题包与
+> `theme-apply` 的 kvconfig 切换仍保留但不再作用于 Qt 应用。根因与移除条件见
+> `docs/quirks.md`。
 
 **问题**：Qt 侧原先用 `adwaita-dark`（Fedora 的 Adwaita Qt 移植）。Adwaita 是另一套设计语言——控件形状、按钮、输入框都与 MacTahoe 无关，而本机有 VLC（UI 面积最大）、Telegram、qView、fcitx5 配置工具四个 Qt 应用，它们的菜单 / 对话框 / 工具条会明显“不像这个桌面”。
 

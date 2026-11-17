@@ -98,13 +98,11 @@ in
       # 保持不变：Wayland 下 Qt 的窗口装饰由平台主题提供，与控件样式是两回事。
       # 换掉它会让自绘标题栏消失（本仓库 env.nix 里就是为此才恢复 Qt 自绘）。
       platformTheme.name = "adwaita";
-      style = {
-        # 由 adwaita-dark 改为 kvantum：Adwaita 是另一套设计语言（Fedora 的
-        # GNOME 移植），控件形状与 GTK 侧的 macOS 观感无关。kvantum 是
-        # SVG 驱动的 Qt 样式引擎，配同一个作者的 MacTahoe 主题才能与 GTK 对齐。
-        # HM 依 style.name 自动挑选 qtstyleplugin-kvantum（Qt5 + Qt6 各一份）。
-        name = "kvantum";
-      };
+      # 停用 Kvantum：不设 qt.style.name，HM 就不会导出全局 QT_STYLE_OVERRIDE=kvantum。
+      # 该变量经 systemd 用户环境被所有会话继承，而 Kvantum 的 SVG 样式会把 Kirigami/QML
+      # 应用（如 Spectacle）渲成白字压白底、文字不可读（QtWidgets 的 Dolphin 则正常）。
+      # 现在所有会话（含 Plasma）都走 platformTheme=adwaita 的原生主题。
+      style.name = null;
       kvantum = {
         enable = true;
         # 主题包不用 qt.kvantum.themes 安装：那个选项会把 ~/.config/Kvantum
@@ -115,7 +113,8 @@ in
       };
     };
 
-    # Kvantum 主题包（MacTahoeDark：只含深色那一对，见 pkgs/mactahoe-kvantum）
+    # MacTahoe Kvantum 主题文件（保留：theme-apply 仍会切它的浅/深 kvconfig，
+    # 但已不再设 QT_STYLE_OVERRIDE，Qt 应用不再使用 Kvantum 样式，属惰性保留）。
     home.packages = [ pkgs.mactahoe-kvantum ];
 
   };
