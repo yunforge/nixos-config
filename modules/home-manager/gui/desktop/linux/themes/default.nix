@@ -4,6 +4,7 @@
   config,
   pkgs,
   myLib,
+  osConfig,
   ...
 }:
 let
@@ -40,8 +41,8 @@ in
         name = myLib.theme.cursor;
         # 24：Bibata 的箭头比 macOS 原版更撑满画布。切回 1.5 倍缩放前的取值
         # （2 倍缩放下曾降到 20）。改这一个数不够 —— 光标的尺寸是**多处各写一份**
-        # （niri 的 cursor.kdl、GTK 的 variants.nix、XWayland 的 env.nix、SDDM 的 sddm.nix），
-        # 改就一起改。
+        # （niri 的 cursor.kdl、GTK 的 variants.nix、XWayland 的 env.nix、SDDM 的 sddm.nix、
+        # KDE 会话的 plasma-workspace/env），改就一起改。
         size = 24;
       };
       font = {
@@ -65,12 +66,30 @@ in
     # 变体（不在本 generation 里），HM 会判「would be clobbered」直接中断激活。
     # 不能用 xdg.configFile.… 重写（会和 gtk/qt 模块的同名目标冲突），
     # 故各设一个独立的 force 标记项（force 项只贡献本路径，不重复铺设）。
-    xdg.configFile = {
-      "gtk-3.0/settings.ini".force = true;
-      "gtk-4.0/settings.ini".force = true;
-      "gtk-4.0/gtk.css".force = true;
-      "Kvantum/kvantum.kvconfig".force = true;
-    };
+    xdg.configFile = lib.mkMerge [
+      {
+        "gtk-3.0/settings.ini".force = true;
+        "gtk-4.0/settings.ini".force = true;
+        "gtk-4.0/gtk.css".force = true;
+        "Kvantum/kvantum.kvconfig".force = true;
+      }
+
+      # KDE Plasma 会话里 XWayland 应用的 XCURSOR_SIZE 修正（否则微信窗口内光标是
+      # 桌面的两倍大）。仓库全局 `XCURSOR_SIZE=48`（env.nix）是给 niri/xwayland-satellite
+      # 的 X11 物理翻倍用的；KDE 下 KWin 自己在 Xwayland 上把 X 资源 `Xcursor.size` 设成
+      # 24（与桌面光标一致），但 libXcursor 会优先读环境变量，于是经 systemd --user 启动的
+      # XWayland 应用（微信）仍继承 48 → 以 24 的逻辑尺寸加载成 48 物理像素，视觉上大一圈。
+      # startplasma 会执行 `~/.config/plasma-workspace/env/*.sh` 并把结果 `import-systemd`
+      # 进用户 systemd 环境（`startplasma.cpp` 的 runEnvironmentScripts → importSystemdEnvironment），
+      # 故在此把 Plasma 会话的该变量钉回 24；niri 会话不读这个目录，仍用全局 48。
+      # 与 plasma.nix 里 KWin 单元的 24 drop-in 一致（那只管 KWin 自己，管不到 XWayland 应用）。
+      # 需重建 + 重新登录（登录时 startplasma 才导入）。详见 docs/quirks.md。
+      (lib.mkIf osConfig.mySystem.desktop.plasma.enable {
+        "plasma-workspace/env/50-xcursor-size.sh".text = ''
+          export XCURSOR_SIZE=24
+        '';
+      })
+    ];
 
     # XWayland 应用（Steam 等）的光标查找路径是 ~/.local/share/icons，
     # gtk.cursorTheme 只写 gsettings、不落地主题文件到该路径，
