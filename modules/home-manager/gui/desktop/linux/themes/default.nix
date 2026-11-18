@@ -74,19 +74,38 @@ in
         "Kvantum/kvantum.kvconfig".force = true;
       }
 
-      # KDE Plasma 会话里 XWayland 应用的 XCURSOR_SIZE 修正（否则微信窗口内光标是
-      # 桌面的两倍大）。仓库全局 `XCURSOR_SIZE=48`（env.nix）是给 niri/xwayland-satellite
-      # 的 X11 物理翻倍用的；KDE 下 KWin 自己在 Xwayland 上把 X 资源 `Xcursor.size` 设成
-      # 24（与桌面光标一致），但 libXcursor 会优先读环境变量，于是经 systemd --user 启动的
-      # XWayland 应用（微信）仍继承 48 → 以 24 的逻辑尺寸加载成 48 物理像素，视觉上大一圈。
-      # startplasma 会执行 `~/.config/plasma-workspace/env/*.sh` 并把结果 `import-systemd`
-      # 进用户 systemd 环境（`startplasma.cpp` 的 runEnvironmentScripts → importSystemdEnvironment），
-      # 故在此把 Plasma 会话的该变量钉回 24；niri 会话不读这个目录，仍用全局 48。
-      # 与 plasma.nix 里 KWin 单元的 24 drop-in 一致（那只管 KWin 自己，管不到 XWayland 应用）。
+      # KDE Plasma 会话里 XWayland 应用的 XCURSOR_SIZE（单位：**物理/设备像素**——
+      # X11 应用是 libXcursor 按这个像素数直接加载光标位图，Xwayland 不会再替你换算）。
+      # 仓库全局 `XCURSOR_SIZE=48`（env.nix）是给 niri/xwayland-satellite 的 X11 翻倍用的；
+      # Plasma 桌面光标由 KWin 按输出缩放绘制（逻辑 24 × 1.5 = 物理 36），X11 应用要跟桌面
+      # 对齐到同样的物理像素，故此处取 36。
+      #   · 现在 `60-xwayland-clients-scale.sh` 把 `XwaylandClientsScale` 置 true（X11 自行
+      #     缩放），Xwayland 屏是原生 3840/5760 物理分辨率，应用按设备像素绘制 → 光标给 36。
+      #   · 若哪天把该项关回「由系统缩放」，整窗会被 KWin 再放大 1.5×，那时这里要改回 24。
+      # startplasma 会执行 `~/.config/plasma-workspace/env/*.sh` 并 `import-systemd` 进用户
+      # systemd 环境（`startplasma.cpp` 的 runEnvironmentScripts → importSystemdEnvironment），
+      # 故在此设置；niri 会话不读该目录，仍用全局 48。KWin 自己另有 plasma.nix 的 24 drop-in
+      # （那只管 KWin 画桌面光标，管不到 XWayland 应用）。
       # 需重建 + 重新登录（登录时 startplasma 才导入）。详见 docs/quirks.md。
       (lib.mkIf osConfig.mySystem.desktop.plasma.enable {
         "plasma-workspace/env/50-xcursor-size.sh".text = ''
-          export XCURSOR_SIZE=24
+          export XCURSOR_SIZE=36
+        '';
+      })
+
+      # KDE Plasma 会话里把 X11(XWayland) 应用切回「自行缩放」，避免整窗被合成器拉伸
+      # 导致文字发虚。根因：X11 应用拿到的 Xwayland 屏是逻辑分辨率（4K@1.5 时
+      # 2560×1440），KWin 再把整窗放大 1.5× 到 3840×2160 → 双线性重采样；Plasma 显示
+      # 设置里对应项 'Scaled by the system' 的原文就是「always look slightly blurry」。
+      # 该项 = kdeglobals 的 [KScreen] XwaylandClientsScale（kscreen KCM 的
+      # globalscalesettings.kcfg，**默认 true = 'Apply scaling themselves'**，清晰）。
+      # 本仓库不写它即默认清晰，但运行期可能被误写成 false 而发虚；这里在 startplasma
+      # 起点（runEnvironmentScripts 在启动 plasma-workspace.target 之前跑，此时 KWin 还
+      # 没读 kdeglobals）幂等写回 true。只影响 X11 应用如何缩放，**不改整体 1.5 缩放**，
+      # Wayland 应用不受影响。需重建 + 重新登录。详见 docs/quirks.md。
+      (lib.mkIf osConfig.mySystem.desktop.plasma.enable {
+        "plasma-workspace/env/60-xwayland-clients-scale.sh".text = ''
+          ${pkgs.kdePackages.kconfig}/bin/kwriteconfig6 --file "$HOME/.config/kdeglobals" --group KScreen --key XwaylandClientsScale --type bool true >/dev/null 2>&1 || true
         '';
       })
     ];
