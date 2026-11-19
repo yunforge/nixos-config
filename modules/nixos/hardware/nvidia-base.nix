@@ -32,11 +32,14 @@ in
       services.xserver.videoDrivers = [ "nvidia" ];
 
       # nvidia-drm.modeset=1 不手写：下方 modesetting.enable = true 会让
-      # nixpkgs 的 NVIDIA 模块注入同一参数
+      # nixpkgs 的 NVIDIA 模块注入同一参数。
+      # VRAM 保存/恢复参数也交给 nixpkgs：powerManagement.enable 会注入
+      # NVreg_PreserveVideoMemoryAllocations=1；开了 powerManagement.kernelSuspendNotifier
+      # 的主机再由它注入 NVreg_UseKernelSuspendNotifiers=1。2026-11-18 从 S3 唤醒黑屏，
+      # 根因之一就是这里手写的 notifier 参数与 /proc + systemd 服务路径同时在跑。
       boot.kernelParams = [
-        "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+        # /tmp 在 tmpfs 上时 VRAM 暂存会占内存，统一落到磁盘
         "nvidia.NVreg_TemporaryFilePath=/var/tmp"
-        "nvidia.NVreg_UseKernelSuspendNotifiers=1"
       ];
       boot.blacklistedKernelModules = [ "nouveau" ];
 
@@ -72,7 +75,9 @@ in
 
       hardware = {
         nvidia = {
-          open = false;
+          # open 由各主机显式声明（nixpkgs 对 >= 560 要求非 null，见 assertions）：
+          # 595+ 的内核 suspend notifier 只支持 open 内核模块，PRIME offload 的
+          # Pascal 笔记本则必须留在专有模块。
           nvidiaSettings = true;
           powerManagement.enable = true;
           modesetting.enable = true;

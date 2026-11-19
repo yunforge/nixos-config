@@ -7,6 +7,9 @@
   hardware.nvidia = {
     # 锁定 580.x Legacy 驱动
     package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
+    # MX150 是 Pascal（open 模块只支持 Turing 及以后），且 580 < 595 不支持
+    # kernel suspend notifier，继续走 /proc + systemd 服务路径
+    open = false;
     # 笔记本精细功耗控制（powerManagement.enable 由 nvidia-base 统一开启）
     powerManagement.finegrained = true;
 

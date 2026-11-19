@@ -32,5 +32,12 @@
   hardware.nvidia = {
     # 当前架构可用的最新版本 - 稳定分支（电源管理 base 已开）
     package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # 595+ 的内核 suspend notifier 只支持 open 内核模块，且它会取代
+    # nvidia-suspend/resume/hibernate 三个 /proc 服务：休眠不再 chvt 63，
+    # VRAM 由内核 notifier 直接保存/恢复。2026-11-18 从 S3 唤醒后 nvidia-drm
+    # 原子提交失败（plane fence 信号量 -EAGAIN）导致黑屏，即两条保存/恢复路径
+    # 同时生效所致。RTX 3060 Ti（Ampere）在 open 模块支持范围内。
+    open = true;
+    powerManagement.kernelSuspendNotifier = true;
   };
 }
