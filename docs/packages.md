@@ -8,14 +8,14 @@
 
 ## 清单
 
-版本核对于 2026-11-17（当日全部升到上游最新）。
+版本核对于 2026-11-19（其余包升到上游最新；FlClash 故意钉在 0.9.3，原因见 `docs/quirks.md`）。
 
 | 属性名 | 上游 | 钉法 | 当前钉住 | 上游最新 | 状态 |
 |--------|------|------|----------|----------|------|
-| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.4347` | `v0.1.4347` | 最新 |
-| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.17.1` | `2026.11.17.1` | 最新 |
-| `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.3` | `0.9.3` | 最新（nixpkgs 已移除，见下） |
-| `dalibre` | [djyde/dalibre](https://github.com/djyde/dalibre) | release 资产（tar.gz） | `0.6.1` | `0.6.1` | 最新（unfree：上游无 LICENSE 文件） |
+| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.4538` | `v0.1.4538` | 最新 |
+| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.18.1` | `2026.11.18.1` | 最新 |
+| `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.3` | `0.9.4` | 回退（0.9.4 渲染回归，见 `docs/quirks.md`） |
+| `dalibre` | [djyde/dalibre](https://github.com/djyde/dalibre) | release 资产（tar.gz） | `0.6.3` | `0.6.3` | 最新（unfree：上游无 LICENSE 文件） |
 | `pulse` | [egoist/pulse-feedback](https://github.com/egoist/pulse-feedback) | release 资产（tar.gz） | `0.1.29` | `0.1.29` | 最新（unfree：只有反馈仓库、无 LICENSE 文件） |
 | `misterdownloadmanager` | [anefzaoui/misterdownloadmanager](https://github.com/anefzaoui/misterdownloadmanager) | release 资产（deb） | `0.5.2` | `0.5.2` | 最新（上游仅发 x86_64-linux 的 Linux 资产） |
 | `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
@@ -139,7 +139,7 @@ sources = {
 `SHA256SUMS`，本包只取 Linux 的两个 deb：
 
 ```nix
-version = "0.9.2";
+version = "0.9.3";
 
 sources = {
   x86_64-linux  = { asset = "amd64"; hash = "sha256-…"; };
