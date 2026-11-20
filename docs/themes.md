@@ -161,6 +161,27 @@ shadow {
 
 仍可选的另一条路：改回字面 macOS 值 16，并按 concentricity 把上表里 ≥ 18px 的选择器用 `gtk.gtk{3,4}.extraCss` 一并下移。
 
+### KDE 窗口外角为何是直角
+
+KDE 会话不跟随 niri 的 `geometry-corner-radius`：普通窗口的标题栏由 KWin 的
+Aurorae 主题绘制，GTK 应用则可能自己画 CSD，两条路径的半径互不相干。WhiteSur
+默认主题的底角是圆的，`sharp` 变体只压平底角、顶角仍保留 12px；MacTahoe 又给
+GTK 顶层窗口留了 8px。把它们并排放在一起，就会出现「几类窗口、几种圆角」，
+而且 CSD 的透明角需要和 KWin 的阴影/背景补齐，缩放后更容易露出接缝。
+
+现在的做法是把**窗口外角**全部归零：
+
+- KWin：`kwin-square-corners.nix` 安装 `whitesur-kde` 的 `--window sharp` 变体，
+  并在构建时把 Aurorae 框 SVG 的顶角路径改成直角；`kwinrc` 选中
+  `__aurorae__svg__WhiteSur-dark-sharp`，登录/激活后由 KWin 重新加载。
+- GTK：`pkgs/mactahoe-gtk-theme` 只改顶层 `decoration` / `window.csd` /
+  `headerbar.titlebar` 为 0，内层卡片、按钮、菜单的圆角不动。
+- Plasma 会话额外设 `GTK_CSD=0`，让没有自定义 headerbar 的 GTK3 也交给 KWin
+  画直角标题栏（GTK4 本来就会按 KWin 的 xdg-decoration server 模式走 SSD）。
+
+这不是把 KDE 的所有控件都压成方形：按钮、卡片、弹出菜单仍按各自的 Plasma/GTK
+样式绘制。niri 的窗口圆角仍由 `geometry-corner-radius 8` 决定，KWin 配置和
+`GTK_CSD=0` 都不影响 niri 会话。
 
 ### 窗口间距为何是 8px
 

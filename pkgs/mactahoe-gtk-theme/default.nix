@@ -54,15 +54,21 @@ stdenv.mkDerivation {
     # 提供假 home 目录，避免读取真实用户信息
     substituteInPlace libs/lib-core.sh --replace-fail 'MY_HOME=$(getent passwd "''${MY_USERNAME}" | cut -d: -f6)' 'MY_HOME=/tmp'
 
-    # 把「顶层窗口装饰」的圆角从 24px（$wm_radius 在 desktop 下的取值）改成 8px，
-    # 与 niri 的 geometry-corner-radius 8 以及其它窗口统一。只改三处顶层窗口框：
-    # GTK3 `decoration`、GTK4 `window.csd`、GTK4 Chromium/Edge 的 `headerbar.titlebar`
-    # （Edge 走 GTK4 时这层框会用到）。内层 19/18/16/14/12、popup / tooltip /
-    # messagedialog / .ssd，以及 $wm_radius 变量本身（170 处引用）都不动，避免
-    # 波及 cinnamon/gnome-shell/libadwaita 等其它组件。
-    perl -0pi -e 's/decoration \{\n  transition: none;\n  border-radius: \$wm_radius;/decoration {\n  transition: none;\n  border-radius: 8px;/' src/sass/gtk/_common-3.0.scss
-    perl -0pi -e 's/border-radius: \$wm_radius;/border-radius: 8px;/' src/sass/gtk/_common-4.0.scss
-    perl -0pi -e 's/border-radius: \$wm_radius \$wm_radius 0 0;/border-radius: 8px 8px 0 0;/' src/sass/gtk/apps/_gnome-40.0.scss
+    # 把「顶层窗口装饰」压成直角（原来是 $wm_radius = 24）。KDE 下 KWin 的
+    # 服务端装饰已改直角；GTK 自绘窗口不能再保留 8/24px，否则同一个桌面里
+    # 会出现两种圆角。只改顶层窗口框：
+    # GTK3 `decoration` / `.ssd`、GTK4 `window.csd` 及其 headerbar 顶角、
+    # GTK4 Chromium/Edge 的 `headerbar.titlebar`。内层 19/18/16/14/12、
+    # popup / tooltip / messagedialog，以及 $wm_radius 变量本身都不动。
+    #
+    # niri 仍通过 geometry-corner-radius 8 裁切窗口，所以这里的 0 不会改变
+    # niri 会话里最终看到的窗口外角。
+    perl -0pi -e 's/decoration \{\n  transition: none;\n  border-radius: \$wm_radius;/decoration {\n  transition: none;\n  border-radius: 0;/' src/sass/gtk/_common-3.0.scss
+    perl -0pi -e 's/\.ssd & \{\n    border-radius: \$wm_radius \$wm_radius 0 0;/.ssd & {\n    border-radius: 0;/' src/sass/gtk/_common-3.0.scss
+    perl -0pi -e 's/border-radius: \$wm_radius;/border-radius: 0;/' src/sass/gtk/_common-4.0.scss
+    perl -0pi -e 's/border-top-left-radius: \$wm_radius;/border-top-left-radius: 0;/' src/sass/gtk/_common-4.0.scss
+    perl -0pi -e 's/border-top-right-radius: \$wm_radius;/border-top-right-radius: 0;/' src/sass/gtk/_common-4.0.scss
+    perl -0pi -e 's/border-radius: \$wm_radius \$wm_radius 0 0;/border-radius: 0;/' src/sass/gtk/apps/_gnome-40.0.scss
   '';
 
   dontBuild = true;
