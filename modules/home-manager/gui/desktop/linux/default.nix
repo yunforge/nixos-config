@@ -12,6 +12,7 @@
   imports = [
     ./niri
     ./themes
+    ./kwin-tile-gaps.nix
     ./winapps.nix
   ];
 }

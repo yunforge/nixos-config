@@ -11,6 +11,7 @@
 | 桌面主题 / GTK / Qt / 图标 | `docs/themes.md` | `modules/home-manager/gui/desktop/linux/themes/default.nix`、`modules/home-manager/gui/desktop/linux/niri/noctalia.nix` |
 | Niri 快捷键、窗口与布局规则 | `docs/niri.md` | `modules/home-manager/gui/desktop/linux/niri/config/` + 生成 KDL 的 `gui/desktop/linux/niri/default.nix` |
 | 桌面登录会话（SDDM、niri / KDE Plasma 可切换与默认会话） | `docs/quirks.md`（多会话默认会话坑位） | `modules/nixos/desktop/sddm.nix`、`modules/nixos/desktop/niri/`、`modules/nixos/desktop/plasma.nix` |
+| KDE Plasma 平铺窗口间距（KWin 快速平铺） | `docs/quirks.md`（KWin quick tile padding 固定为 0） | `modules/home-manager/gui/desktop/linux/kwin-tile-gaps.nix`、`.../kwin-tile-gaps.js` |
 | 装了哪些应用 | `docs/softwares.md` | `modules/home-manager/gui/apps/linux/`（含嵌入式工具链） |
 | 自维护包（nixpkgs 未收录）的版本、升级与「更新系统」清单 | `docs/packages.md` | `pkgs/`、`overlays/default.nix` |
 | 开发工具链、Distrobox | `docs/environment.md` | `modules/home-manager/dev/languages/`、`modules/home-manager/common/tools/` |
