@@ -113,5 +113,21 @@ in
         KWIN_DRM_NO_DIRECT_SCANOUT = "1";
       };
     };
+
+    # Plasma 6.8 注销竞态（KDE bug 527660）：plasma-shutdown 的 logoutComplete()
+    # 用 `plasma-workspace.target` 是否仍 active 判断是不是 systemd 会话；实测该
+    # target 此时已经停止，于是走了旧分支，没有执行 StopUnit graphical-session.target，
+    # 旧 graphical target 残留 active。下一次登录时，XDG autostart 单元只写
+    # `After=graphical-session.target`，该条件立即满足，plasma-fallback-session-restore
+    # 等应用会在 KWin 建出 Wayland socket 前启动，Qt 初始化 wayland 插件失败并 SIGABRT。
+    #
+    # 让 graphical target 随 workspace target 一起停：下一次登录时 autostart 必须等
+    # graphical target 重新到达，而它会等 plasma-workspace.target → plasma-core.target
+    # （后者 After=plasma-kwin_wayland.service），因此不会再抢跑。
+    # 上游给的 `startkderc` `systemdBoot=false` workaround 会关掉 systemd 会话管理，不采用。
+    systemd.user.targets."graphical-session" = {
+      overrideStrategy = "asDropin";
+      partOf = [ "plasma-workspace.target" ];
+    };
   };
 }
