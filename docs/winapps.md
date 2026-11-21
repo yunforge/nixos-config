@@ -123,7 +123,7 @@ windows-vm-media.iso
 | 步骤 | 选择 |
 | --- | --- |
 | 安装来源 | 本地安装介质 → 选 Windows 11 ISO（勾选「自动从安装介质检测」） |
-| 内存 / CPU | 建议 ≥ 8192 MiB / 4 vCPU（本机配了 16 GiB / 8 vCPU） |
+| 内存 / CPU | 建议 ≥ 8192 MiB / 4 vCPU（本机配了 16 GiB / 8 vCPU，拓扑 `sockets=1 cores=8 threads=1`） |
 | 存储 | 建议 ≥ 64 GB（本机 128 GB 级即可；qcow2 稀疏分配，按需增长） |
 | 名称 | **必须与 `myHome.gui.winapps.vmName` 一致**，默认 `RDPWindows` |
 | 勾选 | 「在安装前自定义配置」 |
@@ -135,11 +135,13 @@ windows-vm-media.iso
 3. **Add Hardware → Storage**：`Device type = CDROM device`，选装机盘
    `/run/current-system/sw/share/windows-vm-media/windows-vm-media.iso`
 4. 网卡 / 磁盘二选一：
-   - **省事路线（本机采用）**：磁盘 `SATA`、网卡 `e1000e` → **装系统时不需要任何驱动**，
-     装完直接用；
-   - **性能路线**：磁盘 `virtio`、网卡 `virtio` → 安装时点「加载驱动程序」，指向装机盘
-     `amd64\w11` 目录。
-5. （可选）**Boot Options** → 勾「主机启动时启动虚拟机」。非必须：WinApps 在应用启动时
+   - **性能路线（本机采用，2026-11-21 已从 SATA/e1000e 切换）**：磁盘 `virtio`、网卡
+     `virtio` → 安装时点「加载驱动程序」，指向装机盘 `amd64\w11` 目录；装完运行
+     `virtio-win-guest-tools.exe`。已装好的 Windows 迁移步骤见 §4.1；
+   - **省事路线**：磁盘 `SATA`、网卡 `e1000e` → **装系统时不需要任何驱动**，装完直接用。
+5. **Add Hardware → Channel**：设备名 `org.qemu.guest_agent.0`（装完 guest tools 后宿主机
+   可用 `virsh qemu-agent-command` 查询/操作客户机；没有此需求可不加）。
+6. （可选）**Boot Options** → 勾「主机启动时启动虚拟机」。非必须：WinApps 在应用启动时
    会自动 `virsh start`。
 
 热插/更换光驱注意：**SATA 不支持热插拔**。运行中要换盘必须用 USB 总线：
@@ -158,6 +160,26 @@ virsh attach-device RDPWindows /tmp/cd.xml --live --config   # 加盘
 virsh detach-disk  RDPWindows sdc --live --config            # 拔盘
 ```
 
+### 4.1 已装好的 Windows：SATA/e1000e → virtio（本机做法）
+
+1. 客户机里以管理员运行装机盘根目录 `virtio-win-guest-tools.exe`（含
+   viostor / netkvm / balloon / vioserial 与 QEMU Guest Agent），装完重启。
+2. 关机后改总线：磁盘 `sda/sata` → `vda/virtio`（保留 `discard='unmap'`），网卡
+   `e1000e` → `virtio`（MAC 不变）；同时加 `org.qemu.guest_agent.0` 通道。
+3. **切换前必查 `StartOverride`**：`sc qc viostor` 应为 `START_TYPE : 0 BOOT_START`，且
+   注册表 `HKLM\SYSTEM\CurrentControlSet\Services\viostor\StartOverride` 不存在。
+   PnP 安装会把这个键写成 `3`（按需启动）并**覆盖** `Start=0`，引导时 viostor 不加载 →
+   `INACCESSIBLE_BOOT_DEVICE` → 自动修复（现象：蓝屏「选择键盘布局」、`dir C:\` 报
+   找不到路径）。修法：进 WinRE 命令行（疑难解答 → 高级选项 → 命令提示符）→
+   `drvload E:\viostor\w11\amd64\viostor.inf`（盘符以实际为准）挂出系统盘 →
+   `reg load HKLM\W C:\Windows\System32\config\SYSTEM` →
+   `reg delete HKLM\W\ControlSet001\Services\viostor\StartOverride /f` →
+   `reg unload HKLM\W` → `wpeutil reboot`。
+4. 启动后确认：`Get-Disk` 显示 `Red Hat VirtIO`，`Get-NetAdapter` 显示
+   `Red Hat VirtIO Ethernet Adapter`，`virsh domifaddr RDPWindows` 仍拿到
+   `192.168.122.x`，宿主机 `virsh qemu-agent-command RDPWindows '{"execute":"guest-ping"}'`
+   返回 `{"return":{}}`。
+
 ---
 
 ## 5. 安装 Windows 11 Pro
@@ -165,8 +187,8 @@ virsh detach-disk  RDPWindows sdc --live --config            # 拔盘
 1. 按向导安装，版本选 **Pro**（Home 没有 RDP 服务端，RemoteApp 无从谈起）。
 2. 账户：建议**本地账户**并**设置密码**（记牢，后面要写进 `rdp-pass`）。
    若走到联网/登录微软账户那步无法跳过：`Shift+F10` 打开命令行 → `OOBE\BYPASSNRO`（新版镜像可能已移除）。最省事的做法是让 VM 联网
-   （e1000e 免驱）正常走完，然后**新建一个带密码的本地账户**用于 RDP 亦可。
-3. 进入桌面后（如果用了 virtio 路线）：运行装机盘根目录 `virtio-win-guest-tools.exe`
+   （省事路线 e1000e 免驱；virtio 路线在加载 netkvm 驱动后同样可用）正常走完，然后**新建一个带密码的本地账户**用于 RDP 亦可。
+3. 进入桌面后（**virtio 路线必做**）：运行装机盘根目录 `virtio-win-guest-tools.exe`
    补齐驱动与 guest agent；SATA/e1000e 路线下它是可选（装了会顺带得到 QEMU guest agent、
    balloon 驱动，方便以后切 virtio）。
 
