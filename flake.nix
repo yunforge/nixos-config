@@ -268,6 +268,7 @@
                 mkdir -p "$HOME/.config/niri-colors" "$HOME/.config/niri-outputs"
                 cp ${mkKdl "niri-colors/layout.kdl"}   "$HOME/.config/niri-colors/layout.kdl"
                 cp ${mkKdl "niri-colors/overview.kdl"} "$HOME/.config/niri-colors/overview.kdl"
+                cp ${mkKdl "niri-colors/environment.kdl"} "$HOME/.config/niri-colors/environment.kdl"
                 cp ${mkKdl "niri-outputs/outputs.kdl"} "$HOME/.config/niri-outputs/outputs.kdl"
                 cp -r ${./modules/home-manager/gui/desktop/linux/niri/config} conf
                 chmod -R u+w conf

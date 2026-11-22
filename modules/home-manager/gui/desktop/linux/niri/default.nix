@@ -5,11 +5,31 @@
   osConfig,
   pkgs,
   inputs,
+  myLib,
   ...
 }:
 let
   desktopCfg = config.myHome.desktop;
   niriConfigPath = "${config.home.homeDirectory}/Projects/nixos-config/modules/home-manager/gui/desktop/linux/niri/config";
+
+  # niri 会话专有的环境变量：光标与 Qt 平台主题都属于「niri 的外观」。
+  # 不能放进系统级 environment.sessionVariables —— KWin 在 XCURSOR_THEME 非空时
+  # 会把 XCURSOR_SIZE 当作光标逻辑尺寸，Qt 也会拿 QT_QPA_PLATFORMTHEME 绕开
+  # KDE 的「应用程序风格」，等于由 NixOS 改写 Plasma 的设置。
+  # niri 的 environment 段只作用于它启动的进程（Noctalia 及其应用启动器派生的
+  # 应用、xwayland-satellite 都在其中）；KDE 会话不读这份配置。
+  #
+  # XCURSOR_SIZE 取物理像素：libXcursor 不认逻辑像素，分数缩放下要按 scale 翻倍
+  # （niri 的 cursor.kdl 仍是 24 逻辑像素）。
+  xcursorSize = 24 * (if osConfig.mySystem.desktop.scale > 1 then 2 else 1);
+  environmentKdl = ''
+    // niri 会话专有的环境变量（由 HM 生成；KDE 会话不读，见 env.nix）
+    environment {
+        XCURSOR_THEME "${myLib.theme.cursor}"
+        XCURSOR_SIZE "${toString xcursorSize}"
+        QT_QPA_PLATFORMTHEME "adwaita"
+    }
+  '';
 
   # ── 概览底色 ────────────────────────────────────────────────────────────
   # niri 装饰颜色不再由外部渲染（Noctalia 模板已停用，2026-11-17），用 niri 内置默认；
@@ -275,6 +295,9 @@ in
     # 不带 force 的话 HM 的 checkLinkTargets 会判成外来文件、整份激活失败。
     xdg.configFile."niri-colors/layout.kdl".text = mkLayout;
     xdg.configFile."niri-colors/layout.kdl".force = true;
+    # niri 会话专有环境变量（光标 / Qt 平台主题）。与 layout.kdl 一样由 HM 持有，
+    # 不进 theme-apply：亮/暗切换不改变这些值。
+    xdg.configFile."niri-colors/environment.kdl".text = environmentKdl;
     # overview.kdl 仍随亮/暗切换（概览底色），故走 theme-apply 的软链机制。
     # force：这个软链归 theme-apply 运行时接管（light 模式会指到 light 变体），
     # 而 HM 的 checkLinkTargets 只认「指向本 generation」的软链，指到变体就判成

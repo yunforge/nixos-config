@@ -6,6 +6,10 @@ include "core/startup.kdl"
 // 与 niri-colors 同理：显示器配置按主机区分，无法放进被 symlink 的共享目录
 include "~/.config/niri-outputs/outputs.kdl"
 
+// niri 会话专有的环境变量（XCURSOR_* / QT_QPA_PLATFORMTHEME），由 HM 生成。
+// 不放系统级 sessionVariables：那会顺带改写 KDE Plasma 的光标与 Qt 主题。
+include "~/.config/niri-colors/environment.kdl"
+
 // 视觉效果：动画、模糊、磨砂玻璃、布局、光标、概览
 include "visual/animations.kdl"
 include "visual/blur.kdl"

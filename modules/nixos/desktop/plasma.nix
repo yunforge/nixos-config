@@ -84,13 +84,15 @@ in
       X-KDE-StartupNotify=false
     '';
 
-    # KDE 下把 KWin 的光标尺寸钉回 24 逻辑像素。仓库全局 `XCURSOR_SIZE=48` 是给
-    # niri / xwayland-satellite 的 X11 光标翻倍用的（libXcursor 只认物理像素），
-    # 但 KWin 在 `XCURSOR_THEME` 非空时会直接把 `XCURSOR_SIZE` 当作**逻辑**光标尺寸
-    # （kwin src/cursor.cpp `loadThemeSettings`：theme 与 size 都在则优先环境变量，
-    # 否则回落到 kcminputrc 的 cursorSize，默认 24）。于是 Plasma 的光标变成 48
-    # 逻辑像素、明显偏大。这里只覆盖 KWin 单元的该变量为 24，与 niri 的 24 逻辑像素
-    # 一致；其它会话仍用全局 48。
+    # KWin 的 NVIDIA workaround。KDE 桌面的光标主题/尺寸不在这里设置：
+    # XCURSOR_* 已不再由 NixOS 全局注入（见 modules/nixos/desktop/env.nix），
+    # KWin 会回落到 kcminputrc 里 Plasma 系统设置的值。
+    #
+    # `KWIN_DRM_NO_DIRECT_SCANOUT=1`：KWin 6.8 在 NVIDIA 上反复尝试 direct scanout，
+    # 交换链缓冲区分配失败时会在「直扫」与「合成」两条管线之间来回切换，表现为外接屏
+    # 亮度/伽马快速闪烁，日志同步刷 `Failed to allocate a graphics buffer for a
+    # swapchain`（KDE bug 527184；本机 6.8.2 + 595.112.07 仍复现）。关掉直扫强制走
+    # 合成管线可同时消除闪烁与报错，代价是少一条省电路径。
     #
     # 注意：`environment` 选项默认会顺带注入 NixOS 的最小 PATH
     # （`enableDefaultPath` 把 `systemd.defaultPath` 追加进单元的 PATH），而 KWin 单元
@@ -99,17 +101,10 @@ in
     # 后黑屏（实测：minimal PATH 下 `kwin_wayland_wrapper --virtual` 无输出、rc=124；
     # 加上 `:/run/current-system/sw/bin` 即正常启动）。故关掉默认 PATH，让单元继续继承
     # 会话 PATH；drop-in 里只保留 KWin 自己的变量。
-    #
-    # `KWIN_DRM_NO_DIRECT_SCANOUT=1`：KWin 6.8 在 NVIDIA 上反复尝试 direct scanout，
-    # 交换链缓冲区分配失败时会在「直扫」与「合成」两条管线之间来回切换，表现为外接屏
-    # 亮度/伽马快速闪烁，日志同步刷 `Failed to allocate a graphics buffer for a
-    # swapchain`（KDE bug 527184；本机 6.8.2 + 595.112.07 仍复现）。关掉直扫强制走
-    # 合成管线可同时消除闪烁与报错，代价是少一条省电路径。
     systemd.user.services."plasma-kwin_wayland" = {
       overrideStrategy = "asDropin";
       enableDefaultPath = false;
       environment = {
-        XCURSOR_SIZE = "24";
         KWIN_DRM_NO_DIRECT_SCANOUT = "1";
       };
     };

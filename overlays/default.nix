@@ -12,13 +12,13 @@
 #   overlay 本身拿不到 flake inputs，只能由调用方注入。
 { inputs }:
 final: prev: {
-  # Bibata 光标补齐 36px 档位（Plasma 1.5× 缩放专用）
+  # Bibata 光标补齐 36px 档位（KDE 1.5× 缩放下 24 逻辑 × 1.5 = 36 物理）
   # ------------------------------------------------------------
   # 上游 x11_sizes 只有 [16 20 22 24 28 32 40 48 56 64 72 80 88 96]，**没有 36**。
-  # 在 Plasma「X11 应用自行缩放」（XwaylandClientsScale=true）下，X11/Qt5 应用按设备
-  # 像素取光标，XCURSOR_SIZE=36 会被 Xcursor 吸附到最近的 32px → 看起来比桌面（KWin
-  # 逻辑 24 × 1.5 = 物理 36）小一截。此处把 36 加进 x11_sizes，clickgen 从 256px 母版
-  # 直接重采样出 36px，清晰无损。根因与配套（微信单独压 env）见 docs/quirks.md。
+  # KDE 光标设为默认 24 逻辑像素、且 Plasma「X11 应用自行缩放」时，X11/Qt5 应用按
+  # 设备像素取光标，XCURSOR_SIZE=36 会被 Xcursor 吸附到最近的 32px → 看起来比桌面
+  # 小一截。此处把 36 加进 x11_sizes，clickgen 从 256px 母版直接重采样出 36px，
+  # 清晰无损。根因与配套（微信单独压 env）见 docs/quirks.md。
   bibata-cursors = prev.bibata-cursors.overrideAttrs (old: {
     postPatch = (old.postPatch or "") + ''
       for f in configs/normal/x.build.toml configs/right/x.build.toml; do

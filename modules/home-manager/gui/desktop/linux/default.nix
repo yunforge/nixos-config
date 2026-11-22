@@ -13,7 +13,6 @@
     ./niri
     ./themes
     ./kwin-tile-gaps.nix
-    ./kwin-square-corners.nix
     ./winapps.nix
   ];
 }

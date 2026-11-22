@@ -85,8 +85,8 @@ Nix 里的空列表。停用时必须把运行时那段删一次，再 `noctalia
 | GTK4 / libadwaita | **MacTahoe-Dark** | 须显式设 `gtk.gtk4.theme`：HM 26.05 起其默认值为 `null`，不设就不会生成 `gtk-4.0/gtk.css`，应用会退回原生 Adwaita |
 | color-scheme | **dark** | `gtk.colorScheme`；写 dconf `color-scheme=prefer-dark` 与 GTK4 的 `gtk-interface-color-scheme=2`，libadwaita 依此判定深色 |
 | 图标 | **MacTahoe-dark** | 自定义打包图标（`pkgs/mactahoe-icon-theme`），为深色背景设计 |
-| 光标 | **Bibata-Modern-Classic** | 24px，XWayland 亦生效（软链到 `~/.local/share/icons`）；Bibata 只内嵌 16/20/22/24/28/32/40/… 整数档。**另有一份 `icons/default` 指向同一主题**：XWayland 上的 Qt5（微信）会退到字面量 `default`，缺它即回落 X 核心字体光标，见 `docs/quirks.md`。KDE 会话由 `plasma.nix` 单独把 KWin 的 `XCURSOR_SIZE` 覆盖为 24（全局值是给 niri/X11 翻倍用的 48）；KDE 下经 systemd 启动的 XWayland 应用（微信等）由 `themes/default.nix` 生成的 `~/.config/plasma-workspace/env/50-xcursor-size.sh`（`export XCURSOR_SIZE=24`）拉回 24，见 `docs/quirks.md` |
-| Qt | **Adwaita 原生**（`platformTheme`） | Kvantum 于 2026-11-17 停用：`qt.style.name = null`，不再导出全局 `QT_STYLE_OVERRIDE`；原因见 `docs/quirks.md`（Kirigami 白字压白底）。`pkgs/mactahoe-kvantum` 与 kvconfig 切换惰性保留，见下文 |
+| 光标 | **Bibata-Modern-Classic**（仅 niri） | 24px 逻辑、XWayland 物理像素由 niri 的 `environment` 段按缩放给出（`~/.config/niri-colors/environment.kdl`）；软链到 `~/.local/share/icons` 供 XWayland 查找。Bibata 只内嵌 16/20/22/24/28/32/40/… 整数档。**另有一份 `icons/default` 指向同一主题**：XWayland 上的 Qt5（微信）会退到字面量 `default`，缺它即回落 X 核心字体光标，见 `docs/quirks.md`。**KDE 会话不读这些值**：Plasma 的光标主题与尺寸归系统设置（`kcminputrc`），NixOS 不再全局注入 `XCURSOR_*` |
+| Qt | **Adwaita 原生（仅 niri）** | Kvantum 于 2026-11-17 停用：`qt.style.name = null`，不再导出全局 `QT_STYLE_OVERRIDE`；原因见 `docs/quirks.md`（Kirigami 白字压白底）。`QT_QPA_PLATFORMTHEME=adwaita` 也只在 niri 会话注入（`niri-colors/environment.kdl`），Plasma 的 Qt 应用跟随 KDE 的「应用程序风格」。`pkgs/mactahoe-kvantum` 与 kvconfig 切换惰性保留，见下文 |
 | SDDM 登录界面 | MacTahoe | 登录器换成 SDDM（Wayland greeter，不装 X server）；greeter 主题用自打包的 `mactahoe-sddm-theme`（`MacTahoe-Dark`），它仿 KDE Breeze，需把 `plasma-workspace` / `libplasma` / `plasma5support` / `kirigami` / `qt5compat` / `qtsvg` 放进 `services.displayManager.sddm.extraPackages` 供 greeter 的 QML 导入路径解析（否则黑屏 / 白屏），光标声明 `CursorTheme=Bibata-Modern-Classic`。全部在 `modules/nixos/desktop/sddm.nix` |
 | Niri 装饰配色 | **niri 内置默认** | Noctalia 不再渲染 `~/.config/niri/noctalia.kdl`；HM 只留结构项（宽度、几何、阴影），见下文 |
 | Niri 概览底色 | MacTahoe 同源 | `niri-colors/overview.kdl`，暗 `#242424` / 亮 `#FFFFFF`（Noctalia 的 niri 模板不管这一项） |
@@ -161,27 +161,25 @@ shadow {
 
 仍可选的另一条路：改回字面 macOS 值 16，并按 concentricity 把上表里 ≥ 18px 的选择器用 `gtk.gtk{3,4}.extraCss` 一并下移。
 
-### KDE 窗口外角为何是直角
+### KDE 外观不归仓库管（2026-11-22）
 
-KDE 会话不跟随 niri 的 `geometry-corner-radius`：普通窗口的标题栏由 KWin 的
-Aurorae 主题绘制，GTK 应用则可能自己画 CSD，两条路径的半径互不相干。WhiteSur
-默认主题的底角是圆的，`sharp` 变体只压平底角、顶角仍保留 12px；MacTahoe 又给
-GTK 顶层窗口留了 8px。把它们并排放在一起，就会出现「几类窗口、几种圆角」，
-而且 CSD 的透明角需要和 KWin 的阴影/背景补齐，缩放后更容易露出接缝。
+NixOS/HM 只维护 **niri 会话**的外观；KDE Plasma 的图标、主题（窗饰 / 应用程序
+风格）与光标都交给 Plasma 自己的系统设置（`kdeglobals`、`kwinrc`、`kcminputrc`
+由 KDE 运行时维护）。此前为了让两个会话看起来一致，仓库曾从系统侧写入 KDE 的
+配置和全局环境变量，会覆盖用户在系统设置里的选择，已全部移除：
 
-现在的做法是把**窗口外角**全部归零：
+- `kwin-square-corners.nix`：把 KWin 窗饰换成顶角直角的 `WhiteSur-dark-sharp`，
+  并在 Plasma 会话设 `GTK_CSD=0` —— 模块已删除；
+- `~/.config/plasma-workspace/env/` 下的 `50-xcursor-size.sh`、`60-xwayland-clients-scale.sh`
+  （写 `XCURSOR_SIZE` 与 `kdeglobals` 的 `XwaylandClientsScale`）—— 已删除；
+- 全局 `XCURSOR_THEME` / `XCURSOR_SIZE` 与 `QT_QPA_PLATFORMTHEME` —— 已从
+  `environment.sessionVariables` / HM 的 environment.d 移除，改由 niri 的
+  `environment` 段（`~/.config/niri-colors/environment.kdl`）只在 niri 会话内注入。
 
-- KWin：`kwin-square-corners.nix` 安装 `whitesur-kde` 的 `--window sharp` 变体，
-  并在构建时把 Aurorae 框 SVG 的顶角路径改成直角；`kwinrc` 选中
-  `__aurorae__svg__WhiteSur-dark-sharp`，登录/激活后由 KWin 重新加载。
-- GTK：`pkgs/mactahoe-gtk-theme` 只改顶层 `decoration` / `window.csd` /
-  `headerbar.titlebar` 为 0，内层卡片、按钮、菜单的圆角不动。
-- Plasma 会话额外设 `GTK_CSD=0`，让没有自定义 headerbar 的 GTK3 也交给 KWin
-  画直角标题栏（GTK4 本来就会按 KWin 的 xdg-decoration server 模式走 SSD）。
-
-这不是把 KDE 的所有控件都压成方形：按钮、卡片、弹出菜单仍按各自的 Plasma/GTK
-样式绘制。niri 的窗口圆角仍由 `geometry-corner-radius 8` 决定，KWin 配置和
-`GTK_CSD=0` 都不影响 niri 会话。
+因此 Plasma 的光标、窗饰、Qt 应用风格现在以系统设置为准；想恢复原来的观感就在
+Plasma 系统设置里自行选择（窗饰、光标、GTK 应用风格都有对应页面）。`pkgs/mactahoe-gtk-theme`
+仍把 GTK 顶层窗口外角压成直角，这只影响 GTK 应用自身，与 KWin 窗饰无关；niri 的
+窗口圆角仍由 `geometry-corner-radius 8` 决定。
 
 ### 窗口间距为何是 8px
 
@@ -228,9 +226,9 @@ GTK 顶层窗口留了 8px。把它们并排放在一起，就会出现「几类
 
 > **现状**：`themes/default.nix` 的 `qt.style.name` 已改为 `null`，不再导出全局
 > `QT_STYLE_OVERRIDE=kvantum` —— Kvantum 会把 Kirigami/QML 应用（Spectacle 实测）
-> 渲成浅底浅字，所有会话（含 Plasma）现走 `platformTheme=adwaita`。主题包与
-> `theme-apply` 的 kvconfig 切换仍保留但不再作用于 Qt 应用。根因与移除条件见
-> `docs/quirks.md`。
+> 渲成浅底浅字。`QT_QPA_PLATFORMTHEME=adwaita` 只在 niri 会话注入（2026-11-22 起），
+> Plasma 会话用 KDE 自己的应用程序风格。主题包与 `theme-apply` 的 kvconfig 切换仍保留
+> 但不再作用于 Qt 应用。根因与移除条件见 `docs/quirks.md`。
 
 **问题**：Qt 侧原先用 `adwaita-dark`（Fedora 的 Adwaita Qt 移植）。Adwaita 是另一套设计语言——控件形状、按钮、输入框都与 MacTahoe 无关，而本机有 VLC（UI 面积最大）、Telegram、qView、fcitx5 配置工具四个 Qt 应用，它们的菜单 / 对话框 / 工具条会明显“不像这个桌面”。
 

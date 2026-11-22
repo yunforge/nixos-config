@@ -2,7 +2,6 @@
 {
   lib,
   config,
-  myLib,
   ...
 }:
 let
@@ -10,11 +9,6 @@ let
   # AWT 的 sun.java2d.uiScale 只接受整数，分数值（如 1.5）会被静默忽略，
   # 导致 4K 分数缩放主机上 Java 应用整体落在 1x、文字偏小。
   # 按桌面声明的 scale 向上取整：scale=1 → 1，>1 → 2。
-  # XWayland 光标尺寸：niri/GTK 侧统一按 24 逻辑像素配置（cursor.kdl、
-  # gtk.cursorTheme.size），libXcursor 却只认物理图像尺寸。分数缩放主机上
-  # niri 会加载 xcursor-size*2 的纹理再缩放，故此处同样按 scale 翻倍，
-  # 否则 scale=1 的主机会拿到比原生光标大一倍的 X11 光标。
-  xcursorSize = 24 * (if cfg.scale > 1 then 2 else 1);
   javaUiScale = if cfg.scale > 1 then 2 else 1;
 in
 {
@@ -30,11 +24,10 @@ in
       _JAVA_AWT_WM_NONREPARENTING = "1";
       _JAVA_OPTIONS = "-Dawt.useSystemAAFontSettings=true -Dswing.aatext=true -Dsun.java2d.uiScale=${toString javaUiScale}";
       RUST_BACKTRACE = "1";
-      # XWayland 应用（Steam 及其游戏）光标主题/大小：
-      # Niri 自身从 config.kdl 读取光标配置，但 XWayland 走 XCURSOR_* 环境变量；
-      # 缺失时 libXcursor 回退默认光标（Steam 里出现小且方向异常的箭头）。
-      XCURSOR_THEME = myLib.theme.cursor;
-      XCURSOR_SIZE = toString xcursorSize;
+      # XCURSOR_THEME / XCURSOR_SIZE 故意不在这里全局注入：KWin 在 XCURSOR_THEME
+      # 非空时会优先拿环境变量当光标主题/逻辑尺寸，等于从 NixOS 侧改写 Plasma 的
+      # 光标设置。niri 会话专用的值由 niri 的 environment 段给出
+      # （modules/home-manager/gui/desktop/linux/niri/default.nix）。
     };
   };
 }
