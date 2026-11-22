@@ -49,6 +49,13 @@ in
       union # 实验性全局主题
     ];
 
+    # plasma6 模块以 `mkDefault true` 打开 programs.kde-pim，会装进 KDE PIM 全家桶：
+    # 基础层 akonadi / akonadi-import-wizard / kdepim-runtime，加上默认继承的子开关
+    # KMail（kmail / kmail-account-wizard / akonadiconsole / akonadi-search）、
+    # Kontact，以及 Merkuro（merkuro / kcontacts / akonadi-contacts）。本机不用
+    # 邮件、日历、通讯录这套，整体关闭；上游安装镜像也以普通赋值 false 覆盖该默认值。
+    programs.kde-pim.enable = false;
+
     # 登录默认进入 Plasma。注意冲突点：plasma6 模块自身以 `mkDefault "plasma"`
     # 声明本项，而 niri 模块以 `mkDefault "niri"` 声明，两个同优先级（1000）的
     # mkDefault 取值不同会直接报 conflicting definition values。这里改用普通赋值
