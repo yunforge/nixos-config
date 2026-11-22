@@ -7,7 +7,8 @@
 #   - 窗口外角：KWin 服务端装饰（KDE/Qt 窗口）走上游圆角 WhiteSur-opaque
 #   - 窗口按钮：右侧 IAX（最小化/最大化/关闭），左侧留空
 #   - 配色方案：WhiteSur（整份 [Colors:*] 写入 kdeglobals）
-#   - Plasma 桌面主题：WhiteSur（面板、弹窗、小组件）
+#   - Plasma 桌面主题：WhiteSur-alt（黑字浅色变体；默认 WhiteSur 是白字，
+#     配浅色面板时系统菜单/弹窗不可读，见 docs/quirks.md）
 #   - 应用风格：Kvantum + WhiteSur 主题（上游的 kvantum 键）
 #   - 图标主题：WhiteSur-light（与 GTK 侧同款，见 themes/variants.nix）
 #   - 启动画面：WhiteSur（系统级包 whitesur-plasma-splash）
@@ -56,7 +57,7 @@ let
       name= ./install.sh --window opaque
 
       # 只保留 aurorae（圆角 opaque 窗饰）、color-schemes（WhiteSur）、
-      # plasma/desktoptheme（WhiteSur）与 Kvantum（WhiteSur 应用风格）。
+      # plasma/desktoptheme（WhiteSur-alt）与 Kvantum（WhiteSur 应用风格）。
       if [ -d "$out/share" ]; then
         find "$out/share" -mindepth 1 -maxdepth 1 \
           ! -name aurorae ! -name color-schemes ! -name plasma ! -name Kvantum \
@@ -68,13 +69,17 @@ let
         # WhiteSur.kvconfig 作浅色入口，深色 QPalette 仍会命中
         # WhiteSurDark.kvconfig，故整个目录保留；--window opaque 额外装出的
         # WhiteSur-opaque 应用风格不属于声明面，删掉。
+        #
+        # 桌面主题用 WhiteSur-alt：上游 WhiteSur 是白字版（供深色壁纸），
+        # WhiteSur-alt 才是黑字版；系统的 WhiteSur 配色方案是浅色，
+        # 用默认主题会让系统菜单白字压白底。
         find "$out/share/aurorae/themes" -mindepth 1 -maxdepth 1 \
           ! -name 'WhiteSur-opaque*' -exec rm -rf {} +
         rm -rf "$out/share/Kvantum/WhiteSur-opaque"
         find "$out/share/color-schemes" -mindepth 1 -maxdepth 1 \
           ! -name WhiteSur.colors -exec rm -rf {} +
         find "$out/share/plasma/desktoptheme" -mindepth 1 -maxdepth 1 \
-          ! -name WhiteSur -exec rm -rf {} +
+          ! -name WhiteSur-alt -exec rm -rf {} +
       fi
 
       runHook postInstall
@@ -104,7 +109,7 @@ let
   # 不放到 plasma-workspace/env：那会在每次登录、KWin 启动前重写一遍。
   applyKdeAppearance = pkgs.writeShellScript "kde-appearance" ''
     # 激活环境里不保证有 HM profile 的 share；补上本包，CLI 才能找到
-    # WhiteSur.colors 与 WhiteSur 桌面主题。
+    # WhiteSur.colors 与 WhiteSur-alt 桌面主题。
     export XDG_DATA_DIRS="${whitesurKde}/share''${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
     # plasma-apply-* 是 QGuiApplication，激活时通常没有显示服务器；
     # offscreen 平台插件让它们只写配置，DBus 仍照常通知运行中的 Plasma。
@@ -139,8 +144,8 @@ let
 
     ${plasmaApplyColorScheme} WhiteSur \
       || echo "kde-appearance: WhiteSur 配色应用失败" >&2
-    ${plasmaApplyDesktopTheme} WhiteSur \
-      || echo "kde-appearance: WhiteSur 桌面主题应用失败" >&2
+    ${plasmaApplyDesktopTheme} WhiteSur-alt \
+      || echo "kde-appearance: WhiteSur-alt 桌面主题应用失败" >&2
   '';
 in
 {

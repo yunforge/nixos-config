@@ -176,8 +176,9 @@ NixOS/HM 维护 niri 会话的完整外观；KDE Plasma 的外观也由仓库按
   左侧留空）；
 - 配色方案：`plasma-apply-colorscheme WhiteSur`，整份 `[Colors:*]` 写入
   `kdeglobals`（只改 `ColorScheme` 名字不会生效：旧色值仍在）；
-- Plasma 桌面主题：`plasma-apply-desktoptheme WhiteSur`（面板、弹窗、小组件；
-  面板布局不变）；
+- Plasma 桌面主题：`plasma-apply-desktoptheme WhiteSur-alt`（面板、弹窗、小组件；
+  面板布局不变）。上游 `WhiteSur` 是白字变体，`WhiteSur-alt` 才是配浅色面板的
+  黑字变体；仓库用后者，避免系统菜单白字压白底（见 `docs/quirks.md`）；
 - 应用风格：`kdeglobals [KDE] widgetStyle=kvantum`（上游的浅色 style key），
   Kvantum 的 kvconfig 主题为 `WhiteSur`（浅色 QPalette 命中
   `WhiteSur.kvconfig`）。仅 Plasma 会话；niri 仍走 Adwaita，见上表；
@@ -194,8 +195,8 @@ NixOS/HM 维护 niri 会话的完整外观；KDE Plasma 的外观也由仓库按
   （外缘 8、相邻合计 8，见 `docs/quirks.md`）。
 
 主题包在构建时裁掉未声明的变体：只装 `WhiteSur-opaque` 窗饰（含 DPI 变体）、
-`WhiteSur` 配色与 `WhiteSur` 桌面主题（Kvantum 目录保留 `WhiteSur`
-入口及其 Dark 档），系统设置里不会再出现 WhiteSur 的深色 / alt / sharp /
+`WhiteSur` 配色与 `WhiteSur-alt` 桌面主题（Kvantum 目录保留 `WhiteSur`
+入口及其 Dark 档），系统设置里不会再出现 WhiteSur 的深色 / 默认白字 / sharp /
 默认模糊窗饰变体。KDE 侧浅色名没有 `-light` 后缀；`WhiteSur-Light` 只用于 GTK。
 SDDM 登录界面仍固定为深色 `WhiteSur-dark`。
 
@@ -266,8 +267,9 @@ GTK 应用的圆角由 WhiteSur-GTK 自己决定；niri 的窗口圆角仍由
 > `QT_STYLE_OVERRIDE=kvantum` —— 那个变量经 systemd 用户环境被所有会话继承，会让
 > Kirigami/QML 应用（Spectacle 实测）渲成浅底浅字。`QT_QPA_PLATFORMTHEME=adwaita`
 > 只在 niri 会话注入（2026-11-22 起）。Plasma 侧改为 `kdeglobals [KDE]
-> widgetStyle=kvantum` + WhiteSur 主题（配色/桌面主题同为 WhiteSur，调色板
-> 一致，不再触发当年的白底问题）；kvconfig 由 `theme-apply` 写 `WhiteSur`。
+> widgetStyle=kvantum` + WhiteSur 主题（配色为 WhiteSur、桌面主题为黑字版
+> WhiteSur-alt，调色板一致，不再触发当年的白底问题）；kvconfig 由 `theme-apply`
+> 写 `WhiteSur`。
 > 根因与移除条件见 `docs/quirks.md`。
 >
 > 下面这段是当年 niri 侧换 QStyle 的设计记录，工程细节（主题包落位、Kvantum
