@@ -67,16 +67,16 @@
   libsoup_3,
 }:
 let
-  version = "0.1.29";
+  version = "0.1.31";
 
   sources = {
     x86_64-linux = {
       asset = "amd64";
-      hash = "sha256-olXmMKeRMUP7MYTJXER0YF4jj3NAvla33ZA4kcFzcE0=";
+      hash = "sha256-KIxQ4ZQLzf1ZvQWbTrfWkZrEuAPoaZ6Eoo/iANBn4hA=";
     };
     aarch64-linux = {
       asset = "arm64";
-      hash = "sha256-hRjnwe2w83maDrqUWVATvoFE4iXD6/x+BtzC4j2OSWQ=";
+      hash = "sha256-y0jUhpJXwRU+pVoRGzRdterNLLSrZt2nBDdxPPSM5kU=";
     };
   };
 
