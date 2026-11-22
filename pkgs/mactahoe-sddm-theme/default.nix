@@ -49,9 +49,10 @@ stdenvNoCC.mkDerivation {
       # 上游 Main.qml 把电源/重启等按钮图标写死成发行版路径 /usr/share/sddm/themes/MacTahoe，
       # NixOS 下主题在 store 里、该路径不存在，改为指向本主题的真实目录，否则图标全丢。
       sed -i "s|/usr/share/sddm/themes/MacTahoe|$dest|g" "$dest/Main.qml"
-      # 本地 QML 类型：补上 Plasma 6.8 已移除的 VirtualKeyboardLoader（见文件头）
-      install -m644 ${./virtualkeyboard}/VirtualKeyboardLoader.qml \
-        ${./virtualkeyboard}/VirtualKeyboard_wayland.qml "$dest/"
+      # 本地 QML 类型：补上 Plasma 6.8 已移除的 VirtualKeyboardLoader
+      # （与 WhiteSur 登录主题共用，见 pkgs/sddm-virtualkeyboard/）
+      install -m644 ${../sddm-virtualkeyboard}/VirtualKeyboardLoader.qml \
+        ${../sddm-virtualkeyboard}/VirtualKeyboard_wayland.qml "$dest/"
     done
 
     runHook postInstall

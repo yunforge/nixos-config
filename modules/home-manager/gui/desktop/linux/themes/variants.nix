@@ -1,8 +1,8 @@
 # 亮 / 暗两套外观 —— 单一真源是 Noctalia 的 theme mode
 # （状态栏那个主题图标切的就是它：noctalia msg theme-mode-toggle）
 #
-# 为什么需要这一层：主题取值此前全部钉死在 Nix 里（MacTahoe-Dark / MacTahoeDark /
-# 深色调色板），而运行时切换需要**可写的目标文件**，那几个文件都是 HM 的 store 软链
+# 为什么需要这一层：主题取值此前全部钉死在 Nix 里（单一深色主题 / 深色调色板），
+# 而运行时切换需要**可写的目标文件**，那几个文件都是 HM 的 store 软链
 # （gtk-3.0/settings.ini、gtk-4.0/{settings.ini,gtk.css}、Kvantum/kvantum.kvconfig、
 # niri-colors/*.kdl）。做法：把**两套变体都生成到 store**，脚本只把当前模式对应的
 # 软链指过去 —— Nix 仍然持有全部取值，运行时只有一个「哪一套」的选择。
@@ -30,20 +30,22 @@ let
   variantDir = "theme-variants";
 
   # 一套模式的全部取值。改主题只改这里。
-  # GTK 变体名取自包里的实际目录：share/themes/{MacTahoe-Dark,MacTahoe-Light}；
-  # Kvantum 上游只有浅深两态，深色那对被单独命名为 MacTahoeDark
-  # （命名理由见 pkgs/mactahoe-kvantum 顶部）。
-  # 图标不随亮暗切换：两套都用 WhiteSur-dark（KDE 侧同款，见 kde-appearance.nix）。
+  # GTK 变体名取自包里的实际目录：share/themes/{WhiteSur-Dark,WhiteSur-Light}。
+  # Kvantum 只被 Plasma 的「应用程序风格」使用，而 Plasma 外观固定为 WhiteSur
+  # 浅色（见 kde-appearance.nix），故两套模式都写 WhiteSur：Kvantum 会按应用的
+  # QPalette 明暗在同一目录里选 WhiteSur.kvconfig / WhiteSurDark.kvconfig。
+  # niri 不设 QT_STYLE_OVERRIDE，Kvantum 的取值对它没有作用。
+  # 图标不随亮暗切换：两套都用 WhiteSur-light（KDE 侧同款，见 kde-appearance.nix）。
   modes = {
     dark = {
-      gtk = "MacTahoe-Dark";
-      icons = "WhiteSur-dark";
-      kvantum = "MacTahoeDark";
+      gtk = "WhiteSur-Dark";
+      icons = "WhiteSur-light";
+      kvantum = "WhiteSur";
     };
     light = {
-      gtk = "MacTahoe-Light";
-      icons = "WhiteSur-dark";
-      kvantum = "MacTahoe";
+      gtk = "WhiteSur-Light";
+      icons = "WhiteSur-light";
+      kvantum = "WhiteSur";
     };
   };
 
@@ -83,58 +85,71 @@ let
   # 模式无关的 GTK4 用户样式：GTK 只在**启动时读一次**这个文件（GtkCssProvider 文档
   # 原话），所以不能把亮/暗做成两个文件 —— 否则运行中的程序拿到新 color-scheme 后，
   # 里面已经解析进去的还是旧那份调色板（实测：只有一侧变亮）。
-  # 改为「结构取 MacTahoe-Dark + 整份 MacTahoe-Light 放进 @media」，媒体查询自 GTK 4.20
-  # 起支持（本机 4.22.4），color-scheme 一变就会重算 —— 文件本身永远不需要换。
-  # 两个变体除颜色值外同构（125 条 @define-color + 约 1300 行内联颜色），故整份覆盖是安全的。
+  # WhiteSur-GTK 的 gtk-4.0/gtk.css 只是一行 `@import resource:///org/gnome/theme/gtk.css`，
+  # 真正的 CSS 与 PNG/SVG 都在同目录的 `gtk.gresource` 里。这里把两套变体的
+  # gresource 解包到 store，重写成绝对 file:// URL，再把整份暗色放在顶层、
+  # 整份亮色放进 @media(prefers-color-scheme: light)。媒体查询自 GTK 4.20 起
+  # 支持（本机 4.22.4），color-scheme 一变就会重算 —— 文件本身永远不需要换。
   #
-  # 内联那份的相对 url("windows-assets/…") 必须改写成绝对 file://：相对路径以
-  # **本文件**的 URI 为基准解析，不改写则亮色下红黄绿灯那套 PNG 全找不到（实测消失）。
-  # 另：黄灯“不亮”见文件末尾那段 override —— 根因是 GTK 4.x 对 disabled 控件
-  # 施加 `filter: opacity(.5)`，只认 `filter` 这一个属性（`opacity`/`-gtk-icon-filter` 无效）。
-  gtk4UserCss = pkgs.runCommand "gtk-user.css" { } ''
-        theme=${pkgs.mactahoe-gtk-theme}/share/themes
-        light="$theme/MacTahoe-Light/gtk-4.0"
+  # 不能直接用 resource:///org/gnome/theme/...：切换主题时旧 gresource 可能
+  # 仍注册着，暗/亮两套的 assets 会串；绝对 file:// 不依赖注册顺序。
+  gtk4UserCss =
+    pkgs.runCommand "whitesur-gtk-user-css"
+      {
+        nativeBuildInputs = [ pkgs.glib.dev ]; # gresource
+      }
+      ''
+        theme=${pkgs.whitesur-gtk-theme}/share/themes
+
+        extract() {
+          variant="$1"
+          case "$variant" in
+            Dark) dest="$out/dark" ;;
+            Light) dest="$out/light" ;;
+          esac
+          gresource="$theme/WhiteSur-$variant/gtk-4.0/gtk.gresource"
+          mkdir -p "$dest"
+          gresource extract "$gresource" /org/gnome/theme/gtk.css > "$dest/gtk.css"
+          while IFS= read -r resource; do
+            rel="''${resource#/org/gnome/theme/}"
+            mkdir -p "$dest/$(dirname "$rel")"
+            gresource extract "$gresource" "$resource" > "$dest/$rel"
+          done < <(gresource list "$gresource" | grep '^/org/gnome/theme/')
+          # 相对 url("assets/…") / url("windows-assets/…") 以**本文件**的 URI 为基准
+          # 解析；改成绝对 file:// 后，亮色那份的 PNG 才不会按暗色目录找。
+          sed -i -E 's|url\("([a-zA-Z][^":]*)"\)|url("file://'"$dest"'/\1")|g' "$dest/gtk.css"
+        }
+
+        extract Dark
+        extract Light
+
         {
-          echo '/* 由 Home Manager 生成 —— modules/home-manager/gui/themes/variants.nix */'
-          echo '/* 结构：MacTahoe-Dark；浅色：整份 MacTahoe-Light 覆盖在 @media 里 */'
-          echo "@import url(\"file://$theme/MacTahoe-Dark/gtk-4.0/gtk.css\");"
+          echo '/* 由 Home Manager 生成 —— modules/home-manager/gui/desktop/linux/themes/variants.nix */'
+          echo '/* 结构：WhiteSur-Dark；浅色：整份 WhiteSur-Light 覆盖在 @media 里 */'
+          cat "$out/dark/gtk.css"
           echo '@media (prefers-color-scheme: light) {'
-          # 内联进来的浅色那份，相对 url("windows-assets/…") 会以**本文件**的 URI 为基准解析
-          # （GTK 不会 realpath 软链、也不会把 @media 里的相对路径重挂到源目录），
-          # 于是红黄绿灯那套 PNG 找不到 —— 实测亮色下三个灯直接消失。
-          # 而 @import 那一行是绝对 file://，它的相对路径本就落在主题目录里，不用改。
-          sed -E 's|url\("([a-zA-Z][^":]*)"\)|url("file://'"$light"'/\1")|g' "$light/gtk.css"
+          cat "$out/light/gtk.css"
           echo '}'
 
           # 最小化按钮在 niri 上没有对应动作（niri 无 minimize），GTK 把它置为 disabled。
           # GTK 4.x 对 insensitive 控件施加的是 `filter: opacity(.5)`（不是 opacity、
-          # 也不是 -gtk-icon-filter —— 那两个属性覆盖后像素完全不变，实测），于是黄灯被
-          # 压淡到 97,77,33。只认 `filter: none` 一个属性，写它即恢复实心 241,174,27（实测）。
-          # 代价：点它没有反应（动作本就不存在）；不想要这种“视觉上说谎”就删掉下面这段。
+          # 也不是 -gtk-icon-filter —— 那两个属性覆盖后像素完全不变，实测），灯会被压淡。
+          # 只认 `filter: none` 一个属性。代价：点它没有反应（动作本就不存在）。
           cat <<'CSS'
 
-    /* 黄灯（minimize）：niri 无最小化，GTK 给 disabled 控件加 filter: opacity(.5) 压淡它 */
-    headerbar windowcontrols button.minimize:disabled {
-      filter: none;
-    }
+        headerbar windowcontrols button.minimize:disabled {
+          filter: none;
+        }
 
-    /* MacTahoe 的两处测量告警（亮/暗两份都有，故放在文件末尾统一压过）。
-       1) `switch { font-size: 0 }`：GtkImage 用当前字号算基线，ascent+descent 为 0
-          时除法得 inf，转 int 成 G_MININT，GTK 报「baselines ... must be inside」。
-          改成 1px（视觉无差）后警告消失（实测）。
-       2) `tabbar tabbox { margin: 0 -3px }`：负边距把 min width 算成 -6，GTK 报
-          「reported min width -6, but sizes must be >= 0」。归零即消失，代价是
-          tabbar 左右各少 3px 出血。 */
-    switch {
-      font-size: 1px;
-    }
-
-    tabbar tabbox {
-      margin: 0;
-    }
-    CSS
-        } > $out
-  '';
+        /* WhiteSur 的 `switch { font-size: 0 }`：GtkImage 用当前字号算基线，
+           ascent+descent 为 0 时除法得 inf，转 int 成 G_MININT，GTK 报
+           「baselines ... must be inside」。改成 1px（视觉无差）后警告消失。 */
+        switch {
+          font-size: 1px;
+        }
+        CSS
+        } > "$out/gtk.css"
+      '';
 
   # GTK4 只认 color-scheme，主题本体靠上面的 import（HM 的 gtk4.theme 就是这么做的）
   kvconfig = mode: ''
@@ -275,7 +290,8 @@ in
 
     xdg.configFile = variants // {
       # 模式无关：GTK4 的亮/暗在同一份文件里靠 @media 切（不能靠换文件，见 gtk4UserCss）
-      "gtk-4.0/gtk.css".source = gtk4UserCss;
+      # source 必须指到文件：直接把 derivation 交给 HM 会软链整个输出目录。
+      "gtk-4.0/gtk.css".source = "${gtk4UserCss}/gtk.css";
     };
 
     home.packages = [ applyScript ];

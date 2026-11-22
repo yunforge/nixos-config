@@ -21,19 +21,20 @@ in
   };
 
   config = lib.mkIf (cfg.enable && desktopCfg.enable) {
-    # 下面写的是**初始值**，即暗色那一套（与改造前一致）：rebuild 后 HM 的 store 软链
+    # 下面写的是**初始值**，即暗色那一套：rebuild 后 HM 的 store 软链
     # 就是它，登录时 theme-apply 再按 Noctalia 当前的 theme mode 覆盖（见 variants.nix）。
-    # MacTahoe 的 Dark 变体是中性灰（#242424 / #333333）+ 单一强调色 #0088FF。
-    # 图标独立于 GTK 主题：统一用 WhiteSur-dark（亮暗不变），见 variants.nix。
+    # GTK 用 WhiteSur-gtk-theme（与 KDE 侧的 WhiteSur 同源），Dark/Light 由
+    # variants.nix 按 Noctalia 的 theme mode 切换。
+    # 图标独立于 GTK 主题：统一用 WhiteSur-light（亮暗不变），见 variants.nix。
     gtk = {
       enable = true;
       theme = {
-        package = pkgs.mactahoe-gtk-theme;
-        name = "MacTahoe-Dark";
+        package = pkgs.whitesur-gtk-theme;
+        name = "WhiteSur-Dark";
       };
       iconTheme = {
         package = pkgs.whitesur-icon-theme;
-        name = "WhiteSur-dark";
+        name = "WhiteSur-light";
       };
       cursorTheme = {
         package = pkgs.bibata-cursors;
@@ -122,13 +123,14 @@ in
         # 整个做成指向 store 的软链，而 kvantum.kvconfig 又要写在同一目录下，
         # 两者会打架。改为进 home.packages（落到 XDG_DATA_DIRS，Kvantum 同样会
         # 在那里搜主题，上游自己的 install.sh 就是装到 share/Kvantum）。
-        settings.General.theme = "MacTahoeDark";
+        # 主题名是 WhiteSur 而不是 WhiteSurDark：Kvantum 的解析规则是
+        # 「主题 T → T.kvconfig，应用偏暗且存在 TDark.kvconfig 时改用后者」，
+        # 上游把两者都放在 share/Kvantum/WhiteSur/ 下。Plasma 用 kvantum
+        # 应用风格 + WhiteSur 浅色配色，故实际命中 WhiteSur.kvconfig；
+        # niri 不用 Kvantum 样式。
+        settings.General.theme = "WhiteSur";
       };
     };
-
-    # MacTahoe Kvantum 主题文件（保留：theme-apply 仍会切它的浅/深 kvconfig，
-    # 但已不再设 QT_STYLE_OVERRIDE，Qt 应用不再使用 Kvantum 样式，属惰性保留）。
-    home.packages = [ pkgs.mactahoe-kvantum ];
 
   };
 }

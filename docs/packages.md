@@ -18,10 +18,13 @@
 | `dalibre` | [djyde/dalibre](https://github.com/djyde/dalibre) | release 资产（tar.gz） | `0.8.0` | `0.8.0` | 最新（unfree：上游无 LICENSE 文件） |
 | `pulse` | [egoist/pulse-feedback](https://github.com/egoist/pulse-feedback) | release 资产（tar.gz） | `0.1.31` | `0.1.31` | 最新（unfree：只有反馈仓库、无 LICENSE 文件） |
 | `misterdownloadmanager` | [anefzaoui/misterdownloadmanager](https://github.com/anefzaoui/misterdownloadmanager) | release 资产（deb） | `0.5.2` | `0.5.2` | 最新（上游仅发 x86_64-linux 的 Linux 资产） |
-| `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 最新 |
-| `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit（tag 指向） | `839848b`（tag `2026-09-10`） | 同一 commit | 最新 |
-| `mactahoe-kvantum` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde) | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 最新 |
-| `mactahoe-sddm-theme` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde)（子目录 `sddm/`） | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 最新 |
+| `whitesur-kde` | [vinceliuice/WhiteSur-kde](https://github.com/vinceliuice/WhiteSur-kde) | commit（覆盖 nixpkgs 快照） | `5013507`（2024-12-12） | main 远新于此 | 故意钉住：只取「补上注销界面」的最小提交 |
+| `whitesur-plasma-splash` | 同上（子目录 `plasma/look-and-feel/`） | 跟随 `whitesur-kde` | 同上 | — | 派生包，不用单独升级 |
+| `whitesur-sddm-theme` | 同上（子目录 `sddm/WhiteSur-6.2`） | 跟随 `whitesur-kde` | 同上 | — | 派生包，不用单独升级 |
+| `mactahoe-gtk-theme` | [vinceliuice/MacTahoe-gtk-theme](https://github.com/vinceliuice/MacTahoe-gtk-theme) | commit（tag 指向） | `0aa2a2b`（tag `2026-09-10`） | 同一 commit | 惰性保留：2026-11-22 起不再被引用 |
+| `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit（tag 指向） | `839848b`（tag `2026-09-10`） | 同一 commit | 惰性保留：同上 |
+| `mactahoe-kvantum` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde) | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 惰性保留：同上 |
+| `mactahoe-sddm-theme` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde)（子目录 `sddm/`） | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 惰性保留：同上 |
 | `windows-vm-media` | virtio-win（nixpkgs）+ WinApps `oem/` | 跟随 flake 输入 | — | — | 不手工升级 |
 
 各包的**为什么这么打包**写在 `pkgs/<包名>/default.nix` 文件头，这里不重复。
@@ -46,7 +49,10 @@ v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb�
 | `dalibre` | `modules/home-manager/gui/apps/linux/productivity.nix`（calibre 书库管理器） |
 | `pulse` | `modules/home-manager/gui/apps/linux/utilities.nix`（系统活动监视器，取代 mission-center） |
 | `misterdownloadmanager` | `modules/home-manager/gui/apps/linux/utilities.nix`（下载管理器） |
-| `mactahoe-*` | `gui/desktop/linux/themes/default.nix`、`themes/variants.nix`、`modules/nixos/desktop/sddm.nix`（`mactahoe-sddm-theme`） |
+| `whitesur-kde` | `modules/home-manager/gui/desktop/linux/kde-appearance.nix`（裁出 aurorae / 配色 / 桌面主题 / Kvantum，并取源码里的 logout） |
+| `whitesur-plasma-splash` | `modules/nixos/desktop/sddm.nix`（仅 Plasma 主机，装进系统 profile 供 ksplashqml 读取） |
+| `whitesur-sddm-theme` | `modules/nixos/desktop/sddm.nix`（SDDM 主题 `WhiteSur-dark`） |
+| `mactahoe-*` | 2026-11-22 起无消费方；定义与 overlay 惰性保留，便于回退 |
 | `windows-vm-media` | `modules/nixos/virtualization`（`mySystem.virtualization`） |
 
 不在本清单里的东西：nixpkgs 里的一切（跟着 `nix flake update` 走）、flake inputs
@@ -68,7 +74,8 @@ nix flake update
 nix fmt
 nix flake check
 nix build --dry-run .#magpie .#magpie-cli .#mcpp-m .#flclash .#dalibre .#pulse \
-  .#misterdownloadmanager .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum .#mactahoe-sddm-theme \
+  .#misterdownloadmanager .#whitesur-kde .#whitesur-plasma-splash .#whitesur-sddm-theme \
+  .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum .#mactahoe-sddm-theme \
   .#windows-vm-media
 nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 ```
@@ -88,6 +95,9 @@ curl -sI https://github.com/<owner>/<repo>/releases/latest | grep -i '^location'
 
 # 跟 main 走的（MacTahoe-kde）：HEAD 即最新
 git ls-remote https://github.com/<owner>/<repo> HEAD
+
+# WhiteSur-kde 例外：故意钉在 5013507（只比 nixpkgs 快照多一个注销界面）。
+# 升级前先确认上游未引入仓库未声明的面，且 kde-appearance.nix 的裁剪规则仍匹配。
 ```
 
 ## 按钉法升级
@@ -233,7 +243,7 @@ nix hash convert --hash-algo sha256 --to sri <hex>
 - **不要**用应用内的「检查更新 / 登录时启动」：两者都把绝对 store 路径写回
   可执行文件/自启目录，升级被 GC 后失效（与 magpie / dalibre 同一个坑）。
 
-### commit 钉法（`mactahoe-*`）
+### commit 钉法（`mactahoe-*` / `whitesur-kde`）
 
 ```nix
 rev = "<新 commit>";
@@ -249,6 +259,10 @@ git log -1 --format=%ci <rev>   # 取日期填 version
   （`git ls-remote --tags --refs` 直接给出 rev），`version` 填该 tag 名（两者现在一致）。
   早期曾出现 `version = "2026-08-07"` 而 tag 叫 `2026-08-08` 的一天偏差，现在按 tag 名写即可。
 - `mactahoe-kvantum` / `mactahoe-sddm-theme` 上游（MacTahoe-kde）没有 tag，跟 main HEAD；两者同源同 rev，升级一处即可。
+- `whitesur-kde` 不是「追最新」的包：它只覆盖 nixpkgs 的 `whitesur-kde` 源码快照，补上
+  nixpkgs 钉的 2024-11-18 里还没有的 `contents/logout`。故钉在 2024-12-12 的
+  `5013507`（该提交只加注销界面）；`whitesur-plasma-splash` 与 `whitesur-sddm-theme`
+  都继承它的 `version` / `src`，升级只需改这一处并重取哈希。
 
 ### 跟随 flake 输入（`windows-vm-media`）
 
@@ -265,11 +279,12 @@ nix store prefetch-file --json \
 
 - **magpie 有两个产物**（`gui` 参数）：`magpie` 与 `magpie-cli` 同源同哈希，升版本改一处即可；
   桌面文件与自启由 HM 托管，见 `docs/quirks.md` 的「magpie 升级后 GUI 仍起来旧版本」。
-- **主题升级要看 `docs/themes.md`**：GTK/Qt 两套必须同源，niri 装饰色与 Noctalia
-  调色板都取自 MacTahoe 的具体色值，换主题版本可能让 `customPalettes.mactahoe` 的取值失配。
-  2026-09-10 版实测配色未变（`#242424` / `#dedede` / `#333333` / `#0088FF`）。
-  图标自 2026-11-22 起改用 nixpkgs 的 `WhiteSur-dark`，本包的图标变体
-  （`MacTahoe-dark` / `MacTahoe-light`）已不再被 `variants.nix` 引用，惰性保留。
+- **主题升级要看 `docs/themes.md`**：2026-11-22 起 GTK / Qt / 图标 / SDDM 全部换成
+  WhiteSur（GTK 用 nixpkgs 的 `whitesur-gtk-theme`，图标 `whitesur-icon-theme`，
+  Plasma 用本仓库的 `whitesur-kde`）。niri 装饰色与 Noctalia 调色板仍是 MacTahoe 的
+  具体色值（`customPalettes.mactahoe`，2026-09-10 版实测 `#242424` / `#dedede` /
+  `#333333` / `#0088FF`），不随主题包升级变化；`mactahoe-*` 四个包的产物已无消费方，
+  定义惰性保留，便于回退。
 - **`mactahoe-gtk-theme` 的 `installPhase` 要给临时 `HOME`**：上游 2026-09-10 起新增
   `install_app`，会把 `gnome-theme-switcher` 装到 `$HOME/.local/`；构建沙箱的
   `HOME=/homeless-shelter` 不可写 → `cp` 失败、`set -Eeo pipefail` 直接 exit 1。

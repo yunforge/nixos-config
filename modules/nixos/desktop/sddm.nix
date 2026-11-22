@@ -1,10 +1,10 @@
-# SDDM 登录管理器（Wayland greeter，MacTahoe 换肤）
+# SDDM 登录管理器（Wayland greeter，WhiteSur 换肤）
 #
 # 取代原 GDM：只用 SDDM 做登录器（本体 + Niri / Plasma 会话均在会话菜单里切换），
 # 并且不引入 X server —— SDDM 以 Wayland 模式跑 greeter（Plasma 主机用 kwin，其余用 weston kiosk）。
 #
-# 登录界面用自打包的 mactahoe-sddm-theme（Light / Dark 两套，这里取 Dark，
-# 与用户会话的深色外观一致）。
+# 登录界面用自打包的 whitesur-sddm-theme（取自 WhiteSur-kde 的 6.2 变体，
+# 只装深色 WhiteSur-dark；用户会话已切到浅色，登录界面暂时不同步切换）。
 {
   lib,
   config,
@@ -16,8 +16,8 @@ let
   cfg = config.mySystem.desktop;
 
   # 登录界面与桌面会话共用一套外观：光标（字体走 greeter 主题体系，图标由
-  # 主题自带的 MacTahoe 图标覆盖，只有光标需要显式给全局名 + 尺寸）。
-  sddmTheme = "MacTahoe-Dark";
+  # 主题自带的 WhiteSur 图标覆盖，只有光标需要显式给全局名 + 尺寸）。
+  sddmTheme = "WhiteSur-dark";
 in
 {
   config = lib.mkIf cfg.enable {
@@ -29,7 +29,7 @@ in
       enable = true;
       wayland.enable = true;
 
-      # 主题在 /run/current-system/sw/share/sddm/themes/MacTahoe-Dark
+      # 主题在 /run/current-system/sw/share/sddm/themes/WhiteSur-dark
       theme = sddmTheme;
 
       # greeter 的鼠标指针不读 [Theme] CursorSize（SDDM 只对 breeze 主题补这个键），
@@ -42,9 +42,8 @@ in
           config.services.displayManager.sddm.wayland.compositor == "kwin"
         ) " QT_WAYLAND_SHELL_INTEGRATION=layer-shell";
 
-      # MacTahoe 主题的 QML 依赖（仿 KDE Breeze 登录主题）：
+      # WhiteSur 主题的 QML 依赖（仿 KDE Breeze 登录主题）：
       #   org.kde.plasma.components / extras            → libplasma
-      #   org.kde.plasma.private.keyboardindicator
       #   org.kde.breeze.components                     → plasma-workspace
       #   org.kde.plasma.plasma5support                 → plasma5support
       #   org.kde.kirigami                              → kirigami
@@ -70,8 +69,14 @@ in
     };
 
     # 主题要进系统 profile 才会落在 ThemeDir=/run/current-system/sw/share/sddm/themes
-    # 下（SDDM 按名字在那里找 MacTahoe-Dark）。光标主题 Bibata 已在
+    # 下（SDDM 按名字在那里找 WhiteSur-dark）。光标主题 Bibata 已在
     # modules/nixos/desktop/default.nix 的 systemPackages 里，无需重复声明。
-    environment.systemPackages = [ pkgs.mactahoe-sddm-theme ];
+    #
+    # whitesur-plasma-splash 提供 Plasma 的启动画面；注销界面由 HM 在用户级
+    # 构造完整 shell 包副本（见 kde-appearance.nix）。纯 niri 主机不需要。
+    environment.systemPackages = [
+      pkgs.whitesur-sddm-theme
+    ]
+    ++ lib.optional config.mySystem.desktop.plasma.enable pkgs.whitesur-plasma-splash;
   };
 }

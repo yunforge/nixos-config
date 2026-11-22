@@ -50,6 +50,21 @@ final: prev: {
   mactahoe-kvantum = prev.callPackage ../pkgs/mactahoe-kvantum { };
   mactahoe-sddm-theme = prev.callPackage ../pkgs/mactahoe-sddm-theme { };
 
+  # WhiteSur-kde：覆盖 nixpkgs 的源码快照，补上 Plasma 6 注销界面
+  # （nixpkgs 钉的 2024-11-18 还没有 contents/logout）。
+  whitesur-kde = prev.callPackage ../pkgs/whitesur-kde {
+    whitesur-kde = prev.whitesur-kde;
+  };
+
+  # WhiteSur 的 Plasma 启动画面（注销界面在 HM 里构造完整 shell 包副本）
+  # 与 SDDM 登录主题（补 Plasma 6.8 移除的 VirtualKeyboardLoader）。
+  whitesur-plasma-splash = prev.callPackage ../pkgs/whitesur-plasma-splash {
+    whitesur-kde = final.whitesur-kde;
+  };
+  whitesur-sddm-theme = prev.callPackage ../pkgs/whitesur-sddm-theme {
+    whitesur-kde = final.whitesur-kde;
+  };
+
   # mcpp：C++23 模块优先的构建工具（上游 mcpp-community/mcpp）。
   # 名字不能省成 `mcpp`：nixpkgs 的 mcpp 是 Matsui 的 C 预处理器，同名不同物
   #（打包理由见 pkgs/mcpp-m/default.nix 顶部）。

@@ -11,7 +11,7 @@
 | 桌面主题 / GTK / Qt / 图标 | `docs/themes.md` | `modules/home-manager/gui/desktop/linux/themes/default.nix`、`modules/home-manager/gui/desktop/linux/niri/noctalia.nix` |
 | Niri 快捷键、窗口与布局规则 | `docs/niri.md` | `modules/home-manager/gui/desktop/linux/niri/config/` + 生成 KDL 的 `gui/desktop/linux/niri/default.nix` |
 | 桌面登录会话（SDDM、niri / KDE Plasma 可切换与默认会话） | `docs/quirks.md`（多会话默认会话坑位） | `modules/nixos/desktop/sddm.nix`、`modules/nixos/desktop/niri/`、`modules/nixos/desktop/plasma.nix` |
-| KDE 外观（直角窗饰、WhiteSur 图标、Bibata 光标）与快速平铺间距（其余外观归 Plasma 系统设置） | `docs/themes.md`、`docs/quirks.md` | `modules/home-manager/gui/desktop/linux/kde-appearance.nix`、`.../kwin-tile-gaps.nix` |
+| KDE 外观（WhiteSur 窗饰/配色/桌面主题/应用风格/图标、启动画面、注销界面、Bibata 光标）与快速平铺间距（面板布局/字体/壁纸仍归 Plasma 系统设置） | `docs/themes.md`、`docs/quirks.md` | `modules/home-manager/gui/desktop/linux/kde-appearance.nix`、`.../kwin-tile-gaps.nix` |
 | 装了哪些应用 | `docs/softwares.md` | `modules/home-manager/gui/apps/linux/`（含嵌入式工具链） |
 | 自维护包（nixpkgs 未收录）的版本、升级与「更新系统」清单 | `docs/packages.md` | `pkgs/`、`overlays/default.nix` |
 | 开发工具链、Distrobox | `docs/environment.md` | `modules/home-manager/dev/languages/`、`modules/home-manager/common/tools/` |
