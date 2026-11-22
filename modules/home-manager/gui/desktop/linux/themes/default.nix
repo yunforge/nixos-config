@@ -24,6 +24,7 @@ in
     # 下面写的是**初始值**，即暗色那一套（与改造前一致）：rebuild 后 HM 的 store 软链
     # 就是它，登录时 theme-apply 再按 Noctalia 当前的 theme mode 覆盖（见 variants.nix）。
     # MacTahoe 的 Dark 变体是中性灰（#242424 / #333333）+ 单一强调色 #0088FF。
+    # 图标独立于 GTK 主题：统一用 WhiteSur-dark（亮暗不变），见 variants.nix。
     gtk = {
       enable = true;
       theme = {
@@ -31,9 +32,8 @@ in
         name = "MacTahoe-Dark";
       };
       iconTheme = {
-        package = pkgs.mactahoe-icon-theme;
-        # 图标主题变体后缀是小写 -dark（区别于 GTK 主题的 MacTahoe-Dark）
-        name = "MacTahoe-dark";
+        package = pkgs.whitesur-icon-theme;
+        name = "WhiteSur-dark";
       };
       cursorTheme = {
         package = pkgs.bibata-cursors;
@@ -41,8 +41,7 @@ in
         # 24：Bibata 的箭头比 macOS 原版更撑满画布。切回 1.5 倍缩放前的取值
         # （2 倍缩放下曾降到 20）。改这一个数不够 —— 光标的尺寸是**多处各写一份**
         # （niri 的 cursor.kdl、GTK 的 variants.nix、niri 的 environment.kdl（XWayland
-        # 物理像素）、SDDM 的 sddm.nix），改就一起改。KDE 会话的光标归 Plasma 自己管
-        # （niri 的环境变量只在 niri 会话生效）。
+        # 物理像素）、SDDM 的 sddm.nix、KDE 的 kde-appearance.nix），改就一起改。
         size = 24;
       };
       font = {
@@ -68,8 +67,8 @@ in
     # 故各设一个独立的 force 标记项（force 项只贡献本路径，不重复铺设）。
     #
     # ~/.config/plasma-workspace/env/ 下的脚本（XCURSOR_SIZE、GTK_CSD、
-    # XwaylandClientsScale）已全部移除：KDE 桌面的光标尺寸、GTK 标题栏与 X11
-    # 缩放选项归 Plasma 的系统设置自己管，不再从 NixOS/HM 侧写入。
+    # XwaylandClientsScale）已全部移除：KDE 的 X11 缩放选项归 Plasma 系统设置，
+    # 光标则由 kde-appearance.nix 在 rebuild 激活时直接写 kcminputrc，不走登录脚本。
     xdg.configFile = {
       "gtk-3.0/settings.ini".force = true;
       "gtk-4.0/settings.ini".force = true;

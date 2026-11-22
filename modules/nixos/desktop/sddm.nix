@@ -4,7 +4,7 @@
 # 并且不引入 X server —— SDDM 以 Wayland 模式跑 greeter（Plasma 主机用 kwin，其余用 weston kiosk）。
 #
 # 登录界面用自打包的 mactahoe-sddm-theme（Light / Dark 两套，这里取 Dark，
-# 与用户会话的 MacTahoe-dark 图标一致）。
+# 与用户会话的深色外观一致）。
 {
   lib,
   config,

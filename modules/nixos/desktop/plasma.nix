@@ -93,7 +93,8 @@ in
 
     # KWin 的 NVIDIA workaround。KDE 桌面的光标主题/尺寸不在这里设置：
     # XCURSOR_* 已不再由 NixOS 全局注入（见 modules/nixos/desktop/env.nix），
-    # KWin 会回落到 kcminputrc 里 Plasma 系统设置的值。
+    # KWin 回落到 kcminputrc；该文件由 HM 的 kde-appearance.nix 在激活时写入
+    # （Bibata-Modern-Ice / 24），其余键仍由 Plasma 运行时维护。
     #
     # `KWIN_DRM_NO_DIRECT_SCANOUT=1`：KWin 6.8 在 NVIDIA 上反复尝试 direct scanout，
     # 交换链缓冲区分配失败时会在「直扫」与「合成」两条管线之间来回切换，表现为外接屏

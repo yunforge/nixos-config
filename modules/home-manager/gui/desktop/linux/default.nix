@@ -13,6 +13,7 @@
     ./niri
     ./themes
     ./kwin-tile-gaps.nix
+    ./kde-appearance.nix
     ./winapps.nix
   ];
 }

@@ -265,10 +265,11 @@ nix store prefetch-file --json \
 
 - **magpie 有两个产物**（`gui` 参数）：`magpie` 与 `magpie-cli` 同源同哈希，升版本改一处即可；
   桌面文件与自启由 HM 托管，见 `docs/quirks.md` 的「magpie 升级后 GUI 仍起来旧版本」。
-- **主题升级要看 `docs/themes.md`**：GTK/Qt/图标三套必须同源，niri 装饰色与 Noctalia
+- **主题升级要看 `docs/themes.md`**：GTK/Qt 两套必须同源，niri 装饰色与 Noctalia
   调色板都取自 MacTahoe 的具体色值，换主题版本可能让 `customPalettes.mactahoe` 的取值失配。
-  2026-09-10 版实测配色未变（`#242424` / `#dedede` / `#333333` / `#0088FF`），
-  图标变体目录仍是 `MacTahoe-dark` / `MacTahoe-light`（与 `variants.nix` 引用一致）。
+  2026-09-10 版实测配色未变（`#242424` / `#dedede` / `#333333` / `#0088FF`）。
+  图标自 2026-11-22 起改用 nixpkgs 的 `WhiteSur-dark`，本包的图标变体
+  （`MacTahoe-dark` / `MacTahoe-light`）已不再被 `variants.nix` 引用，惰性保留。
 - **`mactahoe-gtk-theme` 的 `installPhase` 要给临时 `HOME`**：上游 2026-09-10 起新增
   `install_app`，会把 `gnome-theme-switcher` 装到 `$HOME/.local/`；构建沙箱的
   `HOME=/homeless-shelter` 不可写 → `cp` 失败、`set -Eeo pipefail` 直接 exit 1。

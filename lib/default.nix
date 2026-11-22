@@ -87,7 +87,7 @@ in
   # 注意：niri 的 cursor.kdl 是 git 内静态文件（mkOutOfStoreSymlink 直连工作树），
   # 无法吃 Nix 插值，改名时它需要手动同步。
   theme = {
-    cursor = "Bibata-Modern-Classic";
+    cursor = "Bibata-Modern-Ice";
     fontSans = "HarmonyOS Sans SC";
   };
 

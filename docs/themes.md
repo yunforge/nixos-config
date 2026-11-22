@@ -6,9 +6,9 @@
 切一下，壳层（macOS 中性灰 + 单一强调色）与工作区（Catppuccin）各自在亮/暗两态之间换，而
 「壳层冷中性 / 工作区低饱和」这些约定不变。**Noctalia 只负责自己的状态栏/面板调色板**；
 各应用的主题文件自 2026-11-17 起不再由它渲染（eza/fish 跟随终端 ANSI，btop/yazi 用自带主题，
-niri 用内置默认色，见「Noctalia 不再渲染应用主题」一节）。GTK/Qt/图标仍走 `theme-apply`
-翻软链的老机制（它们保持 MacTahoe）。下面几节里的具体取值都是**暗色那一套**，亮色的对应值
-见各文件自己的注释。
+niri 用内置默认色，见「Noctalia 不再渲染应用主题」一节）。GTK/Qt 仍走 `theme-apply`
+翻软链的老机制（GTK 主题保持 MacTahoe）；图标固定 `WhiteSur-dark`，不随亮暗切换。
+下面几节里的具体取值都是**暗色那一套**，亮色的对应值见各文件自己的注释。
 
 ## 亮/暗切换
 
@@ -84,10 +84,10 @@ Nix 里的空列表。停用时必须把运行时那段删一次，再 `noctalia
 | GTK3 | **MacTahoe-Dark** | 自定义打包主题（`pkgs/mactahoe-gtk-theme`） |
 | GTK4 / libadwaita | **MacTahoe-Dark** | 须显式设 `gtk.gtk4.theme`：HM 26.05 起其默认值为 `null`，不设就不会生成 `gtk-4.0/gtk.css`，应用会退回原生 Adwaita |
 | color-scheme | **dark** | `gtk.colorScheme`；写 dconf `color-scheme=prefer-dark` 与 GTK4 的 `gtk-interface-color-scheme=2`，libadwaita 依此判定深色 |
-| 图标 | **MacTahoe-dark** | 自定义打包图标（`pkgs/mactahoe-icon-theme`），为深色背景设计 |
-| 光标 | **Bibata-Modern-Classic**（仅 niri） | 24px 逻辑、XWayland 物理像素由 niri 的 `environment` 段按缩放给出（`~/.config/niri-colors/environment.kdl`）；软链到 `~/.local/share/icons` 供 XWayland 查找。Bibata 只内嵌 16/20/22/24/28/32/40/… 整数档。**另有一份 `icons/default` 指向同一主题**：XWayland 上的 Qt5（微信）会退到字面量 `default`，缺它即回落 X 核心字体光标，见 `docs/quirks.md`。**KDE 会话不读这些值**：Plasma 的光标主题与尺寸归系统设置（`kcminputrc`），NixOS 不再全局注入 `XCURSOR_*` |
+| 图标 | **WhiteSur-dark** | nixpkgs 的 `whitesur-icon-theme`，macOS 风格；GTK 侧写 dconf，KDE 侧写 `kdeglobals [Icons] Theme`（`kde-appearance.nix`）。亮暗都固定用深色变体 |
+| 光标 | **Bibata-Modern-Ice** | 名字来自 `lib/default.nix` 的 `myLib.theme.cursor`；24px 逻辑、XWayland 物理像素由 niri 的 `environment` 段按缩放给出（`~/.config/niri-colors/environment.kdl`）；软链到 `~/.local/share/icons` 供 XWayland 查找。Bibata 只内嵌 16/20/22/24/28/32/40/… 整数档。**另有一份 `icons/default` 指向同一主题**：XWayland 上的 Qt5（微信）会退到字面量 `default`，缺它即回落 X 核心字体光标，见 `docs/quirks.md`。KDE 侧由 `kde-appearance.nix` 在激活时写 `kcminputrc`，NixOS 不再全局注入 `XCURSOR_*` |
 | Qt | **Adwaita 原生（仅 niri）** | Kvantum 于 2026-11-17 停用：`qt.style.name = null`，不再导出全局 `QT_STYLE_OVERRIDE`；原因见 `docs/quirks.md`（Kirigami 白字压白底）。`QT_QPA_PLATFORMTHEME=adwaita` 也只在 niri 会话注入（`niri-colors/environment.kdl`），Plasma 的 Qt 应用跟随 KDE 的「应用程序风格」。`pkgs/mactahoe-kvantum` 与 kvconfig 切换惰性保留，见下文 |
-| SDDM 登录界面 | MacTahoe | 登录器换成 SDDM（Wayland greeter，不装 X server）；greeter 主题用自打包的 `mactahoe-sddm-theme`（`MacTahoe-Dark`），它仿 KDE Breeze，需把 `plasma-workspace` / `libplasma` / `plasma5support` / `kirigami` / `qt5compat` / `qtsvg` 放进 `services.displayManager.sddm.extraPackages` 供 greeter 的 QML 导入路径解析（否则黑屏 / 白屏），光标声明 `CursorTheme=Bibata-Modern-Classic`。全部在 `modules/nixos/desktop/sddm.nix` |
+| SDDM 登录界面 | MacTahoe | 登录器换成 SDDM（Wayland greeter，不装 X server）；greeter 主题用自打包的 `mactahoe-sddm-theme`（`MacTahoe-Dark`），它仿 KDE Breeze，需把 `plasma-workspace` / `libplasma` / `plasma5support` / `kirigami` / `qt5compat` / `qtsvg` 放进 `services.displayManager.sddm.extraPackages` 供 greeter 的 QML 导入路径解析（否则黑屏 / 白屏），光标声明 `CursorTheme=Bibata-Modern-Ice`。全部在 `modules/nixos/desktop/sddm.nix` |
 | Niri 装饰配色 | **niri 内置默认** | Noctalia 不再渲染 `~/.config/niri/noctalia.kdl`；HM 只留结构项（宽度、几何、阴影），见下文 |
 | Niri 概览底色 | MacTahoe 同源 | `niri-colors/overview.kdl`，暗 `#242424` / 亮 `#FFFFFF`（Noctalia 的 niri 模板不管这一项） |
 | Noctalia Shell | **自定义调色板 `mactahoe`** | `customPalettes.mactahoe`，色值与 GTK/Qt 同源；界面字体 HarmonyOS Sans SC。**仅调色板归 Nix，bar 布局归 GUI**；只影响状态栏/面板，不再渲染应用主题，见下文 |
@@ -161,25 +161,36 @@ shadow {
 
 仍可选的另一条路：改回字面 macOS 值 16，并按 concentricity 把上表里 ≥ 18px 的选择器用 `gtk.gtk{3,4}.extraCss` 一并下移。
 
-### KDE 外观不归仓库管（2026-11-22）
+### KDE 外观（仓库声明部分，2026-11-22）
 
-NixOS/HM 只维护 **niri 会话**的外观；KDE Plasma 的图标、主题（窗饰 / 应用程序
-风格）与光标都交给 Plasma 自己的系统设置（`kdeglobals`、`kwinrc`、`kcminputrc`
-由 KDE 运行时维护）。此前为了让两个会话看起来一致，仓库曾从系统侧写入 KDE 的
-配置和全局环境变量，会覆盖用户在系统设置里的选择，已全部移除：
+NixOS/HM 维护 niri 会话的完整外观；KDE Plasma 的多数外观仍归系统设置
+（`kdeglobals`、`kwinrc`、`kcminputrc` 由 KDE 运行时维护），但下面几项由仓库声明，
+因为系统设置里没有稳定的「一次配置」入口，或改完会被运行时覆盖：
 
-- `kwin-square-corners.nix`：把 KWin 窗饰换成顶角直角的 `WhiteSur-dark-sharp`，
-  并在 Plasma 会话设 `GTK_CSD=0` —— 模块已删除；
-- `~/.config/plasma-workspace/env/` 下的 `50-xcursor-size.sh`、`60-xwayland-clients-scale.sh`
-  （写 `XCURSOR_SIZE` 与 `kdeglobals` 的 `XwaylandClientsScale`）—— 已删除；
+- 窗口外角：`kde-appearance.nix` 安装顶角已补成直角的 `WhiteSur-dark-sharp` 并写入
+  `kwinrc`，KDE/Qt 窗口外角为直角；
+- 图标主题：`kdeglobals [Icons] Theme=WhiteSur-dark`（GTK 侧用同一套，见上表）；
+- 光标主题：`kcminputrc` 的 `cursorTheme=Bibata-Modern-Ice`、`cursorSize=24`；
+- 快速平铺间距：`kwin-tile-gaps.nix` 用 KWin 脚本把 quick tile 的 padding 设为 8
+  （外缘 8、相邻合计 8，见 `docs/quirks.md`）。
+
+写入方式是 rebuild 激活时用 `kwriteconfig6` 逐键写入，**不在每次登录重写**。
+代价：在系统设置里应用 Global Theme 会清掉 `kwinrc` 的逐组件覆盖，装饰退回主题
+自带的圆角，直到下一次 rebuild 激活；图标与光标同理，以仓库的值为准。
+
+此前为了让两个会话看起来一致而写入的其它 KDE 配置和全局环境变量已移除：
+
+- `~/.config/plasma-workspace/env/` 下的 `50-xcursor-size.sh`、`60-xwayland-clients-scale.sh`、
+  `70-gtk-csd.sh`（写 `XCURSOR_SIZE`、`kdeglobals` 的 `XwaylandClientsScale` 与 `GTK_CSD`）
+  —— 已删除；
 - 全局 `XCURSOR_THEME` / `XCURSOR_SIZE` 与 `QT_QPA_PLATFORMTHEME` —— 已从
   `environment.sessionVariables` / HM 的 environment.d 移除，改由 niri 的
   `environment` 段（`~/.config/niri-colors/environment.kdl`）只在 niri 会话内注入。
 
-因此 Plasma 的光标、窗饰、Qt 应用风格现在以系统设置为准；想恢复原来的观感就在
-Plasma 系统设置里自行选择（窗饰、光标、GTK 应用风格都有对应页面）。`pkgs/mactahoe-gtk-theme`
-仍把 GTK 顶层窗口外角压成直角，这只影响 GTK 应用自身，与 KWin 窗饰无关；niri 的
-窗口圆角仍由 `geometry-corner-radius 8` 决定。
+`pkgs/mactahoe-gtk-theme` 仍把 GTK 顶层窗口外角压成 0，这只影响 GTK 应用自身；
+niri 的窗口圆角仍由 `geometry-corner-radius 8` 决定。窗饰的按钮形状、阴影与颜色
+由 WhiteSur 装饰主题本身决定；其余 Plasma 面（应用程序风格、配色、面板）仍以
+系统设置为准。
 
 ### 窗口间距为何是 8px
 
@@ -292,7 +303,7 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 
 **“选中 / 活动”的归属**（这是决定，不是默认）：壳层的蓝只标**壳层控件**（按钮、输入框焦点、niri 标签指示器）；工作区里“选中”一律用 Catppuccin 的强调色 **mauve** —— 终端选区与编辑器同源。终端光标是唯一例外，保持 rosewater（Catppuccin 对终端光标的约定，光标不是“选中”）。理由：终端选区与光标会**同屏出现**，rosewater 与 mauve 一暖粉一冷紫，分属两套会让它们看着来自不同系统。
 
-选这个组合的理由：一是 GTK/SDDM/图标/自打包已经全部在 MacTahoe 上，二是“macOS 壳 + 低饱和冷调工作区”比单纯的全局 Catppuccin 更有辨识度。
+选这个组合的理由：一是 GTK/SDDM/自打包主题已经全部是 MacTahoe 风格、图标是同一路数的 WhiteSur-dark，二是“macOS 壳 + 低饱和冷调工作区”比单纯的全局 Catppuccin 更有辨识度。
 
 **定调：以应用层为主体。** bar 应当退到背景里，而不是与窗口争主体。这条决定了下面 Noctalia 一节的取舍。
 

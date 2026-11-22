@@ -1,9 +1,10 @@
 // 光标配置
 cursor {
     // 主题，存放路径在 ~/.local/share/icons
-    xcursor-theme "Bibata-Modern-Classic";
+    xcursor-theme "Bibata-Modern-Ice";
     // 大小（逻辑像素；Bibata 内嵌 16/20/22/24/28/… 整数档，别的值会取最接近的一档）
-    // 改这一处不够：GTK / XWayland / GDM 各写了一份，见 modules/home-manager/gui/themes/default.nix
+    // 改这一处不够：GTK / XWayland / SDDM / KDE 各写了一份，
+    // 见 modules/home-manager/gui/desktop/linux/themes/default.nix 与 kde-appearance.nix
     xcursor-size 24
     // 按下键盘按键时将隐藏光标
     hide-when-typing

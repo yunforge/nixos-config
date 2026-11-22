@@ -31,18 +31,18 @@ let
 
   # 一套模式的全部取值。改主题只改这里。
   # GTK 变体名取自包里的实际目录：share/themes/{MacTahoe-Dark,MacTahoe-Light}；
-  # 图标主题是小写后缀 {MacTahoe-dark,MacTahoe-light}；
   # Kvantum 上游只有浅深两态，深色那对被单独命名为 MacTahoeDark
   # （命名理由见 pkgs/mactahoe-kvantum 顶部）。
+  # 图标不随亮暗切换：两套都用 WhiteSur-dark（KDE 侧同款，见 kde-appearance.nix）。
   modes = {
     dark = {
       gtk = "MacTahoe-Dark";
-      icons = "MacTahoe-dark";
+      icons = "WhiteSur-dark";
       kvantum = "MacTahoeDark";
     };
     light = {
       gtk = "MacTahoe-Light";
-      icons = "MacTahoe-light";
+      icons = "WhiteSur-dark";
       kvantum = "MacTahoe";
     };
   };
