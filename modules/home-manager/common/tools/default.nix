@@ -116,9 +116,9 @@ in
     ];
 
     # fastfetch 亮/暗两套：只有配置 jsonc 一份变体（亮色那份的 10 阶渐变是**重算**的，
-    # Latte 底色上 blue 只有 4.34:1，达不到 AA，改用 subtext1 → mauve 两个端点插值，
-    # 算据写在那个文件的注释里），由 theme-apply 翻软链。logo 不在这条轴上：用 fastfetch
-    # 内置的 NixOS 字符图（不可着色、随终端前景色），两份 jsonc 相同，不再部署图片。
+    # 色相/彩度与暗色相同，算据写在那个文件的注释里），由 theme-apply 翻软链。
+    # logo 不在这条轴上：用 fastfetch 内置的 Arch 字符图（ANSI cyan），两份 jsonc
+    # 相同，不再部署图片。
     home.file = {
       ".config/fastfetch/config.jsonc" = {
         source = ../../../../assets/fastfetch/nixos-01.jsonc;

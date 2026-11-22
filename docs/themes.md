@@ -326,7 +326,7 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 | 层 | 家族 | 元 |
 |---|---|---|
 | 壳层：niri 装饰 + GTK + Qt + Noctalia bar | macOS 中性灰 + 单一强调色 `#0088FF` | WhiteSur 的 `gtk-4.0/gtk.css` |
-| 工作区：终端 + 编辑器 + shell + 文件管理器 + 系统监控 | 暗 Catppuccin Frappe / 亮 Catppuccin Latte | **Noctalia 调色板的 `terminal` 色槽**；Neovim、yazi、btop、eza、fish 多处同源。例外：fastfetch 的 10 阶渐变取自 **logo 的官方双色**（见「fastfetch」一节） |
+| 工作区：终端 + 编辑器 + shell + 文件管理器 + 系统监控 | 暗 Catppuccin Frappe / 亮 Catppuccin Latte | **Noctalia 调色板的 `terminal` 色槽**；Neovim、yazi、btop、eza、fish 多处同源。例外：fastfetch 保留一套固定冷蓝色阶（见「fastfetch」一节） |
 
 > 工作区一族现在也由 Noctalia 的 `terminal` 色槽统一供色：暗色块填 Frappe、亮色块填 Latte，
 > 亮暗切换时整族一起换（btop/yazi/eza/fish 由 Noctalia 模板渲染，nvim/tmux/fastfetch 随终端或自行跟随）。
@@ -339,39 +339,25 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 
 **定调：以应用层为主体。** bar 应当退到背景里，而不是与窗口争主体。这条决定了下面 Noctalia 一节的取舍。
 
-### fastfetch：logo 与 10 阶渐变
+### fastfetch：Arch logo 与无框信息
 
-细节全在 `assets/fastfetch/nixos-01.jsonc` 的注释里，两个结论：
+细节全在 `assets/fastfetch/nixos-01.jsonc` 的注释里，几个结论：
 
-- **logo 用 fastfetch 内置的 NixOS 字符图（`type: "builtin"`，`source: "NixOS"`）。**
-  内置 logo 不可着色（实测 `--logo-color-1..9` 完全无效），随终端前景色显示；好处是
-  tmux / SSH / 管道等环境与图形终端表现一致，不会再有「静默回退」这个坑。
-  尺寸约 37 列 × 20 行，`padding.top / left` 只影响排版。备选（`fastfetch --list-logos`
-  可查）：`NixOS_small`（更窄）、`nixos_old` / `nixos_old_small`、`NixOS2`。
-  历史上试过手绘半块字符图（44 列 × 20 行）和 sixel 图片 logo（官方
-  `nix-snowflake-colours.svg` → 1024² 透明底 PNG，按真像素抗锯齿渲染），现已改回内置。
-- **那 10 个常量是冷色明度渐变，不是彩虹。** 它们会被用在约 30 个键名标签上
-  （`├ Board` / `├ CPU` …），10 个色相铺满一列文字就是噪声。
-  **色相与彩度取自 logo 的官方双色**：深蓝 `#5277C3`（OKLCH H263.4 / C0.1248）与浅蓝
-  `#7EBAE4`（H239.9 / C0.0866），10 阶沿这两点在 OKLCH 里插值 —— 整列文字与 logo 同族。
-  亮度被对比度顶住而非直接取 logo 值：`#5277C3` 压在终端底色 `#303446` 上只有 **2.81:1**
-  （低于 AA），故暗色那份 `{$1}` 抬到刚好 4.53:1（L=0.6985），`{$10}` 恰好落在 logo 浅蓝
-  `#7EBAE4`（5.88:1，端点即品牌色），10 阶全部 ≥ 4.53:1。
-  亮色那份**色相/彩度完全相同，只翻亮度方向**：Latte 底色上两个 logo 蓝都不可读
-  （3.88 / 1.85），故 `{$1}` 压到 4.79:1（L=0.5270），`{$10}` 沿用暗色那份的亮度跨度
-  0.0651 → 6.19:1。亮暗翻软链时色族不变。
-
-- **宽度预算 ≲ 102 列**（半屏终端），实测最长 **102 列**（最长行来自模块区，不是 logo）。历史上是 133 列：分组横线原来是
-  10 段 × 7 字符（横线自己就有 70 列）+ 43 列的手绘 logo。收的过程：横线改 10 段 × 2 字符；
-  logo 一度换成 32 列的鲸鱼（90 列），换回 43 列的手绘 NixOS 图后又嫌它「从两边往中间扁」，
-  现在是内置 NixOS 字符图（37 列，见上面 logo 一节）；模块格式只留有效字段（`os` 名字+版本、`disk` 不留文件系统类型、
-  `localip` 不留 MAC、`display` 分辨率+刷新率、`packages` 改 `nix: A+B`）；模块清单也砍了
-  一批（Board / Sound / BIOS / Packages / Processes / Term Font / BT Radio / WiFi / DNS /
-  Public IP / 日期时间 / 运行时长）。
-  量法：`fastfetch --pipe -c assets/fastfetch/nixos-01.jsonc` 后取最长行。内置字符 logo
+- **logo 用 fastfetch 内置的 Arch 字符图（`type: "builtin"`，`source: "arch"`）。**
+  内置 logo 使用 ANSI cyan（跟随终端调色板），tmux / SSH / 管道等环境表现一致。
+  尺寸 37 列 × 19 行，`padding` 只影响排版（当前顶部空 2 行、左侧空 3 列）；
+  备选 `arch2` / `arch3` / `arch_small`。
+- **那 10 个常量是冷色明度渐变，不是彩虹。** 它们给约 30 个键名标签供色；色值沿用
+  仓库原有的深蓝 → 浅蓝冷色阶，不再由 logo 推导。暗色 `{$1}` 4.53:1、`{$10}` 5.88:1；
+  亮色只翻亮度方向，端点 4.79:1 / 6.19:1，10 阶全部达到 AA。
+- **右侧只留字段。** 已删除 Fastfetch 版本行、分组标题、分组横线、条目树形线
+  `├` / `└` 和底部装饰；字段只保留图标、键名与值。
+- **输出前后各留两行空行。** 前置两行由 `logo.padding.top` 和起始的两个 `break`
+  一起生成；末尾用 3 个 `break` 抵消 fastfetch 吃掉的最后一个换行，视觉上同样是两行。
+- **宽度预算 ≲ 96 列**（半屏终端），实测最长 **96 列**（OpenGL 行）。量法：
+  `fastfetch --pipe -c assets/fastfetch/nixos-01.jsonc` 后取最长行。内置字符 logo
   在管道里也照常渲染，量到的就是真实宽度。
   信息头（键名）改成中文，按显示宽度手工补空格到 8 列 —— fastfetch 不会自己对齐 CJK。
-  分组收敛成三组：**硬件 / 软件 / 网络**（原来的 Time 组只剩「系统年龄」一行，并进软件组）。
   用量相关的三行（memory / swap / 两块 disk）统一成 `已用 / 总量 (百分比)`，**没有进度条**：
   memory / swap 的 `percent` 覆盖块直接删掉（阈值本来就只作用于进度条），disk 用
   `{size-percentage}` 把百分比内联进 `format`。还想更窄只剩两个杠杆：去掉
