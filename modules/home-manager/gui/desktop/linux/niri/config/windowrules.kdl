@@ -104,14 +104,14 @@ window-rule {
 //
 // 尺寸只写在一个地方：niri 没有「全局浮动尺寸」选项，尺寸只能落在 window-rule 上；
 // 但一条规则里可以写多个 match（彼此是 OR —— 见 niri wiki「Window Rules」：
-// is_active / title / app-id 多条 `match` 之间是「或」）。于是下面把 19 个 app-id
-// （共 20 个窗口：Pot 的翻译窗与偏好面板各一个）堆进**一条规则**，几何只声明一次
+// is_active / title / app-id 多条 `match` 之间是「或」）。于是下面把 16 个 app-id
+// 堆进**一条规则**，几何只声明一次
 // —— 比原先逐 app 各写一遍尺寸少十几处重复。
 //
 // 居中：niri 对浮动窗口**本来就默认居中**（floating.rs 的 add_tile_at 用
 // center_preferring_top_left_in_area(working_area) 兜底）。所以「居中且尺寸合适」
 // 只需要一处尺寸 + 不写 default-floating-position —— 后者一旦写出就会覆盖居中、
-// 把窗口推到屏幕角上。原 Pot 那条 relative-to="top-right" 正是这么做的，现已删除。
+// 把窗口推到屏幕角上。
 //
 // 尺寸：1300×850 逻辑像素，比例约 3:2。
 //
@@ -143,8 +143,7 @@ window-rule {
 //
 // open-floating 仍逐条写明：全局规则声明了 open-floating false，而本规则要把它翻回
 // true。niri 对同一条规则内的多个 match 不做「后覆盖前」——一条规则要么整体命中、
-// 要么不命中，所以这里不需要像原来那样为「同 app-id 的第二个窗口」留覆盖规则
-// （Pot 的翻译窗与 Config 面板原先正是两条同 app-id 的规则）。
+// 要么不命中，所以这里不需要像原来那样为「同 app-id 的第二个窗口」留覆盖规则。
 window-rule {
     // 输入法设置 / 图床上传 / 看图 / 传文件
     match app-id="(?i)fcitx5"
@@ -162,10 +161,6 @@ window-rule {
     // 便签一直按平铺打开。实测 id 后改为精确匹配。
     match app-id="(?i)eudic"
     match app-id=r#"(?i)org\.gnome\.TextEditor"#
-    // Pot — 划词翻译与它的偏好面板。翻译窗与「Config」面板同属一个 app-id，
-    // 都在本规则内，面板不再像原来那样另设一档尺寸（niri 会遵从面板自己请求的
-    // 尺寸，只有它主动放弃首选尺寸时才会落到下面的浮窗默认值）。
-    match app-id="(?i)pot"
     // 其它（AI 模型选择器 / Anki / 音乐 / 代理 / 磁盘占用图）
     // ⚠ 这几个的 app-id 都不是照 .desktop 文件名写的 ——
     // gapless 其实是 g4music

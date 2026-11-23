@@ -16,6 +16,5 @@
     ./development.nix
     ./embedded.nix
     ./utilities.nix
-    ./pot.nix
   ];
 }

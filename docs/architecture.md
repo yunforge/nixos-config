@@ -82,7 +82,7 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
     配置共享，安装方式按平台分开：Linux 走 HM 的 `programs.<name>` 装包，
     macOS 走 `modules/darwin/gui.nix` 的 Homebrew casks（HM 侧 `package = null`）。
   - `apps/linux/`：Linux 专属 GUI 应用（浏览器 / 通讯 / 媒体 / mpv /
-    生产力 / Steam / 开发 / 嵌入式 / 工具 / Pot）。
+    生产力 / Steam / 开发 / 嵌入式 / 工具）。
   - `desktop/linux/`：Linux 桌面会话（Niri / Noctalia / 主题与亮暗切换 /
     MIME 关联 / WinApps）。输入法只在系统层接线（`modules/nixos/desktop`）。
 - **platform**（`modules/home-manager/platform/`）：平台专属用户级适配

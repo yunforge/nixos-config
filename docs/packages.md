@@ -57,8 +57,6 @@ v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb�
 
 不在本清单里的东西：nixpkgs 里的一切（跟着 `nix flake update` 走）、flake inputs
 （nixpkgs / nur / winapps / home-manager / noctalia / msime / zen-browser）。
-另有一处**不是包但同样钉住哈希**的取物：`gui/apps/linux/pot.nix` 的 `pot-icon`
-（取 `pot-desktop` master 分支的 `icon.svg`，上游改文件即构建失败，需重取哈希）。
 
 ## 「更新系统」时的固定动作
 
