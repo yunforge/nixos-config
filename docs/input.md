@@ -50,9 +50,9 @@ GLFW_IM_MODULE = "fcitx";
 NIXOS_OZONE_WL = "1";
 ```
 
-XWayland 应用不靠全局变量：微信、欧陆词典、WPS 等 Qt 应用由 `lib/default.nix` 的
+XWayland 应用不靠全局变量：微信、欧陆词典等 Qt 应用由 `lib/default.nix` 的
 `wrapQtXWayland` 按应用注入 `GTK_IM_MODULE` / `QT_IM_MODULE` / `XMODIFIERS`
-（**Qt5 应用没有 XIM 支持**，`XMODIFIERS` 兜不住它们，必须 wrap，WPS 即此例）。
+（**Qt5 应用没有 XIM 支持**，`XMODIFIERS` 兜不住它们，必须 wrap）。
 某个 X11 GTK 应用若 XIM 体验不可接受，照同一模式按应用 wrap `GTK_IM_MODULE=fcitx`。
 
 ## 候选词窗外观
@@ -66,8 +66,8 @@ XWayland 应用不靠全局变量：微信、欧陆词典、WPS 等 Qt 应用由
 下次重启被覆盖。
 
 **路线变更（2026-10-24，10-25 真机验证通过）**：全局 `GTK_IM_MODULE` 已移除（见上文「环境变量」），
-Wayland GTK 应用改走 text-input-v3 → classicui，不再经过下述 client-side popover。ghostty、WPS、
-XIM 兜底三项手测全部通过后，`nine-slice-overlap.patch` 与 `overlays/default.nix` 的 fcitx5-gtk
+Wayland GTK 应用改走 text-input-v3 → classicui，不再经过下述 client-side popover。ghostty、
+XIM 兜底等应用手测全部通过后，`nine-slice-overlap.patch` 与 `overlays/default.nix` 的 fcitx5-gtk
 override 已于 2026-10-25 退役（X11 下 fcitx5-gtk 的候选窗由 classicui-XCBUI 绘制，不经此代码；
 若未来重新启用 popover 路径需恢复补丁）。以下为当时的根因记录：
 
@@ -161,7 +161,7 @@ fcitx5-diagnose
 - fcitx5 由 systemd 用户单元 `app-org.fcitx.Fcitx5@autostart.service` 自启（niri 等非 KDE 会话；KDE 会话由 KWin 在 startSession 拉起，见「KDE Plasma 会话下的自启」；xdg-autostart 生成，
   在 graphical-session.target 之后拉起，Wayland/X11 连接就绪）；niri 的 `startup.kdl` 不再 spawn
   fcitx5（曾与之抢 DBus 名，spawn 实例赢、单元 217ms 让位，导致下面的 restart 命令失效）
-- XWayland 应用输入法由 `wrapQtXWayland` 按应用注入的变量接管（Qt5 应用无 XIM 支持，必须 wrap，如 WPS），其余 X11 应用走 XIM
+- XWayland 应用输入法由 `wrapQtXWayland` 按应用注入的变量接管（Qt5 应用无 XIM 支持，必须 wrap），其余 X11 应用走 XIM
 
 排查时优先看日志（fcitx5 自动启动，stderr 会进 journal）：
 

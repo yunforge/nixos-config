@@ -42,7 +42,6 @@ in
       zed-editor
       qtcreator # QT
       heidisql # 数据库
-      cutecom # 简单的图形化串口终端模拟器
     ];
   };
 }

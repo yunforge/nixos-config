@@ -13,8 +13,8 @@ let
       pkgs,
       pkg,
       binary ? null,
-      # 多入口二进制包（如 wpsoffice 的 wps/et/wpp/wpspdf）传 binaries= 逐个
-      # wrap；单入口应用维持 binary= 用法不变。
+      # 一个包内提供多个可执行命令时传 binaries= 逐个 wrap；
+      # 单入口应用维持 binary= 用法不变。
       binaries ? [ ],
       # 可选：若应用运行窗口的 WM_CLASS 与桌面文件 ID 不一致（如欧陆词典窗口类为
       # eudic 而桌面文件是 eusoft-eudic.desktop），GNOME Shell / Dash to Panel 会

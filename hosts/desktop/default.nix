@@ -36,7 +36,7 @@
         # 24" 1080p（92 PPI），scale 1.5 而非 1.0：**必须与 DP-3 同值**。
         # xwayland-satellite 在混合缩放时按最小 scale 给所有 X11 应用
         # （日志原文 "choosing to give apps the smallest detected scale"），
-        # DP-2 若留 1.0 会把 Xft.dpi 压到 96，微信/WPS/Logisim 在 4K 屏上
+        # DP-2 若留 1.0 会把 Xft.dpi 压到 96，微信/Logisim 在 4K 屏上
         # 全按 1x 渲染（字号 UI 明显偏小）。代价是这块屏有效空间 1280x720，
         # 观感上字比 1.0 大不少——这是换来 X11 应用正确的取舍。
         # EDID 首选即 1920x1080@60，无需钉模式（另有 75Hz 模式可用，未钉）。

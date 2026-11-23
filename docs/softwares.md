@@ -45,7 +45,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | AI 编程 | Claude Code、pi-coding-agent、CodeX |
 | Git | git、lazygit、github-desktop |
 | 容器 | Distrobox + Podman、Docker 扩展、lazydocker |
-| 数据库 / 串口 | HeidiSQL、CuteCom |
+| 数据库 | HeidiSQL |
 
 ## 生产力与笔记
 
