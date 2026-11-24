@@ -2,6 +2,7 @@
 {
   lib,
   config,
+  pkgs,
   ...
 }:
 let
@@ -132,7 +133,12 @@ in
         set -gx LC_ALL en_US.UTF-8
         set -gx EDITOR nvim
         # 初始化 fnm（HM 无 programs.fnm 模块，需手动 source）
-        fnm env --use-on-cd | source
+        # --shell fish：不依赖进程树推断。Tern 等启动器下进程树里没有可识别的 shell，
+        #   不指定时 fnm 会报 "Can't infer shell!"；显式指定后任何启动方式都正常。
+        # type -q 兜底：容器/极简环境里没有 fnm 时不至于在启动时报错
+        if type -q fnm
+            fnm env --use-on-cd --shell fish | source
+        end
         # Agent 侧 shell 集成（`cc` 别名、atria 密钥 source）在 common/ai/tools.nix，
         # 随 myHome.ai.enable 门控，不在此处。
       '';
@@ -162,6 +168,18 @@ in
         zquery = "zoxide query -l -s";
       };
       shellInit = ''
+        # Tern 等“干净环境 + login shell”的启动器只给最小 PATH
+        # （/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin），而 fish 不读 /etc/profile，
+        # 于是 podman / sudo / nix 等系统命令在 Tern 里会缺失。补回 NixOS 系统 profile。
+        ${lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
+          fish_add_path /run/wrappers/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin
+        ''}
+        # Home Manager（useUserPackages）把 fzf/fnm/eza/zoxide/bat/fd 等装进
+        # per-user profile（${config.home.profileDirectory}/bin）。该目录通常只在
+        # 图形会话的 PATH 里；TTY/SSH 等 login shell 继承的 PATH 不含它，而 fish
+        # 又不像 bash 那样读 /etc/profile，于是 fzf/fnm 在登录式 shell 里找不到、
+        # 启动即报错。这里显式补进 PATH，任何 fish 启动方式都能解析到这些 HM 包。
+        fish_add_path ${config.home.profileDirectory}/bin
         fish_add_path ${config.home.homeDirectory}/.cargo/bin
         fish_add_path ${config.home.homeDirectory}/.local/bin
         set -gx NPM_CONFIG_PREFIX ${config.home.homeDirectory}/.npm-global

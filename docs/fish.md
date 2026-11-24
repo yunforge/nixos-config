@@ -84,3 +84,23 @@ shell 集成与补全，`home.packages` 里不再重复列。
   通配符 `*` 跨越 `/`，故 `/usr*` 同时覆盖 `/usr` 与其全部子目录。
 
 `$HOME` 只排自身，`~/Projects` 这类子目录仍会入库。
+
+## PATH 与工具可见性
+
+`programs.fish.shellInit` 开头有一行 `fish_add_path ${config.home.profileDirectory}/bin`
+（见 `modules/home-manager/common/shell/fish.nix`）。原因：Home Manager 开了
+`useUserPackages`，fzf / fnm / eza / zoxide / bat / fd 等被装进 per-user profile
+（`/etc/profiles/per-user/<user>/bin`）；而 fish **不读 `/etc/profile`**，TTY / SSH 等
+登录式 shell 继承的 PATH 里往往没有这个目录，就会报 `fish: Unknown command: fnm`、
+`fzf was not found in path.` 之类的启动错误。显式补进 PATH 后，图形 / TTY / SSH 各种
+启动方式都能解析到这些 HM 包。
+
+`fnm env` 初始化用 `fnm env --use-on-cd --shell fish | source`：`--shell fish` 显式指定
+shell，**不依赖进程树推断**——Tern 等启动器下进程树里没有可识别的 shell，缺省会报
+`Can't infer shell!`；外层再用 `type -q fnm` 兜底，容器等没有 fnm 的环境不会在启动时刷错误。
+
+Tern 这类启动器用「干净环境 + `fish -l`」起 shell，只传
+`/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin`，而 fish 不读 `/etc/profile`，所以
+podman / sudo 等系统命令在 Tern 面板里不可见。`shellInit` 在 Linux 上因此还会补回
+`/run/wrappers/bin` 与 `/run/current-system/sw/bin`；`/nix/var/nix/profiles/default/bin`
+在本机不存在，`fish_add_path` 会自动忽略不存在的目录。
