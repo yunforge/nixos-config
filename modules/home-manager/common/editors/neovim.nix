@@ -25,11 +25,12 @@ in
       # nvim 在启动时读，运行中的实例要重进（或 :colorscheme catppuccin）。
       "theme-variants/nvim/dark.lua".text = ''return "dark"'';
       "theme-variants/nvim/light.lua".text = ''return "light"'';
-      # 初始值 = 暗色（与改造前一致）：rebuild 后被还原，登录时 theme-apply 再纠正。
+      # 初始值 = 亮色（与 noctalia.nix 的 theme.mode 一致）：登录时 theme-apply 再按
+      # 当前模式纠正。
       # force：这个软链归 theme-apply 接管（按 mode 指到 dark/light 变体），不跳过碰撞
       # 检查的话，下次 rebuild 会判成外来文件「would be clobbered」而整份激活失败。
       "theme-variants/nvim/mode.lua" = {
-        text = ''return "dark"'';
+        text = ''return "light"'';
         force = true;
       };
     };

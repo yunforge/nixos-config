@@ -120,8 +120,9 @@ in
     # logo 不在这条轴上：用 fastfetch 内置的 Arch 字符图（ANSI cyan），两份 jsonc
     # 相同，不再部署图片。
     home.file = {
+      # 初始值走亮色那份（与 noctalia.nix 的 theme.mode 一致）；登录时 theme-apply 再按当前模式翻软链。
       ".config/fastfetch/config.jsonc" = {
-        source = ../../../../assets/fastfetch/nixos-01.jsonc;
+        source = ../../../../assets/fastfetch/nixos-01-light.jsonc;
         force = true;
       };
 

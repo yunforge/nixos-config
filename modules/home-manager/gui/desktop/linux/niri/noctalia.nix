@@ -72,7 +72,10 @@ in
           };
         };
         theme = {
-          mode = "dark";
+          # 桌面整体亮色。真源仍是 Noctalia 的 theme mode：theme-apply 按它切换
+          # GTK/Qt/图标/niri（见 gui/themes/variants.nix）；壳层调色板用下面
+          # customPalettes.mactahoe.light。想整体切回暗色只改这一行。
+          mode = "light";
           # 用下面的自定义调色板，而不是内置/社区方案：只有自定义调色板能同时钉住
           # "MacTahoe 的中性灰"与"#0088FF 强调色"。
           # 注意：若 settings.toml 已有 theme.source，本项会被它覆盖，改后需在
@@ -159,7 +162,8 @@ in
       #   mHover = #3584e4                            → 饱和强调色当悬浮底色（文档约定是柔和提亮）
       #   mSurfaceVariant = #1e1e1e                   → 比主面更暗，层叠方向反了
       #
-      # 不写 light 变体：文档规定省略时两种模式都用 dark，而桌面是纯深色。
+      # 两套变体都写：dark 取自 MacTahoe-Dark，light 取自 MacTahoe-Light
+      # （见下面 light 块）。当前桌面用 light（mode 见上）。
       customPalettes.mactahoe = {
         dark = {
           mPrimary = "#0088FF"; # 主强调色 (106)

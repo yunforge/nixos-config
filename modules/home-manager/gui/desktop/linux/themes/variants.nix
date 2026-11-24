@@ -8,9 +8,9 @@
 # 软链指过去 —— Nix 仍然持有全部取值，运行时只有一个「哪一套」的选择。
 #
 # 归属约定（一个文件只有一个主人）：
-#   - HM 写初始值（= 暗色，与改造前一致）+ 两套变体（~/.config/theme-variants/…）
+#   - HM 写初始值（= 亮色，与 noctalia.nix 的 theme.mode 一致）+ 两套变体（~/.config/theme-variants/…）
 #   - theme-apply 只做一件事：把上面那几个软链指到当前模式的变体，并写 dconf
-#   - 于是 rebuild 后回到暗色，登录时的 theme-apply 再按 Noctalia 的模式纠正，
+#   - 于是 rebuild 后回到亮色，登录时的 theme-apply 再按 Noctalia 的模式纠正，
 #     不需要任何「哪套生效中」的状态文件（脚本幂等，见下方 link()）
 #
 # 为什么监听**目录**而不是文件：Noctalia 保存 settings.toml 是 temp+rename
@@ -183,8 +183,16 @@ let
             mode="''${1-}"
             if [ -z "$mode" ]; then
               state="''${XDG_STATE_HOME:-$HOME/.local/state}/noctalia/settings.toml"
-              # 只读 [theme] 段里的 mode；文件不存在或未写该键时保持暗色
+              # 先读运行时 state 的 [theme] 段（GUI 切换会把 mode 写在这里）。
               mode="$(awk -F'"' '/^\[/{s=($0=="[theme]")} s && /^mode *=/ {print $2; exit}' "$state" 2>/dev/null)"
+              # state 里还没写过 mode（用户从未切换过）时，回落到 HM 生成的
+              # config.toml —— 那是版本控制里的默认值（noctalia.nix 的 theme.mode）。
+              # 不回落到这里的话 mode 取空串，下面 case 直接报「未知模式」退出，
+              # 登录后 GTK/Qt/niri 就停在 HM 初始值不动（实测 theme-apply.service
+              # 目前正是因此 failed）。
+              if [ -z "$mode" ]; then
+                mode="$(awk -F'"' '/^\[/{s=($0=="[theme]")} s && /^mode *=/ {print $2; exit}' "$HOME/.config/noctalia/config.toml" 2>/dev/null)"
+              fi
             fi
             case "$mode" in
               light | dark) ;;

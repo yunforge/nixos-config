@@ -302,8 +302,8 @@ in
     # force：这个软链归 theme-apply 运行时接管（light 模式会指到 light 变体），
     # 而 HM 的 checkLinkTargets 只认「指向本 generation」的软链，指到变体就判成
     # 外来文件「would be clobbered」而整个激活失败。force 只跳过碰撞检查，
-    # HM 仍会把自己那份先按普通软链铺好（= 初始暗色）。
-    xdg.configFile."niri-colors/overview.kdl".text = mkOverview shell.backdrop;
+    # HM 仍会把自己那份先按普通软链铺好（= 初始亮色）。
+    xdg.configFile."niri-colors/overview.kdl".text = mkOverview shellLight.backdrop;
     xdg.configFile."niri-colors/overview.kdl".force = true;
     xdg.configFile."niri-outputs/outputs.kdl".text = outputsKdl;
 

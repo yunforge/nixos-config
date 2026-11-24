@@ -21,7 +21,7 @@ in
   };
 
   config = lib.mkIf (cfg.enable && desktopCfg.enable) {
-    # 下面写的是**初始值**，即暗色那一套：rebuild 后 HM 的 store 软链
+    # 下面写的是**初始值**，即亮色那一套：rebuild 后 HM 的 store 软链
     # 就是它，登录时 theme-apply 再按 Noctalia 当前的 theme mode 覆盖（见 variants.nix）。
     # GTK 用 WhiteSur-gtk-theme（与 KDE 侧的 WhiteSur 同源），Dark/Light 由
     # variants.nix 按 Noctalia 的 theme mode 切换。
@@ -30,7 +30,7 @@ in
       enable = true;
       theme = {
         package = pkgs.whitesur-gtk-theme;
-        name = "WhiteSur-Dark";
+        name = "WhiteSur-Light";
       };
       iconTheme = {
         package = pkgs.whitesur-icon-theme;
@@ -51,10 +51,10 @@ in
       };
 
       # GTK4/libadwaita 不认 gtk-theme-name，只认 color-scheme：
-      # gtk3 侧会写 dconf 的 org.gnome.desktop.interface color-scheme=prefer-dark，
-      # gtk4 侧会写 settings.ini 的 gtk-interface-color-scheme=2。
+      # gtk3 侧会写 dconf 的 org.gnome.desktop.interface color-scheme=prefer-light，
+      # gtk4 侧会写 settings.ini 的 gtk-interface-color-scheme=1。
       # 不设则 libadwaita 按 "default"（浅色）渲染，且 GNOME 系应用不跟随桌面。
-      colorScheme = "dark";
+      colorScheme = "light";
 
       # 不再设 gtk.gtk4.theme：~/.config/gtk-4.0/gtk.css 由 gui/themes/variants.nix 拥有
       # （模式无关的单一文件，亮/暗在同一份里用 @media 切；两个模块同时写该文件会冲突）。
