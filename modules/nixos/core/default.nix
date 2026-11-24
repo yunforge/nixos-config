@@ -62,6 +62,13 @@ in
     system.autoUpgrade = {
       enable = true;
       allowReboot = false;
+      # 改到白天常开机时段触发，避开凌晨无人期。
+      dates = "12:00";
+      # 关闭「漏跑补执行」：persistent=true（默认）会把错过的 04:40 升级在下次
+      # 开机/休眠唤醒的瞬间立刻补跑一次 nixos-rebuild switch（重启
+      # home-manager 等单元），表现为长时间休眠后唤醒特别卡顿。设 false 后
+      # 错过的运行直接跳过，不再在唤醒瞬间补跑。
+      persistent = false;
       flake = "${config.mySystem.configDir}#${config.networking.hostName}";
       # 显式钉死 --refresh：nixpkgs 默认 flags 已含此项，此处重复声明仅为
       # 防止上游变更默认值后退化为只构建 flake.lock 锁定的旧 nixpkgs
