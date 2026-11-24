@@ -128,6 +128,53 @@ buildGoModule rec {
     	os.Setenv("GST_PLUGIN_SYSTEM_PATH_1_0", nixGstPluginPath)
     }
     GO
+
+    # 托盘图标配色竞态：`magpie tray` 在登录时启动，KDE 下
+    # xdg-desktop-portal 通常还要约 1 秒才由 D-Bus 激活起来。于是 app.go
+    # 启动时那次性 traySchemeLight() 读失败 → 返回 false → linuxTrayIcon
+    # 画成白色字形（本是给暗色任务栏准备的默认），而 portal 起来后带着
+    # color-scheme=light 作为初始值、不会补发 SettingChanged，白鸟就留在
+    # 浅色（WhiteSur light）面板上一整场会话，几乎看不见。这里补一个「等
+    # portal 上线后重读并重设图标」的后台协程，不阻塞启动；上游修复后删掉本段。
+    cat > internal/gui/nixportalwait.go <<'GO'
+    //go:build linux && !nogui
+
+    package gui
+
+    import (
+    	"time"
+
+    	"github.com/godbus/dbus/v5"
+    )
+
+    // reTintWhenPortalUp re-reads the desktop colour scheme once
+    // xdg-desktop-portal answers, then re-tints the tray icon. It exists only
+    // because the portal can come up after `magpie tray`: the one-shot read in
+    // traySchemeLight then fails and linuxTrayIcon draws the white glyph meant
+    // for dark bars, and the portal never sends a SettingChanged to correct
+    // it. See pkgs/magpie/default.nix for the full rationale.
+    func reTintWhenPortalUp(f func(light bool)) {
+    	conn, err := dbus.ConnectSessionBus()
+    	if err != nil {
+    		return
+    	}
+    	defer conn.Close()
+    	obj := conn.Object("org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop")
+    	for i := 0; i < 40; i++ {
+    		var v dbus.Variant
+    		if err := obj.Call("org.freedesktop.portal.Settings.Read", 0, "org.freedesktop.appearance", "color-scheme").Store(&v); err == nil {
+    			f(portalLight(v))
+    			return
+    		}
+    		time.Sleep(250 * time.Millisecond)
+    	}
+    }
+    GO
+    sed -i 's/^\tconn.Signal(ch)$/\tconn.Signal(ch)\n\tgo reTintWhenPortalUp(f)/' internal/gui/traytip_linux.go
+    grep -q 'go reTintWhenPortalUp(f)' internal/gui/traytip_linux.go || {
+      echo 'magpie: reTintWhenPortalUp hook not applied (traytip_linux.go changed upstream?)' >&2
+      exit 1
+    }
   '';
 
   # 上游不安装任何图标：它自己写的桌面文件（internal/gui/scheme_linux.go，用于
