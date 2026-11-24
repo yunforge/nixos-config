@@ -101,6 +101,10 @@ let
     # store 里的文件是只读的，覆盖 logout 前先给副本加写权限。
     chmod -R u+w $out/contents/logout
     cp -r ${pkgs.whitesur-kde.src}/plasma/look-and-feel/com.github.vinceliuice.WhiteSur/contents/logout/. $out/contents/logout/
+    # WhiteSur 的 Logout.qml 把 Breeze 原本的 black 0.85 深色遮罩换成了浅色壁纸
+    # Image（opacity 0.6，且该相对路径在精简包里失效），注销/关机界面的 Complementary
+    # 近白文字就压在浅色模糊桌面上看不清。这里补回一层深色遮罩，保证任意壁纸下可读。
+    ${pkgs.perl}/bin/perl -0777 -i -pe 's/(\n        opacity: 0\.6\n    \}\n)(\n    MouseArea \{)/$1\n    \/\/ 仓库补丁(kde-appearance.nix)：WhiteSur 注销界面用 Complementary 配色(近白文字)，\n    \/\/ 实际背景是实时桌面的模糊截图，浅色壁纸下白字压浅底不清。加一层深色遮罩保证可读；\n    \/\/ 对应上游 Breeze Logout.qml 的 black 0.85 遮罩（WhiteSur 把它换成了浅色壁纸图）。\n    Rectangle {\n        anchors.fill: parent\n        color: "black"\n        opacity: 0.62\n    }\n$2/' $out/contents/logout/Logout.qml
   '';
 
   # 仓库声明的 KDE 外观键。只在 rebuild 激活时写一次：

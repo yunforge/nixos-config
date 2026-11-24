@@ -188,8 +188,9 @@ NixOS/HM 维护 niri 会话的完整外观；KDE Plasma 的外观也由仓库按
   内容由系统级包 `whitesur-plasma-splash` 提供；
 - 注销界面：Plasma 6.8 的 logout-greeter 读 `Plasma/Shell` 包而不是 LookAndFeel
   包，HM 在用户级复制 `plasma-desktop` 的完整 shell 包并换上 WhiteSur 的
-  `contents/logout`，软链到 `~/.local/share/plasma/shells/org.kde.plasma.desktop`
-  （根因见 `docs/quirks.md`）；
+  `contents/logout`，软链到 `~/.local/share/plasma/shells/org.kde.plasma.desktop`；
+  WhiteSur 的 `Logout.qml` 没有深色背景（近白文字压在浅色模糊桌面上看不清），
+  构建时补一层 `black`/0.62 遮罩（根因见 `docs/quirks.md`）；
 - 光标主题：`kcminputrc` 的 `cursorTheme=Bibata-Modern-Ice`、`cursorSize=24`；
 - 快速平铺间距：`kwin-tile-gaps.nix` 用 KWin 脚本把 quick tile 的 padding 设为 8
   （外缘 8、相邻合计 8，见 `docs/quirks.md`）。
