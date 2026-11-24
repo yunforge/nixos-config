@@ -138,6 +138,15 @@ stdenvNoCC.mkDerivation {
   # dlopen 的库不在 DT_NEEDED 里，靠 runtimeDependencies 写进 RPATH
   runtimeDependencies = runtimeLibs;
 
+  # NVIDIA GPU 利用率通过 NVML 读取（purego dlopen `libnvidia-ml.so.1`）。NixOS 上
+  # 这个库在 /run/opengl-driver/lib，但它不属于上面 runtimeDependencies 的闭包
+  # （驱动由系统按内核版本提供），且 Nix 的 glibc 不读 /etc/ld.so.cache，于是
+  # dlopen 失败、GPU 面板恒为 0（名称仍能显示，是因为经 DRM/PCI 读到 vendor 0x10de）。
+  # appendRunpaths 由 autoPatchelfHook 在生成 RPATH 时追加，不会像 postFixup 那样
+  # 被 hook 的后续逻辑覆盖；只改 RPATH、不改文件名，避免 docs/quirks.md 里
+  # 「wrapProgram 改名导致 Pulse 按 exe basename 匹配图标退化」。
+  appendRunpaths = "/run/opengl-driver/lib";
+
   # 上游 tar.gz 没有顶层目录（pulse / pulse.desktop / *.png 平铺），
   # 不设 sourceRoot 时 unpackPhase 会报 "produced no directories"。
   sourceRoot = ".";
