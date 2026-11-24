@@ -145,8 +145,8 @@ in
       shellAliases = {
         ".." = "cd ..";
         "..." = "cd ../..";
-        arch = "distrobox enter arch";
-        ubuntu = "distrobox enter ubuntu";
+        arch = "$HOME/.local/bin/arch";
+        ubuntu = "$HOME/.local/bin/ubuntu";
         updatewsl = "sudo nixos-rebuild switch --flake ~/Projects/nixos-config#wsl";
         # 构建 desktop 主机 NixOS
         updatedp = "sudo nixos-rebuild switch --flake ~/Projects/nixos-config#desktop";
