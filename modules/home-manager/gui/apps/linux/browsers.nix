@@ -34,6 +34,14 @@ in
     programs.zen-browser = {
       enable = true;
       setAsDefaultBrowser = false;
+      # 桌面条目的 Name 取自未包装包的 applicationName（beta 默认
+      # "Zen Browser (Beta)"）。只改这一处让应用选择器显示 "Zen"；
+      # 可执行名与条目 ID（zen-beta）保持不变。
+      unwrappedPackage =
+        inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.beta-unwrapped.override
+          {
+            applicationName = "Zen";
+          };
     };
 
   };
