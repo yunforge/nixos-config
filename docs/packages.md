@@ -8,12 +8,12 @@
 
 ## 清单
 
-版本核对于 2026-11-22（其余包升到上游最新；FlClash 故意钉在 0.9.3，原因见 `docs/quirks.md`）。
+版本核对于 2026-11-26（其余包升到上游最新；FlClash 故意钉在 0.9.3，原因见 `docs/quirks.md`）。
 
 | 属性名 | 上游 | 钉法 | 当前钉住 | 上游最新 | 状态 |
 |--------|------|------|----------|----------|------|
-| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.4667` | `v0.1.4667` | 最新 |
-| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.21.1` | `2026.11.21.1` | 最新 |
+| `magpie` / `magpie-cli` | [yetone/magpie](https://github.com/yetone/magpie) | tag | `v0.1.4808` | `v0.1.4808` | 最新 |
+| `mcpp-m` | [mcpp-community/mcpp](https://github.com/mcpp-community/mcpp) | release 资产 | `2026.11.24.1` | `2026.11.24.1` | 最新 |
 | `flclash` | [chen08209/FlClash](https://github.com/chen08209/FlClash) | release 资产（deb） | `0.9.3` | `0.9.4` | 回退（0.9.4 渲染回归，见 `docs/quirks.md`） |
 | `dalibre` | [djyde/dalibre](https://github.com/djyde/dalibre) | release 资产（tar.gz） | `0.8.0` | `0.8.0` | 最新（unfree：上游无 LICENSE 文件） |
 | `pulse` | [egoist/pulse-feedback](https://github.com/egoist/pulse-feedback) | release 资产（tar.gz） | `0.1.31` | `0.1.31` | 最新（unfree：只有反馈仓库、无 LICENSE 文件） |
