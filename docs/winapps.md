@@ -1,6 +1,6 @@
 # WinApps 使用教程（libvirt 后端）
 
-在 Niri/GNOME 桌面上把 Windows 虚拟机里的程序当**原生窗口**使用（FreeRDP RemoteApp），
+在 Niri / Plasma 桌面上把 Windows 虚拟机里的程序当**原生窗口**使用（FreeRDP RemoteApp），
 典型用途：Keil MDK、仅 Windows 可用的串口/烧录工具、Office。
 
 - 方案与取舍的来龙去脉见 [`docs/quirks.md`](quirks.md) 的「WinApps」条目。
@@ -34,7 +34,7 @@ winapps help         # 其余子命令
 ## 1. 架构与文件索引
 
 ```
-┌───────────────────────── Linux（NixOS + Niri/GNOME）─────────────────────────┐
+┌───────────────────────── Linux（NixOS + Niri / Plasma）──────────────────────┐
 │  启动器 / 终端                                                                │
 │      │  winapps UV4                                                          │
 │      ▼                                                                       │
