@@ -44,9 +44,9 @@ in
       ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
         iotop # 按进程查看磁盘 I/O（需 root）
         powertop # 功耗/唤醒源分析（需 root）
-        # perf 必须与运行内核同源：core 把 boot.kernelPackages 钉在 linuxPackages_latest，
-        # 这里跟随同一份；裸 pkgs.perf 对应默认内核，版本会与内核不匹配。
-        linuxPackages_latest.perf # Linux 性能分析（perf_events）
+        # perf 已提升为顶层包（linuxPackages*.perf 仅是带 evaluation warning 的别名），
+        # 直接用 pkgs.perf，不再从 kernelPackages 里取。
+        perf # Linux 性能分析（perf_events）
       ];
 
     # lazygit：包由模块提供（上面 home.packages 里不再列）。
