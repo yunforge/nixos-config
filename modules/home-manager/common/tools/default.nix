@@ -21,20 +21,33 @@ in
   ];
 
   config = lib.mkIf cliCfg.enable {
-    home.packages = with pkgs; [
-      fastfetch
-      lazydocker
-      delta
-      unzip
-      gzip
-      tree
-      file
-      net-tools
-      duf
-      glow
-      hugo
-      ffmpeg
-    ];
+    home.packages =
+      with pkgs;
+      [
+        fastfetch
+        lazydocker
+        delta
+        unzip
+        gzip
+        tree
+        file
+        net-tools
+        duf
+        glow
+        hugo
+        ffmpeg
+        ncdu # du 的交互式替代
+      ]
+      # 基础诊断工具里的 Linux 专属项；macbook 上不存在对应实现，直接跳过。
+      # htop 有 programs.<name> 模块（见下），vmstat（procps）/ ss（iproute2）/
+      # systemd-analyze（systemd）由系统基础环境自带，iostat/sar 来自 sysstat。
+      ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+        iotop # 按进程查看磁盘 I/O（需 root）
+        powertop # 功耗/唤醒源分析（需 root）
+        # perf 必须与运行内核同源：core 把 boot.kernelPackages 钉在 linuxPackages_latest，
+        # 这里跟随同一份；裸 pkgs.perf 对应默认内核，版本会与内核不匹配。
+        linuxPackages_latest.perf # Linux 性能分析（perf_events）
+      ];
 
     # lazygit：包由模块提供（上面 home.packages 里不再列）。
     # settings 非空 ⇒ HM 接管 ~/.config/lazygit/config.yml（首次激活会把 lazygit 自己写的
@@ -106,6 +119,10 @@ in
         theme_background = false;
       };
     };
+
+    # htop：经典进程查看器。不写 settings：HM 只在 settings 非空时才接管
+    # ~/.config/htop/htoprc，留空则沿用 htop 自己的交互式配置。
+    programs.htop.enable = true;
 
     myHome.appearance.switchTargets = [
       {
