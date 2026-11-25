@@ -20,11 +20,14 @@ in
     # 用官方 fish 集成（source (fzf --fish)）：Ctrl-T 选文件、Ctrl-R 历史、Alt-C 切目录。
     # 注意它会盖掉 fish 预设的 Ctrl-T 交换字符、Alt-C capitalize-word；
     # 不再装 fzf-fish 插件（那套 Ctrl-Alt-F/L/S/P、Ctrl-V 已随之去掉）。
+    # tmux 内自动改走 fzf-tmux（下方 40% 分屏），非 tmux 仍用 --height 40%。
     # FZF_* 走 sessionVariables（babelfish 转成 set -gx），对所有 shell 与子进程生效。
     programs.fzf = {
       enable = true;
       # 启用 Fish 集成
       enableFishIntegration = true;
+      # tmux 集成：在 tmux 内让 Ctrl-T/Ctrl-R/Alt-C 走 fzf-tmux（FZF_TMUX=1）
+      tmux.enableShellIntegration = true;
       # 默认 UI
       defaultOptions = [
         "--height 40%"
