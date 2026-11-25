@@ -187,10 +187,11 @@ in
           mOnHover = "#FFFFFF";
           mShadow = "#000000";
 
-          # 终端色槽属于"工作区"一族而不是壳层。这里就是 Catppuccin Frappe
-          # （terminal 模板现在开着，见本文件顶部的 theme.templates）—— Noctalia 按它
-          # 渲染 btop/yazi 与 eza/fish，故工作区配色与本文件同源；
-          # 亮色那一份是 Latte（见下面 light 块）。
+          # 终端色槽属于"工作区"一族而不是壳层。这里是 Catppuccin Frappe，亮色那一份
+          # 是 Latte（见下面 light 块）。模板渲染已于 2026-11-17 停用（见本文件上方
+          # theme.templates 处的注释），该色槽现在只供 Noctalia 的终端调色板 / 终端相关
+          # 配色使用，不再渲染到 btop / yazi / eza / fish。btop / yazi 已各自回落自带默认
+          # 主题，eza / fish 跟随终端 ANSI 16 色，故终端配色仍与本文件同源。
           terminal = {
             background = "#303446";
             foreground = "#C6D0F5";
