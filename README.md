@@ -107,7 +107,7 @@ nix store optimise
 - 窗口管理器：[Niri](https://github.com/YaLTeR/niri)（Wayland 平铺合成器）
 - 桌面外壳：[Noctalia](https://github.com/noctalia-dev/noctalia-shell)（启动器 / 控制中心 / 壁纸 / 锁屏）
 - 浏览器：[Zen Browser](https://zen-browser.app/)（默认）、[Brave](https://brave.com/)
-- 主题：壳层 MacTahoe（GTK / Qt / 图标，单一强调色 `#0088FF`）+ 工作区 Catppuccin
+- 主题：壳层 WhiteSur（macOS 风格，GTK / Qt / 图标，单一强调色 `#0088FF`）+ 工作区 Catppuccin
   （终端 / 编辑器 / shell / 文件管理器，Frappe / Latte 跟随亮暗）
 - 字体：Maple Mono NF CN（代码）、HarmonyOS Sans SC（界面）、LXGW WenKai（中文衬线）
 
