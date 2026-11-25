@@ -34,7 +34,7 @@ let
 
   # 重试间隔：virbr0 未就绪时按此周期重启（libvirtd 为 socket 激活，网桥随
   # libvirtd/默认网络启动才出现，开机瞬间未必存在）
-  retrySec = 10;
+  retrySec = 2;
 
   # redsocks 在网桥地址上的监听端口（仅客户机可达，与 mihomo 的 7897 分开）
   redsocksPort = 12345;
