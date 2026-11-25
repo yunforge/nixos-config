@@ -58,6 +58,7 @@
 | `cd` / `cdi` | zoxide 跳转 / 交互式选择（由 `programs.zoxide` 的 `--cmd cd` 接管内置 `cd`） |
 | `zquery` | zoxide 查询历史目录 |
 | `Ctrl` + `o` | 命令选择器（fzf 模糊选择常用命令） |
+| `Ctrl` + `g` / `rgf [rg 参数]` | 全文模糊搜索（rg + fzf）：`rgf TODO` 直接搜，`rgf` 不带参数会先提示 pattern；回车用 nvim 跳到命中行，bat 预览高亮该行。按文件名找仍用 `Ctrl` + `t`（fd） |
 | `cheat <provider>` | 快捷键速查表（fish / tmux / vim） |
 | `lg` | lazygit（由 `programs.lazygit` 的 fish 集成提供，退出时 `cd` 到刚才操作过的目录） |
 

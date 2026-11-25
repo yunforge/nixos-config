@@ -130,8 +130,39 @@ in
           end
         '';
       };
+      # 全文模糊搜索：rg 列出「文件:行:内容」→ fzf 选择 → 回车用 nvim 跳到命中行。
+      # 与 fd（Ctrl-T，只按文件名找）互补。带参数时原样交给 rg（`rgf TODO`、
+      # `rgf -t py foo` 都行；pattern 以 - 开头写 `rgf -- -foo`），不带参数先提示
+      # 输入 pattern，空回车即退出。
+      # --delimiter : 只为让 {1}（文件）/ {2}（行号）能取到字段；fzf 会给占位符
+      # 自动加 shell 引号，路径带空格也安全。预览用 bat 高亮命中行，fzf 的
+      # +{2}/2 把预览滚到该行附近。rg 隐藏文件、忽略规则、smart-case 全局已配
+      # （见 common/shell/default.nix 的 programs.ripgrep）。
+      functions.rgf = {
+        description = "Full-text fuzzy search (rg + fzf), open the match in Neovim";
+        body = ''
+          set -l args $argv
+          if test (count $args) -eq 0
+            read -P 'rg> ' args
+            if test -z "$args"
+              return
+            end
+          end
+          rg --line-number --no-heading --color=always $args \
+            | fzf --ansi --delimiter : \
+                --prompt='rg> ' \
+                --height 40% \
+                --layout=reverse \
+                --border \
+                --preview 'bat --color=always --style=numbers --highlight-line {2} {1}' \
+                --preview-window 'right:60%:+{2}/2' \
+                --bind 'enter:become(nvim +{2} {1})'
+        '';
+      };
       interactiveShellInit = ''
         set fish_greeting ""
+        # Ctrl-G：全文模糊搜索（rgf），回车用 nvim 跳到命中行
+        bind \cg rgf
         # 设置终端为英文环境
         set -gx LC_ALL en_US.UTF-8
         set -gx EDITOR nvim
