@@ -163,6 +163,13 @@ in
       implementation = "broker";
     };
 
+    # 日志上限：journald 默认按磁盘 10% 封顶（1.9 TB 盘约 190 GB）。
+    # 持久日志限 1 GB、运行时（/run）限 256 MB，保留足够排查历史。
+    services.journald.settings.Journal = {
+      SystemMaxUse = "1G";
+      RuntimeMaxUse = "256M";
+    };
+
     # 允许非自由软件
     nixpkgs.config.allowUnfree = true;
 
