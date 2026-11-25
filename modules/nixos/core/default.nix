@@ -62,8 +62,8 @@ in
     system.autoUpgrade = {
       enable = true;
       allowReboot = false;
-      # 改到白天常开机时段触发，避开凌晨无人期。
-      dates = "12:00";
+      # 每周日中午触发一次，避开凌晨无人期。
+      dates = "Sun 12:00";
       # 关闭「漏跑补执行」：persistent=true（默认）会把错过的 04:40 升级在下次
       # 开机/休眠唤醒的瞬间立刻补跑一次 nixos-rebuild switch（重启
       # home-manager 等单元），表现为长时间休眠后唤醒特别卡顿。设 false 后
