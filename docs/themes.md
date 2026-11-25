@@ -331,8 +331,9 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 | 壳层：niri 装饰 + GTK + Qt + Noctalia bar | macOS 中性灰 + 单一强调色 `#0088FF` | WhiteSur 的 `gtk-4.0/gtk.css` |
 | 工作区：终端 + 编辑器 + shell + 文件管理器 + 系统监控 | 暗 Catppuccin Frappe / 亮 Catppuccin Latte | **Noctalia 调色板的 `terminal` 色槽**；Neovim、yazi、btop、eza、fish 多处同源。例外：fastfetch 保留一套固定冷蓝色阶（见「fastfetch」一节） |
 
-> 工作区一族现在也由 Noctalia 的 `terminal` 色槽统一供色：暗色块填 Frappe、亮色块填 Latte，
-> 亮暗切换时整族一起换（btop/yazi/eza/fish 由 Noctalia 模板渲染，nvim/tmux/fastfetch 随终端或自行跟随）。
+> 工作区一族的终端配色仍由 Noctalia 的 `terminal` 色槽同源供给：暗色块 Frappe、亮色块 Latte，
+> 亮暗切换时随之切换。Noctalia 模板渲染已于 2026-11-17 停用，色槽现只供终端调色板与终端相关配色；
+> btop/yazi 各自用自带默认主题，eza/fish 跟随终端 ANSI 16 色，nvim/tmux/fastfetch 随终端或自行跟随。
 > **亮色块必须显式填 `terminal`**：Noctalia 在色块缺 `terminal` 时自行推导，实测推导把绿色槽给成了蓝色
 > （`mactahoe` 只填 `dark.terminal` 时，亮色渲染出 `palette2 = #0076df`）。
 
@@ -455,8 +456,9 @@ GUI 会把自己的 `[bar.default.monitor.*]` 写进 state，那时起就以 GUI
 
 ### 终端色槽（`terminal`）
 
-调色板的每个色块还带一个 `terminal` 子表（16 色 + 前景/背景/光标/选区），供 Noctalia 渲染
-终端类模板使用。暗色块 = Catppuccin **Frappe**，亮色块 = Catppuccin **Latte**，语义槽位对齐
+调色板的每个色块还带一个 `terminal` 子表（16 色 + 前景/背景/光标/选区），供 Noctalia 的终端调色板 /
+终端相关配色使用（模板渲染已于 2026-11-17 停用）。暗色块 = Catppuccin **Frappe**，
+亮色块 = Catppuccin **Latte**，语义槽位对齐
 暗色那份（详见「双层配色模型」）：`foreground = text`、`cursor = rosewater`、选区 = `mauve`。
 **两个色块都必须显式填**，理由见「双层配色模型」的说明（缺了会被推导成错色相）。
 
