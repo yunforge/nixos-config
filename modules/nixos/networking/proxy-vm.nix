@@ -155,36 +155,45 @@ in
     networking.firewall.extraCommands = lib.mkIf (cfg.enable && cfg.transparentForVms) ''
       # 客户机 -> 外网的 TCP 与 DNS 改投宿主代理；只匹配从 virbr0 进入的
       # 转发流量，不影响宿主自身与局域网。
-      iptables -w -t nat -N LIBVIRT_PROXY 2>/dev/null || true
-      iptables -w -t nat -F LIBVIRT_PROXY
+      # 先清掉可能残留的跳转/丢弃规则（extraStopCommands 正常也会做，
+      # 这里兜底 ExecStart 被单独重跑的异常路径），其余规则一次性重建。
+      iptables -w -t nat -D PREROUTING -i ${bridge} -j LIBVIRT_PROXY 2>/dev/null || true
+      iptables -w -D FORWARD -i ${bridge} -p udp --dport 443 -j DROP 2>/dev/null || true
+
+      iptables-restore -w --noflush <<'EOF'
+      *nat
+      :LIBVIRT_PROXY - [0:0]
+      -F LIBVIRT_PROXY
 
       # DNS 放在私网放行之前：客户机的默认 DNS 就是网桥地址，也必须改投
       # mihomo 的 fake-ip DNS，否则 mihomo 只能看到 IP、拿不到域名。
-      iptables -w -t nat -A LIBVIRT_PROXY -p udp --dport 53 -j REDIRECT --to-ports ${toString cfg.dnsPort}
-      iptables -w -t nat -A LIBVIRT_PROXY -p tcp --dport 53 -j REDIRECT --to-ports ${toString cfg.dnsPort}
+      -A LIBVIRT_PROXY -p udp --dport 53 -j REDIRECT --to-ports ${toString cfg.dnsPort}
+      -A LIBVIRT_PROXY -p tcp --dport 53 -j REDIRECT --to-ports ${toString cfg.dnsPort}
 
       # 私网/保留地址直连：含宿主服务、其他 VM、exposeToVms 的 socat 转发口。
       # 注意不要排除 198.18.0.0/16 —— 那是 mihomo fake-ip 的地址段，必须
       # 送进 redsocks 才能映射回域名。
-      iptables -w -t nat -A LIBVIRT_PROXY -d 0.0.0.0/8 -j RETURN
-      iptables -w -t nat -A LIBVIRT_PROXY -d 10.0.0.0/8 -j RETURN
-      iptables -w -t nat -A LIBVIRT_PROXY -d 127.0.0.0/8 -j RETURN
-      iptables -w -t nat -A LIBVIRT_PROXY -d 169.254.0.0/16 -j RETURN
-      iptables -w -t nat -A LIBVIRT_PROXY -d 172.16.0.0/12 -j RETURN
-      iptables -w -t nat -A LIBVIRT_PROXY -d 192.168.0.0/16 -j RETURN
-      iptables -w -t nat -A LIBVIRT_PROXY -d 224.0.0.0/4 -j RETURN
-      iptables -w -t nat -A LIBVIRT_PROXY -d 240.0.0.0/4 -j RETURN
+      -A LIBVIRT_PROXY -d 0.0.0.0/8 -j RETURN
+      -A LIBVIRT_PROXY -d 10.0.0.0/8 -j RETURN
+      -A LIBVIRT_PROXY -d 127.0.0.0/8 -j RETURN
+      -A LIBVIRT_PROXY -d 169.254.0.0/16 -j RETURN
+      -A LIBVIRT_PROXY -d 172.16.0.0/12 -j RETURN
+      -A LIBVIRT_PROXY -d 192.168.0.0/16 -j RETURN
+      -A LIBVIRT_PROXY -d 224.0.0.0/4 -j RETURN
+      -A LIBVIRT_PROXY -d 240.0.0.0/4 -j RETURN
 
       # 其余 TCP 全部交给 redsocks（SOCKS5 可承载任意 TCP）
-      iptables -w -t nat -A LIBVIRT_PROXY -p tcp -j REDIRECT --to-ports ${toString redsocksPort}
+      -A LIBVIRT_PROXY -p tcp -j REDIRECT --to-ports ${toString redsocksPort}
 
-      iptables -w -t nat -D PREROUTING -i ${bridge} -j LIBVIRT_PROXY 2>/dev/null || true
-      iptables -w -t nat -A PREROUTING -i ${bridge} -j LIBVIRT_PROXY
+      -A PREROUTING -i ${bridge} -j LIBVIRT_PROXY
+      COMMIT
 
+      *filter
       # QUIC 走 UDP，redsocks 无法转发；丢弃 UDP/443 迫使浏览器回落 TCP。
       # 其余 UDP（游戏、语音等）不在本方案的覆盖范围内，仍直连。
-      iptables -w -D FORWARD -i ${bridge} -p udp --dport 443 -j DROP 2>/dev/null || true
-      iptables -w -I FORWARD 1 -i ${bridge} -p udp --dport 443 -j DROP
+      -I FORWARD 1 -i ${bridge} -p udp --dport 443 -j DROP
+      COMMIT
+      EOF
     '';
 
     networking.firewall.extraStopCommands = lib.mkIf (cfg.enable && cfg.transparentForVms) ''
