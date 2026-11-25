@@ -1,6 +1,6 @@
 # 主题与外观
 
-配置位置：`modules/home-manager/gui/desktop/linux/niri/noctalia.nix`（**Noctalia 调色板；模板已停用**）+ `modules/home-manager/gui/desktop/linux/themes/noctalia-templates/`（历史 eza / fish 模板，未注册）+ `modules/home-manager/gui/desktop/linux/themes/variants.nix`（GTK/Qt/图标 的亮暗接线与 `theme-apply`）+ `modules/home-manager/gui/desktop/linux/themes/default.nix`（Qt/GTK）+ `modules/home-manager/gui/desktop/linux/niri/default.nix`（Niri 结构与非配色项）。
+配置位置：`modules/home-manager/gui/desktop/linux/niri/noctalia.nix`（**Noctalia 调色板；模板已停用**）+ `modules/home-manager/gui/desktop/linux/themes/variants.nix`（GTK/Qt/图标 的亮暗接线与 `theme-apply`）+ `modules/home-manager/gui/desktop/linux/themes/default.nix`（Qt/GTK）+ `modules/home-manager/gui/desktop/linux/niri/default.nix`（Niri 结构与非配色项）。
 
 整个桌面有**两套外观**，真源是 Noctalia 的 theme mode（状态栏那个主题图标，`noctalia msg theme-mode-toggle`）：
 切一下，壳层（macOS 中性灰 + 单一强调色）与工作区（Catppuccin）各自在亮/暗两态之间换，而
@@ -70,8 +70,8 @@ niri 用内置默认色，见「Noctalia 不再渲染应用主题」一节）。
 | niri 装饰 | `~/.config/niri/noctalia.kdl` 已删除；`config.kdl` 的 `include` 是 `optional=true`，用 niri 内置默认色 |
 | fzf / glow / lazygit / tmux / ghostty / qt5ct / qt6ct | 生成的主题文件未被任何配置引用，可直接删除 |
 
-模板源码（`modules/home-manager/gui/desktop/linux/themes/noctalia-templates/` 里的 eza / fish）
-仍留在仓库里但不再注册；`customPalettes.mactahoe` 的 `terminal` 色块也保留，方便以后重新启用。
+模板源码已于 2026-11-25 删除；`customPalettes.mactahoe` 的 `terminal` 色块仍保留，
+它供终端调色板使用，见「双层配色模型」一节。
 
 ⚠️ 运行时 `~/.local/state/noctalia/settings.toml` 里的 `[theme.templates]` 段会**整体覆盖**
 Nix 里的空列表。停用时必须把运行时那段删一次，再 `noctalia msg config-reload`，否则 Noctalia
