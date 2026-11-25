@@ -13,12 +13,14 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | 桌面环境（desktop，SDDM 会话可切换） | KDE Plasma 6（Wayland）；默认登录进 Plasma，niri 仍可选 |
 | Shell（桌面外壳） | [Noctalia](https://github.com/noctalia-dev/noctalia-shell) - 启动器 / 控制中心 / 壁纸 / 锁屏 |
 | 显示管理器 | SDDM（Wayland greeter；Plasma 主机用 kwin 合成器，其余用 weston kiosk） |
-| 输入法 | Fcitx5 + Rime（万象拼音） |
+| 输入法 | 水杉输入法（`msime-fcitx5`，基于 Fcitx5；见 `docs/input.md`） |
 
 > **KDE 自带应用已裁剪**：`modules/nixos/desktop/plasma.nix` 用 `environment.plasma6.excludePackages`
-> 剔除了与下方应用功能重复的 KDE 自带程序（Dolphin、Konsole、Kate、Gwenview、Okular、Elisa、
-> Ark、KHelpCenter、ffmpegthumbs、krdp、qrca、discover、额外壁纸等），只保留 KWin / plasmashell /
-> systemsettings 等桌面本体，以及 fcitx5 依赖的虚拟键盘组件。要恢复某个 KDE 应用，从该列表里删掉即可。
+> 剔除了与下方应用功能重复的 KDE 自带程序（baloo-widgets、gwenview、okular、elisa、ark、
+> ffmpegthumbs、khelpcenter、krdp、qrca、discover、plasma-workspace-wallpapers、union），
+> 只保留 KWin / plasmashell / systemsettings 等桌面本体，以及 fcitx5 依赖的虚拟键盘组件。
+> Dolphin 与 Kate 保留；Konsole 由 `modules/home-manager/gui/apps/linux/utilities.nix` 显式安装。
+> 要恢复某个 KDE 应用，从该列表里删掉即可。
 
 ## 终端
 
