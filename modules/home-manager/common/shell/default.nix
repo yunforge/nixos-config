@@ -53,7 +53,8 @@ in
       config.global.hide_env_diff = true;
     };
 
-    # ls 的现代替代；fish 的 ls / ll / la / lla / lt 别名由该模块生成
+    # ls 的现代替代；fish 的 ls / ll / la / lla / lt 别名由该模块生成，
+    # 其中 ll / lla 在本模块下方被覆盖（长列表才要列标题）
     programs.eza = {
       # 启用 eza
       enable = true;
@@ -65,13 +66,20 @@ in
       enableFishIntegration = true;
       # Git 状态
       git = true;
-      # 额外的 eza CLI 参数
+      # 额外的 eza CLI 参数（只作用于 HM 生成的 `eza` 别名）
       extraOptions = [
         # 目录排在文件前
         "--group-directories-first"
-        # long view 显示列标题
-        "--header"
       ];
+    };
+
+    # 列标题只对长格式有意义，挂在长列表别名上。不能进上面的 extraOptions：
+    # fish 里 `ls` / `ll` 等别名都经 `eza` 别名二次展开（别名是函数，
+    # `ls` → `eza` → `eza <extraOptions>`），放 extraOptions 会让裸 ls 也打印标题。
+    # HM 用 mkDefault 定义 ll / lla，故此处直接覆盖同键即可。
+    programs.fish.shellAliases = {
+      ll = "eza -l --header";
+      lla = "eza -la --header";
     };
 
     # cd 的现代替代；接管内置 cd（--cmd cd）并注入补全，包也由模块安装，
