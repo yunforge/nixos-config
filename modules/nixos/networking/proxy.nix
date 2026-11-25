@@ -25,7 +25,6 @@ let
     "fd7a:115c:a1e0::/48"
     "ts.net"
     # 国内 Nix 镜像：直连快于代理
-    "mirrors.tuna.tsinghua.edu.cn"
     "mirrors.ustc.edu.cn"
   ];
   proxyEnv = {

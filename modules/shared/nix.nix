@@ -15,11 +15,11 @@
     ];
     # 自动存储优化，定期优化存储以节省空间
     auto-optimise-store = true;
-    # 镜像在前（国内加速）。cache.nixos.org 不在此列：nixpkgs 与 nix-darwin
+    # 镜像在前（国内加速）；清华源暂时移除，仅保留 USTC（见 docs/quirks.md）。
+    # cache.nixos.org 不在此列：nixpkgs 与 nix-darwin
     # 的 nix 模块都会 mkAfter 追加官方源并无条件提供其公钥（darwin 侧曾显式
     # 写出，实际求值出两条重复项），此处只声明增量，避免合并后重复。
     substituters = [
-      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
       "https://mirrors.ustc.edu.cn/nix-channels/store"
       "https://nix-community.cachix.org"
     ];
