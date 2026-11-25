@@ -58,4 +58,9 @@
     # NVIDIA 由主机显式开启（hardware 域的聚合默认值不含它）
     hardware.nvidia.enable = true;
   };
+
+  # Plasma6 模块以 mkDefault 打开了 geoclue2，但本机不使用定位：
+  # 系统 geoclue.service 从未被激活，只剩 geoclue-agent 用户单元空转。
+  # 普通赋值覆盖上游 mkDefault；代价是依赖定位的部件（如天气）不可用。
+  services.geoclue2.enable = false;
 }
