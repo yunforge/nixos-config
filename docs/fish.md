@@ -86,6 +86,22 @@ shell 集成与补全，`home.packages` 里不再重复列。
 
 `$HOME` 只排自身，`~/Projects` 这类子目录仍会入库。
 
+`_ZO_FZF_OPTS`（同一模块）给 `cdi` 加目录预览：右侧 50% 用
+`eza --tree --level=1` 展开候选目录。语义上有个大坑：zoxide 0.10 起该变量是当作
+**FZF_DEFAULT_OPTS 整体替换**传给 fzf，而不是追加。一旦设置，zoxide 内置的
+`--exact` / `--no-sort` / `--height=45%` 等参数**和自带的 ls 预览**全部失效，
+`programs.fzf` 的全局 `FZF_DEFAULT_OPTS` 也被顶掉（`--no-sort` 没了会让候选按
+路径长度重排、丢掉 frecency 顺序）。所以配置里把 zoxide 内置默认参数抄了一份，
+只换预览命令；升级 zoxide 后若上游默认有变，要对照源码 `get_fzf()` 跟一下。
+两个易错点：
+
+- 占位符必须 `{2..}` 而不是 `{}`：zoxide 每行是 `<score>\t<path>`（fzf 侧
+  `--delimiter` 为制表符、`--nth=2`），`{}` 会把分数一起传给 eza；
+- 预览命令的 stdout 是管道不是 TTY，eza 的 `auto` 会**连图标和颜色一起关掉**，
+  必须写 `always`；
+- 预览参数只能用**单引号**：HM 生成的 `hm-session-vars.sh` 用双引号包整个值，
+  内层再写双引号会把值截断，babelfish 转 fish 时构建期报 `invalid var name`。
+
 ## PATH 与工具可见性
 
 `programs.fish.shellInit` 开头有一行 `fish_add_path ${config.home.profileDirectory}/bin`

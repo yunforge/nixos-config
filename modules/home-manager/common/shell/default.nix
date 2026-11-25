@@ -108,6 +108,32 @@ in
       "/.snapshots*"
     ];
 
+    # cdi（zoxide 交互选择）的 fzf 参数：列表右侧加一栏 eza 目录树预览。
+    # ⚠️ zoxide 0.10 起 _ZO_FZF_OPTS 是当作 FZF_DEFAULT_OPTS **整体替换**传给 fzf，
+    # 不是追加：一旦设置，zoxide 内置的 --exact / --no-sort / --height=45% 与自带 ls
+    # 预览全部失效，programs.fzf 的全局 FZF_DEFAULT_OPTS 也被顶掉。故这里把 zoxide
+    # 内置默认原样抄回，只把预览换成 eza；升级 zoxide 后若上游默认有变需跟一下。
+    # 两个实测坑：① 占位符必须 {2..} 不是 {}：zoxide 每行是 "<score>\t<path>"
+    # （fzf 侧 --delimiter 为制表符、--nth=2），{} 会把分数一起传给 eza；② 预览命令
+    # 的 stdout 是管道不是 TTY，eza 的 auto 会连颜色和图标一起关掉，必须用 always。
+    # 另注意预览参数只能用单引号：HM 生成的 hm-session-vars.sh 用双引号包整个值，
+    # 内层再写双引号会把它截断，babelfish 转 fish 时直接报 invalid var name。
+    home.sessionVariables._ZO_FZF_OPTS = lib.concatStringsSep " " [
+      "--exact"
+      "--no-sort"
+      "--bind=ctrl-z:ignore,btab:up,tab:down"
+      "--cycle"
+      "--keep-right"
+      "--border=sharp"
+      "--height=45%"
+      "--info=inline"
+      "--layout=reverse"
+      "--tabstop=1"
+      "--exit-0"
+      "--preview='eza --tree --level=1 --icons=always --color=always {2..}'"
+      "--preview-window=right:50%"
+    ];
+
     # ── 二、常用 CLI 工具（gh / bat / ripgrep / fd / jq / tldr） ──────────────
 
     # GitHub CLI；config.yml 由 HM 生成（gh config set 的改动会被下次激活覆盖，改配置回仓库），
