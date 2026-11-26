@@ -31,6 +31,34 @@ in
     # services.displayManager.sessionPackages，与 niri 的会话合并注册到 SDDM。
     services.desktopManager.plasma6.enable = true;
 
+    # KWin 6.8.3 注销/登录黑屏回归（KDE #528824）的上游修复回移。
+    # 6.8.3 把 libinput 初始事件队列放在 InputRedirection 构造函数里处理，此时
+    # 全局单例尚未设置；注销/登录瞬间的 pointer motion 会解引用空指针，使 SDDM 的
+    # Wayland greeter kwin 崩溃、greeter 随之退出，而 SDDM 不重启 greeter → 黑屏。
+    # 修复（6.8.4）把 setupInputBackends() 从构造函数移到 init()，共 2 行；
+    # 补丁取自上游 6.8 分支 cherry-pick 19404161bc367b87b794361915b85a14c034ec63。
+    # 只在本模块生效（Plasma 主机），不进 overlays/default.nix：后者同时供
+    # flake 的 packages 输出枚举，把 kdePackages 整体覆盖会污染那批输出。
+    # 移除条件：nixpkgs 的 kwin 升到 >= 6.8.4 后，删除本 overlay 与
+    # pkgs/kwin/input-init-after-redirection.patch，并删 docs/quirks.md 对应条目。
+    nixpkgs.overlays = [
+      (final: prev: {
+        kdePackages = prev.kdePackages.overrideScope (
+          kfinal: kprev: {
+            kwin = kprev.kwin.overrideAttrs (old: {
+              # 6.8.4 起上游已含修复；版本守卫让 nixpkgs 滚动到 6.8.4 后
+              # 补丁自动失效，不会因上下文不匹配让每日 autoUpgrade 构建失败。
+              patches =
+                (old.patches or [ ])
+                ++ lib.optionals (lib.versionOlder old.version "6.8.4") [
+                  ../../../pkgs/kwin/input-init-after-redirection.patch
+                ];
+            });
+          }
+        );
+      })
+    ];
+
     # KDE 默认会装一大堆自家应用。本仓库已有等价工具，这里按包名排除重复/用不到的，
     # 只保留 Plasma 桌面本体与必要的集成组件（机制：plasma6 模块把这些放在
     # optionalPackages，用 environment.plasma6.excludePackages 按包名剔除）。
