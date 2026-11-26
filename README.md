@@ -109,7 +109,7 @@ nix store optimise
 - 浏览器：[Zen Browser](https://zen-browser.app/)（默认）、[Brave](https://brave.com/)
 - 主题：壳层 WhiteSur（macOS 风格，GTK / Qt / 图标，单一强调色 `#0088FF`）+ 工作区 Catppuccin
   （终端 / 编辑器 / shell / 文件管理器，Frappe / Latte 跟随亮暗）
-- 字体：Maple Mono NF CN（代码）、HarmonyOS Sans SC（界面）、LXGW WenKai（中文衬线）
+- 字体：Maple Mono NF CN（代码）、Noto Sans CJK SC（界面）、LXGW WenKai（中文衬线）
 
 完整应用清单见 [`docs/softwares.md`](docs/softwares.md)，主题取舍见
 [`docs/themes.md`](docs/themes.md)。

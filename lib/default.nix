@@ -88,7 +88,7 @@ in
   # 无法吃 Nix 插值，改名时它需要手动同步。
   theme = {
     cursor = "Bibata-Modern-Ice";
-    fontSans = "HarmonyOS Sans SC";
+    fontSans = "Noto Sans CJK SC";
   };
 
   # 为所有支持的平台生成属性集

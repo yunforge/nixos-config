@@ -90,14 +90,14 @@ Nix 里的空列表。停用时必须把运行时那段删一次，再 `noctalia
 | SDDM 登录界面 | WhiteSur | 登录器换成 SDDM（Wayland greeter，不装 X server）；greeter 主题用自打包的 `whitesur-sddm-theme`（`WhiteSur-dark`，取自 WhiteSur-kde 的 6.2 变体），它仿 KDE Breeze，需把 `plasma-workspace` / `libplasma` / `plasma5support` / `kirigami` / `qt5compat` / `qtsvg` 放进 `services.displayManager.sddm.extraPackages` 供 greeter 的 QML 导入路径解析（否则黑屏 / 白屏），光标声明 `CursorTheme=Bibata-Modern-Ice`。全部在 `modules/nixos/desktop/sddm.nix` |
 | Niri 装饰配色 | **niri 内置默认** | Noctalia 不再渲染 `~/.config/niri/noctalia.kdl`；HM 只留结构项（宽度、几何、阴影），见下文 |
 | Niri 概览底色 | MacTahoe 同源 | `niri-colors/overview.kdl`，暗 `#242424` / 亮 `#FFFFFF`（Noctalia 的 niri 模板不管这一项） |
-| Noctalia Shell | **自定义调色板 `mactahoe`** | `customPalettes.mactahoe`，色值取自 MacTahoe（与 GTK/Qt 旧主题同源，换成 WhiteSur 后仍沿用）；界面字体 HarmonyOS Sans SC。**仅调色板归 Nix，bar 布局归 GUI**；只影响状态栏/面板，不再渲染应用主题，见下文 |
+| Noctalia Shell | **自定义调色板 `mactahoe`** | `customPalettes.mactahoe`，色值取自 MacTahoe（与 GTK/Qt 旧主题同源，换成 WhiteSur 后仍沿用）；界面字体 Noto Sans CJK SC。**仅调色板归 Nix，bar 布局归 GUI**；只影响状态栏/面板，不再渲染应用主题，见下文 |
 
 ## 字体
 
-- 界面字体：HarmonyOS Sans SC（12pt）
+- 界面字体：Noto Sans CJK SC（12pt）
 - 中文衬线阅读：LXGW WenKai（霞鹜文楷）
 - 代码 / 终端：Maple Mono Normal NL NF（CN）—— 特意取 `-unhinted` 构建
-- 中文兜底：Noto Sans/Serif CJK SC（fontconfig 别名加固，防止国产 Qt 应用缺字方块）
+- 中文回退：PingFang SC 与等宽家族 → Noto Sans/Mono CJK SC（fontconfig 别名 append 加固，防止国产 Qt 应用缺字方块）
 
 **字形渲染：灰度 + 不 hinting**（`modules/nixos/core/locale.nix`）。hinting 把笔画对齐到像素网格、次像素渲染借 R/G/B 子像素换横向分辨率；两者都是为小字号抢清晰度，代价是字形失去原本比例、字边出现彩边 —— 这里两个都不要，与 macOS 自 Mojave 起的取向一致。autohint 与字体选型尤其矛盾：等宽字体特意选了 `-unhinted` 构建（同一包有 hinted 变体而没选），而 autohint 正是对**没有自带 hinting** 的字体生效的开关。
 
@@ -389,7 +389,7 @@ GUI 里的任何改动            →  ~/.local/state/noctalia/settings.toml ←
 | `audio.enable_sounds` | `false` | **`true`** —— 出厂默认被 GUI 推翻（见下） |
 | `audio.enable_overdrive` | `true` | 在 settings.toml 里 → 以 GUI 为准 |
 | `brightness.enable_ddcutil` | laptop 上 `false` | desktop 实测 `true`（laptop 需单独核） |
-| `shell.font_family` | `HarmonyOS Sans SC` | 不在 settings.toml → **生效** ✅ |
+| `shell.font_family` | `Noto Sans CJK SC` | 不在 settings.toml → **生效** ✅ |
 | `bar.default.background_opacity` / `start` / `center` / `end` | `0.30` / 三处控件清单 | state 里有旧值 → **遮蔽**，要删一次才生效 |
 
 audio 那组里 `sound_volume` / `volume_change_sound` / `notification_sound` 已删：它们服务的功能被

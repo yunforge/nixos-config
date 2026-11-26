@@ -32,9 +32,9 @@
   fonts.fontDir.enable = true;
 
   fonts.packages = with pkgs; [
-    pkgs.nur.repos.guanran928.harmonyos-sans # 无衬线字体（界面主字体）
-    # 全量 CJK 兜底（谚文、罕用汉字；含等宽家族 Noto Sans Mono CJK SC）。
-    # 显式安装——localConf 的兜底家族名由它提供，不再依赖 enableDefaultPackages 顺带带入
+    # 无衬线字体（界面主字体）兼全量 CJK（谚文、罕用汉字；含等宽家族
+    # Noto Sans Mono CJK SC）。显式安装——localConf 的兜底家族名由它提供，
+    # 不再依赖 enableDefaultPackages 顺带带入
     noto-fonts-cjk-sans
     noto-fonts-cjk-serif # 宋体衬线；拉丁字形即 Source Serif 血统，故不再单装 source-serif-pro
     maple-mono.NormalNL-NF-CN-unhinted # 等宽字体（CN 变体）
@@ -63,43 +63,29 @@
   # 而它的默认值本来就是 "default"（即上游默认，不替换任何 conf.d 软链）。
 
   # 中文回退加固：部分国产 Qt 应用（欧陆词典等）对 fontconfig
-  # 的逐字回退依赖不可靠，若命中的字体缺字则直接渲染成方块。defaultFonts
-  # 把全量覆盖的 Noto CJK 排进无衬线链第二位——缺字先落**中性无衬线**的
-  # Noto，而不是楷体风格的文楷；常见中文家族名的逐名兜底见下方 localConf。
+  # 的逐字回退依赖不可靠，若命中的字体缺字则直接渲染成方块。无衬线主字体
+  # 即全量覆盖的 Noto Sans CJK SC——缺字不会落到楷体风格的文楷；常见中文
+  # 家族名的逐名兜底见下方 localConf。
   fonts.fontconfig.defaultFonts = {
-    sansSerif = [
-      myLib.theme.fontSans
-      "Noto Sans CJK SC"
-    ];
+    sansSerif = [ myLib.theme.fontSans ];
     # 宋体对位 macOS 的 Songti SC；Noto Serif CJK 的拉丁字形本就是
     # Source Serif 血统，中英文衬线一支全覆盖
     serif = [ "Noto Serif CJK SC" ];
     monospace = [ "Maple Mono Normal NL NF CN" ];
   };
 
-  # 优先级高于 defaultFonts；给中文家族名补一条全量 CJK 兜底
+  # 优先级高于 defaultFonts；给非主字体的中文家族名补一条全量 CJK 兜底
   #
   # 必须用 mode="append"（追加到家族列表**末尾**），不能用 prepend：
-  # prepend 是「插到最前」＝把用户请求的家族整个顶掉。实测 prepend + binding="strong"
-  # 会让 `fc-match "HarmonyOS Sans SC"` 返回 Noto Sans CJK SC —— GTK 的 gtk-font-name
-  # 与 Noctalia 的 font_family 都写的是 HarmonyOS，于是界面实际全程在渲染 Noto 的
-  # 拉丁字形，HarmonyOS 从未被用上。append 则保留请求家族，只在缺字时才轮到 Noto。
+  # prepend 是「插到最前」＝把用户请求的家族整个顶掉，兜底字体反而成了主字体
+  # （实测见 docs/quirks.md）。append 则保留请求家族，只在缺字时才轮到 Noto。
   #
   # fontconfig 单个 <test> 只允许一个 <string>（多值会告警且丢弃后续值），故逐名拆分。
   fonts.fontconfig.localConf = ''
     <?xml version="1.0"?>
     <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
     <fontconfig>
-      <!-- 无衬线中文家族 → 追加 Noto Sans CJK SC 兜底（HarmonyOS Sans SC 自带假名，
-           但无谚文，缺字时由 Noto 接住） -->
-      <match target="pattern">
-        <test qual="any" name="family">
-          <string>${myLib.theme.fontSans}</string>
-        </test>
-        <edit name="family" mode="append" binding="weak">
-          <string>Noto Sans CJK SC</string>
-        </edit>
-      </match>
+      <!-- macOS 风格的无衬线中文家族 → 追加 Noto Sans CJK SC 兜底 -->
       <match target="pattern">
         <test qual="any" name="family">
           <string>PingFang SC</string>

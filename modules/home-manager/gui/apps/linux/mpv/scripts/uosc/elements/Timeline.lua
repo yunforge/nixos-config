@@ -80,8 +80,8 @@ end
 -- Reserve a stable digit budget for the whole file, including slow playback
 -- remaining times. Noto Sans digits fit within 0.58em, with room for borders.
 -- 本地：字体名由上游的 'Noto Sans' 改为 'sans-serif'（NixOS 侧没装 Noto Sans，
--- 改成通用族名后确定性命中 fonts.fontconfig.defaultFonts.sansSerif 首项）。
--- 上面的 0.58em 仍成立：本机 'sans-serif' 与 'Noto Sans' 落到同一个字体文件。
+-- 改成通用族名后确定性命中 fonts.fontconfig.defaultFonts.sansSerif 首项
+-- = Noto Sans CJK SC）。上面的 0.58em 仍成立：两者在本机落到同一支 CJK 字体。
 function Timeline:update_time_gutters()
 	local border = Elements:v('window_border', 'size', 0)
 	self.time_margin = border + 12 * state.scale
