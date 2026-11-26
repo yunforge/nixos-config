@@ -51,7 +51,6 @@ in
   config = lib.mkIf (cfg.enable && guiCfg.enable) {
     home.packages = with pkgs; [
       (wrapJb "clion" clion)
-      github-desktop
       zed-editor
       qtcreator # QT
       heidisql # 数据库

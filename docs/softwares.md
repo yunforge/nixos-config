@@ -45,7 +45,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | 编辑器 | Neovim、VSCode（**只装本体**，扩展由 VSCode 自带的 Settings Sync 管理，不再由 Nix 声明） |
 | IDE | JetBrains CLion（打包时补 skiko 渲染库）、Qt Creator |
 | AI 编程 | Claude Code、pi-coding-agent、CodeX |
-| Git | git、lazygit、github-desktop |
+| Git | git、lazygit |
 | 容器 | Distrobox + Podman、Docker 扩展、lazydocker |
 | 数据库 | HeidiSQL |
 
