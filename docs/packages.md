@@ -25,6 +25,7 @@
 | `mactahoe-icon-theme` | [vinceliuice/MacTahoe-icon-theme](https://github.com/vinceliuice/MacTahoe-icon-theme) | commit（tag 指向） | `839848b`（tag `2026-09-10`） | 同一 commit | 惰性保留：同上 |
 | `mactahoe-kvantum` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde) | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 惰性保留：同上 |
 | `mactahoe-sddm-theme` | [vinceliuice/MacTahoe-kde](https://github.com/vinceliuice/MacTahoe-kde)（子目录 `sddm/`） | commit（main，无 tag） | `cbf6a1f` | 同一 commit | 惰性保留：同上 |
+| `pingfang-sc` | [yunforge/Font-PingFang](https://github.com/yunforge/Font-PingFang)（本人 fork 的 macOS 苹方镜像，只取 `SC/*.otf`） | commit（静态镜像，不打 tag） | `497d8df`（2019-10-07） | 同一 commit | 最新（unfree：苹果字体不可再分发，自用） |
 | `windows-vm-media` | virtio-win（nixpkgs）+ WinApps `oem/` | 跟随 flake 输入 | — | — | 不手工升级 |
 
 各包的**为什么这么打包**写在 `pkgs/<包名>/default.nix` 文件头，这里不重复。
@@ -53,6 +54,7 @@ v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb�
 | `whitesur-plasma-splash` | `modules/nixos/desktop/sddm.nix`（仅 Plasma 主机，装进系统 profile 供 ksplashqml 读取） |
 | `whitesur-sddm-theme` | `modules/nixos/desktop/sddm.nix`（SDDM 主题 `WhiteSur-dark`） |
 | `mactahoe-*` | 2026-11-22 起无消费方；定义与 overlay 惰性保留，便于回退 |
+| `pingfang-sc` | `modules/nixos/core/locale.nix`（`fonts.packages`，所有 Linux 主机的界面主字体；家族名常量 `myLib.theme.fontSans`） |
 | `windows-vm-media` | `modules/nixos/virtualization`（`mySystem.virtualization`） |
 
 不在本清单里的东西：nixpkgs 里的一切（跟着 `nix flake update` 走）、flake inputs
@@ -272,6 +274,13 @@ git log -1 --format=%ci <rev>   # 取日期填 version
 nix store prefetch-file --json \
   https://raw.githubusercontent.com/winapps-org/winapps/<新 rev>/oem/<文件名> | jq -r .hash
 ```
+
+### 静态镜像（`pingfang-sc`）
+
+仓库是 2019 年的 macOS 苹方 OTF 镜像，不跟版本、不打 tag，上游基本不会再动。
+真要换 rev（比如要繁体 HK 或新字重）：改 `pkgs/pingfang-sc/default.nix` 的 `rev`，
+用 `nix flake prefetch --json github:yunforge/Font-PingFang/<rev>` 取哈希，
+再核对 `SC/PingFangSC_*.otf` 的 sha256 是否变了（变了才是真的换字体）。
 
 ## 坑
 

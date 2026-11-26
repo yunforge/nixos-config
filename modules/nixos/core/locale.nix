@@ -32,9 +32,10 @@
   fonts.fontDir.enable = true;
 
   fonts.packages = with pkgs; [
-    # 无衬线字体（界面主字体）兼全量 CJK（谚文、罕用汉字；含等宽家族
-    # Noto Sans Mono CJK SC）。显式安装——localConf 的兜底家族名由它提供，
-    # 不再依赖 enableDefaultPackages 顺带带入
+    pingfang-sc # 界面主字体：苹方简体（6 个字重，unfree，自维护包）
+    # 全量 CJK 兜底（谚文、罕用汉字；含等宽家族 Noto Sans Mono CJK SC）：
+    # 主字体换成 PingFang 后它退居回退链，但 localConf 的兜底家族名仍由它提供，
+    # 且 PingFang 不含谚文 / 罕用汉字，必须显式安装、不能靠 enableDefaultPackages 顺带带入
     noto-fonts-cjk-sans
     noto-fonts-cjk-serif # 宋体衬线；拉丁字形即 Source Serif 血统，故不再单装 source-serif-pro
     maple-mono.NormalNL-NF-CN-unhinted # 等宽字体（CN 变体）
@@ -64,10 +65,15 @@
 
   # 中文回退加固：部分国产 Qt 应用（欧陆词典等）对 fontconfig
   # 的逐字回退依赖不可靠，若命中的字体缺字则直接渲染成方块。无衬线主字体
-  # 即全量覆盖的 Noto Sans CJK SC——缺字不会落到楷体风格的文楷；常见中文
-  # 家族名的逐名兜底见下方 localConf。
+  # PingFang SC 覆盖常用简体汉字，谚文 / 罕用汉字由下方 localConf 逐名兜底到
+  # 全量覆盖的 Noto Sans CJK SC——缺字不会落到楷体风格的文楷。
   fonts.fontconfig.defaultFonts = {
-    sansSerif = [ myLib.theme.fontSans ];
+    # 主字体之后的全量兜底：defaultFonts 列表的后续项在主字体缺字时接住，
+    # 对不读 localConf 的客户端也有效。
+    sansSerif = [
+      myLib.theme.fontSans
+      "Noto Sans CJK SC"
+    ];
     # 宋体对位 macOS 的 Songti SC；Noto Serif CJK 的拉丁字形本就是
     # Source Serif 血统，中英文衬线一支全覆盖
     serif = [ "Noto Serif CJK SC" ];
@@ -85,7 +91,9 @@
     <?xml version="1.0"?>
     <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
     <fontconfig>
-      <!-- macOS 风格的无衬线中文家族 → 追加 Noto Sans CJK SC 兜底 -->
+      <!-- 主字体 PingFang SC 缺字（谚文、罕用汉字）→ 追加 Noto Sans CJK SC 兜底。
+           这条在 PingFang 还是「国产 Qt 应用硬编码的家族名」时就有；主字体换成
+           PingFang 后它顺带成了主字体的缺字兜底，语义不变。 -->
       <match target="pattern">
         <test qual="any" name="family">
           <string>PingFang SC</string>

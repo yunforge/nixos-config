@@ -94,10 +94,10 @@ Nix 里的空列表。停用时必须把运行时那段删一次，再 `noctalia
 
 ## 字体
 
-- 界面字体：Noto Sans CJK SC（12pt）
+- 界面字体：PingFang SC 苹方（12pt；`pkgs/pingfang-sc` 自维护 unfree 包，家族名常量 `myLib.theme.fontSans`；KDE 侧由 `kde-appearance.nix` 写进 `kdeglobals`，与 GTK / fontconfig 同源）
 - 中文衬线阅读：LXGW WenKai（霞鹜文楷）
 - 代码 / 终端：Maple Mono Normal NL NF（CN）—— 特意取 `-unhinted` 构建
-- 中文回退：PingFang SC 与等宽家族 → Noto Sans/Mono CJK SC（fontconfig 别名 append 加固，防止国产 Qt 应用缺字方块）
+- 中文回退：PingFang SC 缺字（谚文、罕用汉字）→ Noto Sans CJK SC（`defaultFonts.sansSerif` 第二项 + localConf 别名 append 双保险）；等宽家族 → LXGW WenKai Mono → Noto Sans Mono CJK SC
 
 **字形渲染：灰度 + 不 hinting**（`modules/nixos/core/locale.nix`）。hinting 把笔画对齐到像素网格、次像素渲染借 R/G/B 子像素换横向分辨率；两者都是为小字号抢清晰度，代价是字形失去原本比例、字边出现彩边 —— 这里两个都不要，与 macOS 自 Mojave 起的取向一致。autohint 与字体选型尤其矛盾：等宽字体特意选了 `-unhinted` 构建（同一包有 hinted 变体而没选），而 autohint 正是对**没有自带 hinting** 的字体生效的开关。
 

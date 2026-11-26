@@ -18,13 +18,13 @@
 # 上游把界面文字的字体**写死在 Lua 里**（`font = 'Noto Sans'`），共 4 处：
 #   scripts/uosc/elements/{Timeline,TopBar,Volume}.lua、scripts/seek_feedback.lua
 # 而本机没装 Noto Sans（只有 Noto Sans **CJK**），故全部改成 `'sans-serif'`：
-# 确定性命中 fonts.fontconfig.defaultFonts.sansSerif 首项 = Noto Sans CJK SC
+# 确定性命中 fonts.fontconfig.defaultFonts.sansSerif 首项 = PingFang SC
 # （与菜单/OSD 文字一致，它们本来就走 mpv 的 --osd-font 默认值 sans-serif）。
 # 本机不装字面的 Noto Sans，直接写家族名只能靠回退链，`sans-serif` 才是
 # 「把运气改成显式」，视觉不变。
 # ⚠️ 别写成 `'Noto Sans CJK SC'`：直接写家族名会跳过 defaultFonts.sansSerif
 # 的首项排序，字号/字重变体也未必命中同一支；`sans-serif` 才是确定命中
-# Noto Sans CJK SC 的写法。
+# PingFang SC 的写法。
 #
 # 字体：uosc 被改造成用 ASS 字体 CupertinoIcons（名字写死在 scripts/uosc/lib/ass.lua，
 # 不是 mpv.conf 选项）—— 全部图标（播放/暂停、音量、菜单、buffering spinner、顶栏

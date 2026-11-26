@@ -1,9 +1,10 @@
 # KDE 外观（仓库声明部分）
 #
 # 全部外观取自 WhiteSur-kde 的浅色变体（上游 KDE 侧名不带 -light 后缀；只有
-# GTK 叫 WhiteSur-Light）。窗饰为圆角 opaque，按钮布局在右侧。面板布局与字体
-# 仍归系统设置；这里声明 WhiteSur 外观的各个面，因为它们在系统设置里没有稳定
-# 的「一次配置」入口，或在应用 Global Theme 后会被覆盖：
+# GTK 叫 WhiteSur-Light）。窗饰为圆角 opaque，按钮布局在右侧。面板布局仍归
+# 系统设置；字体取自 myLib.theme.fontSans（与 GTK / fontconfig 同一处常量），
+# 这里声明 WhiteSur 外观的各个面，因为它们在系统设置里没有稳定的「一次配置」
+# 入口，或在应用 Global Theme 后会被覆盖：
 #   - 窗口外角：KWin 服务端装饰（KDE/Qt 窗口）走上游圆角 WhiteSur-opaque
 #   - 窗口按钮：右侧 IAX（最小化/最大化/关闭），左侧留空
 #   - 配色方案：WhiteSur（整份 [Colors:*] 写入 kdeglobals）
@@ -15,6 +16,8 @@
 #   - 注销界面：WhiteSur（本模块在用户级构造 shell 包副本）
 #   - 光标主题：Bibata-Modern-Ice，24 逻辑像素（与 GTK/SDDM/niri 同款，
 #     名字来自 lib/default.nix 的 myLib.theme.cursor）
+#   - 字体：界面 / 菜单 / 工具栏 / 窗口标题 12pt，小字 10pt，家族统一取
+#     myLib.theme.fontSans（等宽 fixed 已由系统默认给出 Maple Mono，不在此改）
 #
 # 快速平铺间距见同目录 kwin-tile-gaps.nix（KWin 6.8 把 quick tile padding
 # 固定为 0，需要脚本补 8px）。
@@ -35,6 +38,7 @@
 }:
 let
   kwriteconfig = "${pkgs.kdePackages.kconfig}/bin/kwriteconfig6";
+  font = myLib.theme.fontSans;
   # 配色与桌面主题用 Plasma 官方 CLI：配色必须整份写入 [Colors:*]，
   # 只改 ColorScheme 名字时旧色值仍留在 kdeglobals 里（实测）。
   plasmaApplyColorScheme = "${pkgs.kdePackages.plasma-workspace}/bin/plasma-apply-colorscheme";
@@ -138,6 +142,20 @@ let
       --group Mouse --key cursorTheme ${myLib.theme.cursor}
     ${kwriteconfig} --file "$HOME/.config/kcminputrc" \
       --group Mouse --key cursorSize 24
+
+    # 字体：kdeglobals 的字体串格式是
+    #   家族,字号,-1,5,字重(50/75/87→整百制 400 等),斜体,0,0,0,0,0,…（KDE 6 的 19 字段）
+    # 直接照 Plasma 写出的原值改家族名，其余字段不动。
+    ${kwriteconfig} --file "$HOME/.config/kdeglobals" \
+      --group General --key font "${font},12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0"
+    ${kwriteconfig} --file "$HOME/.config/kdeglobals" \
+      --group General --key menuFont "${font},12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0"
+    ${kwriteconfig} --file "$HOME/.config/kdeglobals" \
+      --group General --key toolBarFont "${font},12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0"
+    ${kwriteconfig} --file "$HOME/.config/kdeglobals" \
+      --group General --key smallestReadableFont "${font},10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0"
+    ${kwriteconfig} --file "$HOME/.config/kdeglobals" \
+      --group WM --key activeFont "${font},12,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0"
 
     # 启动画面：ksplashqml 按 ksplashrc 的 Theme 找 LookAndFeel 包
     # （内容由系统级 whitesur-plasma-splash 装进 system profile）。

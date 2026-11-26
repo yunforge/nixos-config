@@ -70,6 +70,11 @@ final: prev: {
   #（打包理由见 pkgs/mcpp-m/default.nix 顶部）。
   mcpp-m = prev.callPackage ../pkgs/mcpp-m { };
 
+  # pingfang-sc：苹果苹方简体（上游 yunforge/Font-PingFang，即 macOS 自带那份 OTF 的
+  # 镜像）。nixpkgs 不收录（苹果字体不可再分发），故自维护；unfree，自用。
+  # 消费方：modules/nixos/core/locale.nix 的 fonts.packages（所有 Linux 主机的界面主字体）。
+  pingfang-sc = prev.callPackage ../pkgs/pingfang-sc { };
+
   # magpie：多个 AI agent 的统一模型选择器（上游 yetone/magpie，nixpkgs 未收录）。
   # 桌面版经 cgo 链接 GTK3 + WebKitGTK 4.1（闭包 847 MiB），只给有图形会话的主机；
   # magpie-cli 是同源码的 nogui/CGO_ENABLED=0 终端版，给 WSL 这类主机。

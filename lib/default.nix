@@ -88,7 +88,9 @@ in
   # 无法吃 Nix 插值，改名时它需要手动同步。
   theme = {
     cursor = "Bibata-Modern-Ice";
-    fontSans = "Noto Sans CJK SC";
+    # 界面主字体：苹果苹方（pkgs/pingfang-sc，见 docs/packages.md）。
+    # 缺字（谚文、罕用汉字等）由 locale.nix 的 localConf 追加 Noto Sans CJK SC 兜底。
+    fontSans = "PingFang SC";
   };
 
   # 为所有支持的平台生成属性集
