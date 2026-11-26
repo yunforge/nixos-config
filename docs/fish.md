@@ -113,11 +113,11 @@ shell 集成与补全，`home.packages` 里不再重复列。
 启动方式都能解析到这些 HM 包。
 
 `fnm env` 初始化用 `fnm env --use-on-cd --shell fish | source`：`--shell fish` 显式指定
-shell，**不依赖进程树推断**——Tern 等启动器下进程树里没有可识别的 shell，缺省会报
+shell，**不依赖进程树推断**——某些启动器下进程树里没有可识别的 shell，缺省会报
 `Can't infer shell!`；外层再用 `type -q fnm` 兜底，容器等没有 fnm 的环境不会在启动时刷错误。
 
-Tern 这类启动器用「干净环境 + `fish -l`」起 shell，只传
+某些启动器用「干净环境 + `fish -l`」起 shell，只传
 `/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin`，而 fish 不读 `/etc/profile`，所以
-podman / sudo 等系统命令在 Tern 面板里不可见。`shellInit` 在 Linux 上因此还会补回
+podman / sudo 等系统命令在这些终端面板里不可见。`shellInit` 在 Linux 上因此还会补回
 `/run/wrappers/bin` 与 `/run/current-system/sw/bin`；`/nix/var/nix/profiles/default/bin`
 在本机不存在，`fish_add_path` 会自动忽略不存在的目录。

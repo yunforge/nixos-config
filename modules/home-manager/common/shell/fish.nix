@@ -167,7 +167,7 @@ in
         set -gx LC_ALL en_US.UTF-8
         set -gx EDITOR nvim
         # 初始化 fnm（HM 无 programs.fnm 模块，需手动 source）
-        # --shell fish：不依赖进程树推断。Tern 等启动器下进程树里没有可识别的 shell，
+        # --shell fish：不依赖进程树推断。某些启动器下进程树里没有可识别的 shell，
         #   不指定时 fnm 会报 "Can't infer shell!"；显式指定后任何启动方式都正常。
         # type -q 兜底：容器/极简环境里没有 fnm 时不至于在启动时报错
         if type -q fnm
@@ -202,9 +202,9 @@ in
         zquery = "zoxide query -l -s";
       };
       shellInit = ''
-        # Tern 等“干净环境 + login shell”的启动器只给最小 PATH
+        # 某些“干净环境 + login shell”的启动器只给最小 PATH
         # （/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin），而 fish 不读 /etc/profile，
-        # 于是 podman / sudo / nix 等系统命令在 Tern 里会缺失。补回 NixOS 系统 profile。
+        # 于是 podman / sudo / nix 等系统命令会缺失。补回 NixOS 系统 profile。
         ${lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
           fish_add_path /run/wrappers/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin
         ''}

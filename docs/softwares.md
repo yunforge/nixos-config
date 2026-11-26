@@ -26,7 +26,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 
 | 组件 | 软件 |
 |------|------|
-| 终端模拟器 | Konsole（`utilities.nix` 装包）、Tern（手动装到 `~/Apps/Tern`） |
+| 终端模拟器 | Konsole（`utilities.nix` 装包）、tty7（`~/Apps/tty7` 本地 Nix 打包） |
 | Shell | Fish（含大量自定义别名） |
 | 终端复用器 | tmux（Omarchy 按键布局，见 `docs/tmux.md`） |
 | 终端文件管理器 | Yazi（`y`） |
