@@ -10,7 +10,6 @@
     ./communication.nix
     ./media.nix
     ./mpv.nix
-    ./nautilus.nix
     ./productivity.nix
     ./steam.nix
     ./development.nix

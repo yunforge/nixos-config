@@ -38,7 +38,7 @@ in
       baloo-widgets
       gwenview # 图片查看 → qView
       okular # 文档/PDF → Papers
-      elisa # 音乐播放 → Gapless
+      elisa # 音乐播放（仓库不装独立播放器）
       ark # 压缩包管理 → File Roller
       ffmpegthumbs # 视频缩略图（配合 Dolphin，已移除）
       khelpcenter # 帮助中心

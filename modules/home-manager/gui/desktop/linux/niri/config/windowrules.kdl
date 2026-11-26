@@ -161,14 +161,11 @@ window-rule {
     // 便签一直按平铺打开。实测 id 后改为精确匹配。
     match app-id="(?i)eudic"
     match app-id=r#"(?i)org\.gnome\.TextEditor"#
-    // 其它（AI 模型选择器 / Anki / 音乐 / 代理 / 磁盘占用图）
-    // ⚠ 这几个的 app-id 都不是照 .desktop 文件名写的 ——
-    // gapless 其实是 g4music
-    // （com.github.neithern.g4music）。照文件名写会静默不命中
-    // （gnome-text-editor 那条就是这么错的）。
+    // 其它（AI 模型选择器 / Anki / 代理 / 磁盘占用图）
+    // ⚠ 这几个的 app-id 都不是照 .desktop 文件名写的；照文件名写会静默不命中
+    // （gnome-text-editor 那条就是这么错的，实测 id 见上）。
     match app-id="(?i)magpie"
     match app-id="(?i)anki"
-    match app-id="(?i)g4music"
     // FlClash（代理客户端，取代 clash-verge）：app-id 来自上游
     // linux/CMakeLists.txt 的 APPLICATION_ID（com.follow.clash），
     // runner 里 g_set_prgname(APPLICATION_ID) 后作 Wayland app_id。

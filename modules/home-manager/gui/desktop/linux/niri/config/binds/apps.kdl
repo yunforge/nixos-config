@@ -16,7 +16,9 @@ binds {
     // 应用快捷方式
     Mod+Return         hotkey-overlay-title="终端"   { spawn "konsole"; }
     Mod+Shift+Return   hotkey-overlay-title="浏览器（Zen）" { spawn "zen-beta"; }
-    Mod+E       hotkey-overlay-title="文件管理器"   { spawn "nautilus"; }
+    // 文件管理器：Yazi（终端内运行，见 docs/softwares.md；`y` 是 fish 函数，
+    // 不能给 konsole -e，故直接调二进制）
+    Mod+E       hotkey-overlay-title="文件管理器（Yazi）"   { spawn "konsole" "-e" "yazi"; }
 
     // PicGo 剪贴板图片上传（Wayland 下 Electron globalShortcut 不可用，通过 Server API 实现）
     Mod+Alt+P hotkey-overlay-title="上传剪贴板图片" { spawn-sh "picgo-clipboard-upload"; }

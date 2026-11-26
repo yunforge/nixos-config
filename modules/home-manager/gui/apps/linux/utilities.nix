@@ -62,7 +62,6 @@ in
       gnome-text-editor
       pulse # 系统活动监视器（进程 / CPU / 内存 / GPU / 磁盘 / 网络 / 能耗）
       foliate # eBook阅读器
-      gapless # 本地音乐播放器
       # 终端（2026-11-14 起，替代已移除的 Ghostty）：只装包不写配置 —— laptop 无
       # Plasma 会话，不能依赖 plasma6 模块带出 konsole；desktop 的 Plasma 侧也有
       # 一份，同包不冲突
