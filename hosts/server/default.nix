@@ -20,6 +20,10 @@
 
   networking.hostName = "server";
 
+  users.users.${config.mySystem.primaryUser}.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEk2eNUcSiMJu0UFIyuvgRMUIYcvpmKNx+iNjP5vWssG"
+  ];
+
   # 引导：服务器通常用 systemd-boot（UEFI）；若为 BIOS 机器改用 grub。
   # 与 core 的默认值一致，写明是为了让部署者一眼看到这是要确认的项。
   boot.loader.systemd-boot.enable = true;

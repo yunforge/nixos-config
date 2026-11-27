@@ -107,6 +107,7 @@ server 角色的明确策略：
 - SSH 关闭密码认证（`PasswordAuthentication = false`，只允许密钥），
   `PermitRootLogin = prohibit-password`；防火墙只放行 22 与 3425（Magpie 网关，
   在 core 的 `allowedTCPPorts` 里）。
+- 主用户的 SSH 授权公钥由 `hosts/server/default.nix` 声明，随系统配置部署。
 - 不启用桌面 / 硬件 / 虚拟化；代理默认关闭，需要时在主机文件里开。
 - 定期重建与回滚沿用 core 的全局策略（按本地 `flake.lock` 切换、`allowReboot = false`，
   启动菜单最多保留 10 个代际，GC 7 天）。
