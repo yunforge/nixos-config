@@ -3,8 +3,7 @@
 # 消费方：modules/nixos/core/default.nix、modules/darwin/base.nix。
 # 两边此前各自维护一份镜像源/公钥/flakes 特性/allowUnfree/overlay 注入，
 # 靠注释提醒人肉保持一致（core 侧注释「与 darwin 侧的镜像顺序保持一致」），
-# 两份必然漂移，收口到这里；平台专属部分（NixOS 的 GC/trusted-users、
-# darwin 的 valgrind 放行等）仍留在各自 base。
+# 两份必然漂移，收口到这里；平台专属部分（如 NixOS 的 GC/trusted-users）仍留在各自基础模块。
 { inputs, ... }:
 {
   # 启用 Flakes 特性以及配套的新 nix 命令行工具

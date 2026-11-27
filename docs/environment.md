@@ -36,7 +36,7 @@ common 与 dev 里的 Linux 专属工具由各叶子模块用 `lib.optionals std
 | Node.js | `fnm`、`yarn`、`pnpm` | typescript-language-server、prettier、eslint |
 | Rust | `rustc`、`cargo` | rust-analyzer、rustfmt、clippy、cargo-watch/audit/outdated/nextest、taplo、cargo-cross |
 | Python | `python3`（**跟随 nixpkgs 默认，不钉版本**，升级 flake 时整体平移）、`uv` | python-lsp-server、ruff、black、isort、mypy、pytest、pylint、bandit、mkdocs |
-| C/C++ | `clang`、`cmake`、`ninja`、`vcpkg` | clangd（clang-tools）、cppcheck、lldb、valgrind、perf-tools、strace |
+| C/C++ | `clang`、`cmake`、`ninja`、`vcpkg` | clangd（clang-tools）、cppcheck、lldb；Linux 另装 valgrind、perf-tools、strace、ltrace |
 | 其他 | bash / lua / nix / markdown / yaml / kdl | bash-language-server、lua-language-server、nil、marksman、ltex-ls-plus、yaml-language-server、kdlfmt |
 
 > 注意：Python 使用 `uv` 作为首选包管理器（替代 pip/poetry）。

@@ -266,12 +266,16 @@ in
     # pinned HM 的全部 programs.* 选项），只能裸装：前两个的配置靠各自 env /
     # 配置文件，sysstat 是系统级采集（NixOS 侧只有 services.sysstat，且它是
     # root 定时采集、不装 CLI），git-repo 无配置面。
-    home.packages = with pkgs; [
-      dust # du 的现代替代
-      yq # yaml/xml/toml 处理器
-      sysstat # Linux的性能监控工具集（如sar、iostat和pidstat）
-      git-repo # android 的仓库管理工具
-    ];
+    home.packages =
+      with pkgs;
+      [
+        dust # du 的现代替代
+        yq # yaml/xml/toml 处理器
+        git-repo # android 的仓库管理工具
+      ]
+      ++ lib.optionals stdenv.hostPlatform.isLinux [
+        sysstat # 性能监控工具集（sar、iostat 和 pidstat）
+      ];
 
     # Git
     programs.git = {

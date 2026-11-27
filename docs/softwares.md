@@ -96,7 +96,7 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 
 ## 系统工具（CLI）
 
-eza、zoxide、bat、fzf、ripgrep、fd、jq、yq、tldr、duf、btop、glow、hugo、ffmpeg、yt-dlp、net-tools、tree、unzip、sysstat
+eza、zoxide、bat、fzf、ripgrep、fd、jq、yq、tldr、duf、btop、glow、hugo、ffmpeg、yt-dlp、net-tools、tree、unzip；Linux 另装 sysstat。
 
 其中 `tldr` 由 `programs.tealdeer` 提供，装的是 Rust 实现的 tealdeer（命令名仍叫 `tldr`）：
 页缓存落在 `~/.cache/tealdeer`（不再是 Python 客户端的 `~/.cache/tldr`），配置在

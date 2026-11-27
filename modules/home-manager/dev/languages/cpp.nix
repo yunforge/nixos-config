@@ -38,7 +38,6 @@ in
 
         # 调试和分析工具
         lldb # LLVM 调试器
-        valgrind # 内存泄漏和性能分析工具
 
         # 代码质量和静态分析
         cppcheck # C++ 静态分析工具
@@ -51,6 +50,7 @@ in
         with pkgs;
         [
           # Linux 专属性能分析工具
+          valgrind # 内存泄漏和性能分析工具（nixpkgs 在 Darwin 上标为 broken）
           perf-tools # Linux 性能分析工具
           strace # 系统调用追踪
           ltrace # 库调用追踪
