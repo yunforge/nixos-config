@@ -19,10 +19,7 @@ window-rule {
     // docs/themes.md「内层不能比外层更圆」那条的反面。压平内层要用
     // gtk.gtk{3,4}.extraCss 覆盖 5 个以上选择器，还没做，先看视觉能否接受。
     //
-    // 注：输入法候选窗的圆角烘在上游 SVG 里（39×39, rx=8），由 fcitx5.nix 的
-    // runCommand 改成 12、九宫格 Margin 从 10 抬到 14（rx 必须 ≤ Margin，否则角片会被切）。
-    //
-    // 阴影由合成器按本值绘制（wm/default.nix 的 shadow 块）；clip-to-geometry
+    // 阴影由合成器按本值绘制（niri/default.nix 生成段的 shadow 块）；clip-to-geometry
     // 会连 CSD 自绘阴影一起裁掉。
     geometry-corner-radius 8
     clip-to-geometry true
@@ -104,7 +101,7 @@ window-rule {
 //
 // 尺寸只写在一个地方：niri 没有「全局浮动尺寸」选项，尺寸只能落在 window-rule 上；
 // 但一条规则里可以写多个 match（彼此是 OR —— 见 niri wiki「Window Rules」：
-// is_active / title / app-id 多条 `match` 之间是「或」）。于是下面把 16 个 app-id
+// is_active / title / app-id 多条 `match` 之间是「或」）。于是下面把 15 个 app-id
 // 堆进**一条规则**，几何只声明一次
 // —— 比原先逐 app 各写一遍尺寸少十几处重复。
 //
@@ -132,14 +129,12 @@ window-rule {
 // 1080p 侧可手动缩放窗口。
 //
 // 客户端仍可自选尺寸（niri 文档：the window itself always has a final say
-// in its size）—— 规则只决定初始 configure 的尺寸。实测两种结果：
-//   - disktree 严格按 1300×850 打开（= 规则值）；
-//   - 微信主窗口实测 1300×720 / 1300×858 两次，高度随客户端而定 —— 宽守住了
-//     1300（它请求的 X11 宽 1350 ≈ 1300 逻辑像素，接近规则值），高则由它
-//     自己的 X11 min_size（845×858）兜底，顶掉规则的 623。
+// in its size）—— 规则只决定初始 configure 的尺寸。实测 disktree 严格按
+// 1300×850 打开（= 规则值）。
 // 试过加 `max-height 850` 强制钳死：niri 侧与客户端 min_size 冲突，窗口
 // 直接无法映射（微信整个消失）；`max-width 1300` 无效果（请求的宽本就等于 1300）。
 // 故此处不加 max-* —— 宽高比最终取决于客户端配合，规则保证的是初始尺寸。
+// 微信主窗口也命中这一组，后面的专用规则会把初始尺寸覆盖为 1500×1000。
 //
 // open-floating 仍逐条写明：全局规则声明了 open-floating false，而本规则要把它翻回
 // true。niri 对同一条规则内的多个 match 不做「后覆盖前」——一条规则要么整体命中、

@@ -32,6 +32,6 @@
 
   # magpie（各 AI agent 的模型选择器）：无图形会话的主机用纯终端版
   # （nogui/CGO_ENABLED=0，闭包 17 MiB）；desktop/laptop 由 GUI 层装带托盘的
-  # 桌面版（链接 WebKitGTK，闭包 847 MiB，见 gui/apps/linux/utilities.nix）。
+  # 桌面版（链接 WebKitGTK，闭包约 970 MiB，见 gui/apps/linux/utilities.nix）。
   environment.systemPackages = with pkgs; [ magpie-cli ];
 }

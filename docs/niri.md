@@ -57,7 +57,7 @@ Niri 配置分两半，`Mod` = `Super`（Windows 键）：
 | `Mod` + `` ` `` | 下一个窗口（按应用过滤） |
 | `Mod` + `Shift` + `` ` `` | 上一个窗口（按应用过滤） |
 
-> 这四条属于 niri 的 `recent-windows` 切换器，定义在 `~/.config/niri-colors/overview.kdl`（由 `wm/default.nix` 生成），所以在 `config/binds/` 下 grep 是找不到的。
+> 这四条属于 niri 的 `recent-windows` 切换器，定义在 `~/.config/niri-colors/overview.kdl`（由 `niri/default.nix` 生成），所以在 `config/binds/` 下 grep 是找不到的。
 
 ## 截图
 
@@ -99,7 +99,8 @@ Noctalia 的窗口截图要求合成器支持 `ext-image-copy-capture-v1`，niri
 
 ## 窗口规则（自动行为）
 
-- **最大化打开**：VSCode、Logisim、Brave、Zotero
-- **浮动打开（居中，统一 900×623，比例 13:9）**：Fcitx5 配置、PicGo、qView、LocalSend、微信、QQ、Telegram、Discord、欧陆词典、gnome-text-editor、magpie、Anki、FlClash、disktree、bilibili。尺寸取自 Omarchy `Super + O`（float & pin）的 1300×900 比例 —— 取舍见 `windowrules.kdl` 注释。客户端可自选尺寸（微信实测 900×720），规则保证的是初始尺寸
+- **最大化打开**：VSCode、Logisim、Brave、Zotero、Steam、Windows（RemoteApp 整机会话）
+- **浮动打开（居中，统一 1300×850，比例约 3:2）**：Fcitx5 配置、PicGo、qView、LocalSend、QQ、Telegram、Discord、欧陆词典、gnome-text-editor、magpie、Anki、FlClash、disktree、bilibili。尺寸取自 Omarchy `Super + O`（float & pin）的 1300×900，宽度沿用 1300、高度按 3:2 调整为 850 —— 取舍见 `windowrules.kdl` 注释。客户端可自选尺寸，规则保证的是初始尺寸
+- **微信主窗口的初始尺寸为 1500×1000**：主窗口同时命中通用浮动规则，由后面的精确匹配规则覆盖初始尺寸。用户反馈 1300×850 太扁，实测 `niri msg action set-window-width/height` 拉到 1500×1000 后客户端正常接受；规则只保证初始尺寸，X11 min_size（845×858）仍可能顶掉高度
 - **微信额外禁止全屏**（`open-fullscreen false`）：XWayland 的 satellite 会把「尺寸等于某块输出」的窗口判成全屏，从而盖掉浮动预设 —— 根因与移除条件见 `docs/quirks.md`
 - 全局默认平铺，圆角 8px（`geometry-corner-radius`，原为 24，理由见 `docs/themes.md`）

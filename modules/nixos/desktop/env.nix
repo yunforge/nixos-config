@@ -1,4 +1,4 @@
-# Wayland/GNOME 通用环境变量
+# Wayland 通用环境变量
 {
   lib,
   config,

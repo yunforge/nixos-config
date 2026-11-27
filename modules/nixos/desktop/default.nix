@@ -97,7 +97,8 @@ in
     mySystem.desktop.niri.enable = lib.mkDefault true;
     mySystem.desktop.distrobox.enable = lib.mkDefault true;
     # 虚拟化与代理的域间联动默认值在角色层（profiles/workstation.nix）声明：
-    # libvirtd 是 WinApps/distrobox 的依赖、代理为 mihomo 客户机转发的前置条件，
+    # libvirtd 是 WinApps 的依赖（distrobox 走 podman、由 distrobox.nix 自管，
+    # 不依赖 libvirtd）、代理为 mihomo 客户机转发的前置条件，
     # 但这是「工作站才成立」的组合而非桌面本身的要求，不放能力聚合里。
 
     # gvfs：文件管理、回收站、网络共享（mkDefault：主机可普通赋值关闭）
@@ -165,7 +166,7 @@ in
       # 而它自己那层 FHS 包装器（~/Apps/Qoder-IDE/qoder-ide-fhs.nix）用 store 绝对
       # 路径调 bwrap，所以「IDE 起得来」并不等于「PATH 上有 bwrap」。
       # 放系统 profile 而非 HM 的 common/tools：后者门控是 myHome.cli.enable，
-      # server / wsl / macbook 四个角色全都开，会把桌面专属依赖带到无 GUI 的主机上。
+      # workstation / server / wsl / macbook 四个角色全都开，会把桌面专属依赖带到无 GUI 的主机上。
       bubblewrap
     ];
   };

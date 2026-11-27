@@ -51,10 +51,10 @@ in
 
     # 思源笔记是 Electron 应用，其 package.json 的 desktopName 为 "org.b3log.siyuan"，
     # Electron 启动时会自动调用 app.setDesktopName()，该值经 Wayland xdg_toplevel.set_app_id
-    # 由 mutter 写入窗口的 wm_class。而 nixpkgs 包提供的 siyuan.desktop 未设置 StartupWMClass，
-    # 导致 GNOME Shell 匹配不到应用，Dash to Panel 图标回退为 application-x-executable（齿轮图标）。
+    # 成为窗口 app_id。而 nixpkgs 包提供的 siyuan.desktop 未设置 StartupWMClass，
+    # 导致 KDE / niri 的任务栏匹配不到应用，图标回退为 application-x-executable（齿轮图标）。
     # 通过 StartupWMClass 把窗口 app_id 关联回 siyuan.desktop，即可命中 Icon=siyuan。
-    # 注意：生效需重启 GNOME Shell（Alt+F2 → r）或重新登录。
+    # 注意：生效需重新登录（KWin / niri 在会话启动时读取桌面条目）。
     xdg.desktopEntries.siyuan = {
       name = "SiYuan";
       comment = "Refactor your thinking";

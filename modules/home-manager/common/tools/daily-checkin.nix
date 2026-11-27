@@ -1,8 +1,9 @@
 # 每日 AI 签到 — 用无头浏览器自动完成多站点每日签到
 #
 # 不是常驻服务：systemd user timer 每天 09:07 拉起一次，跑完即退出。
-# 数据目录 ~/checkin 不由本模块管理（脚本、登录 profile、日志都在那里，
-# 需要每天写，不能进 nix store），本模块只负责「定时拉起」这层。
+# 脚本在 ~/Projects/checkin（run.sh），运行数据目录 ~/checkin 不由本模块管理
+# （登录 profile、日志都在那里，需要每天写，不能进 nix store），本模块只负责
+# 「定时拉起」这层。
 #
 # 手动触发：systemctl --user start daily-checkin.service
 # 看结果：~/checkin/logs/<日期>.md；需要人工时会写 ~/checkin/NEEDS_HUMAN.md
@@ -28,8 +29,8 @@ in
       default = false;
       description = ''
         启用每日 AI 签到：systemd user timer 每天 09:07 运行 ~/Projects/checkin/run.sh，
-        用无头浏览器对已配置的站点执行签到。脚本与登录态存放在 ~/checkin
-        （不由本模块管理），本模块只提供定时与手动启动入口。
+        用无头浏览器对已配置的站点执行签到。脚本在 ~/Projects/checkin，登录态与日志
+        在 ~/checkin（均不由本模块管理），本模块只提供定时与手动启动入口。
       '';
     };
 

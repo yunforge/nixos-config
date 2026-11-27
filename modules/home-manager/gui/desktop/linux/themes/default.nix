@@ -56,14 +56,15 @@ in
       # 不设则 libadwaita 按 "default"（浅色）渲染，且 GNOME 系应用不跟随桌面。
       colorScheme = "light";
 
-      # 不再设 gtk.gtk4.theme：~/.config/gtk-4.0/gtk.css 由 gui/themes/variants.nix 拥有
+      # 不再设 gtk.gtk4.theme：~/.config/gtk-4.0/gtk.css 由 gui/desktop/linux/themes/variants.nix 拥有
       # （模式无关的单一文件，亮/暗在同一份里用 @media 切；两个模块同时写该文件会冲突）。
       # color-scheme 仍从顶层继承（见上），libadwaita 靠它决定明暗。
     };
 
-    # 这 4 个软链归 theme-apply 运行时接管（按 Noctalia 的 mode 指到亮/暗变体），
-    # 加了 force 才能让 HM 跳过碰撞检查 —— 否则下一次 rebuild 时那几个软链指向
-    # 变体（不在本 generation 里），HM 会判「would be clobbered」直接中断激活。
+    # 这 4 个路径都加 force 才能让 HM 跳过碰撞检查 —— 否则下一次 rebuild 时
+    # 那几个软链指向变体（不在本 generation 里），HM 会判「would be clobbered」
+    # 直接中断激活。其中前 3 个软链归 theme-apply 运行时接管（按 Noctalia 的
+    # mode 指到亮/暗变体）；gtk-4.0/gtk.css 是模式无关的单一文件，不随 mode 切换。
     # 不能用 xdg.configFile.… 重写（会和 gtk/qt 模块的同名目标冲突），
     # 故各设一个独立的 force 标记项（force 项只贡献本路径，不重复铺设）。
     #

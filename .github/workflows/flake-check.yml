@@ -2,7 +2,7 @@ name: "Flake checks"
 
 # 两种触发共用同一套检查，区别只在 flake.lock 的新鲜度：
 #   push / PR  → 验已提交的 flake.lock
-#   schedule（03:40 CST，早于 04:40 的 autoUpgrade）/ workflow_dispatch
+#   schedule（每天 03:40 CST，早于每周日 12:00 的 autoUpgrade）/ workflow_dispatch
 #              → 先把 nixpkgs 刷到 master HEAD 再验，拦截滚动通道上的上游回归；
 #                autoUpgrade 用 --refresh 跟踪 master，只验 lock 看不到那些新提交。
 #

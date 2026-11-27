@@ -90,7 +90,7 @@ Nix 里的空列表。停用时必须把运行时那段删一次，再 `noctalia
 | SDDM 登录界面 | WhiteSur | 登录器换成 SDDM（Wayland greeter，不装 X server）；greeter 主题用自打包的 `whitesur-sddm-theme`（`WhiteSur-dark`，取自 WhiteSur-kde 的 6.2 变体），它仿 KDE Breeze，需把 `plasma-workspace` / `libplasma` / `plasma5support` / `kirigami` / `qt5compat` / `qtsvg` 放进 `services.displayManager.sddm.extraPackages` 供 greeter 的 QML 导入路径解析（否则黑屏 / 白屏），光标声明 `CursorTheme=Bibata-Modern-Ice`。全部在 `modules/nixos/desktop/sddm.nix` |
 | Niri 装饰配色 | **niri 内置默认** | Noctalia 不再渲染 `~/.config/niri/noctalia.kdl`；HM 只留结构项（宽度、几何、阴影），见下文 |
 | Niri 概览底色 | MacTahoe 同源 | `niri-colors/overview.kdl`，暗 `#242424` / 亮 `#FFFFFF`（Noctalia 的 niri 模板不管这一项） |
-| Noctalia Shell | **自定义调色板 `mactahoe`** | `customPalettes.mactahoe`，色值取自 MacTahoe（与 GTK/Qt 旧主题同源，换成 WhiteSur 后仍沿用）；界面字体 Noto Sans CJK SC。**仅调色板归 Nix，bar 布局归 GUI**；只影响状态栏/面板，不再渲染应用主题，见下文 |
+| Noctalia Shell | **自定义调色板 `mactahoe`** | `customPalettes.mactahoe`，色值取自 MacTahoe（与 GTK/Qt 旧主题同源，换成 WhiteSur 后仍沿用）；界面字体 PingFang SC。**Nix 声明调色板、bar 的透明度与控件布局，以及逐屏开关**，其余 bar 设置由 GUI 管理；只影响状态栏/面板，不再渲染应用主题，见下文 |
 
 ## 字体
 
@@ -109,7 +109,7 @@ Nix 里的空列表。停用时必须把运行时那段删一次，再 `noctalia
 - 标签指示器在列右侧，圆角 2px（3px 宽的条，半径 ≥ 半宽就是胶囊，不超过窗口圆角）；**仅当列进入 tabbed 显示模式（`Mod+W`）时出现**
 - 概览缩放 0.50，背景暗 `#242424` / 亮 `#FFFFFF`
 - `recent-windows` 高亮框圆角 8px（与窗口圆角同档；Omarchy 无对应项）
-- 模糊 `passes 4 / offset 5.0 / saturation 1.10`；终端 `opacity 0.85`，取值按亮壁纸下的文字对比定，见 `frosted-glass.kdl`
+- 模糊 `passes 4 / offset 5.0 / saturation 1.10`；终端 `opacity 0.80`，取值按亮壁纸下的文字对比定，见 `frosted-glass.kdl`
 - 窗口阴影由合成器提供（`shadow { on }`，参数由 MacTahoe 自己的 CSD 阴影反推，见下）
 - 窗口开/关动画 220ms / 180ms（退场比入场快；scale 0.96→1.0 + 淡入，不用自定义波纹 shader）
 
@@ -284,12 +284,12 @@ GTK 应用的圆角由 WhiteSur-GTK 自己决定；niri 的窗口圆角仍由
 
 1. **主题包进 `home.packages`，不用 `qt.kvantum.themes`。** 后者会把 `~/.config/Kvantum` 整个做成指向 store 的软链，而 `kvantum.kvconfig` 又要写在同一目录下，两者会打架。装进 profile 后落在 `XDG_DATA_DIRS`，Kvantum 同样会在那里搜主题（上游自己的 `install.sh` 就是装到 `share/Kvantum`）。
 
-2. **主题名取 `MacTahoeDark` 而不是 `MacTahoe`。** Kvantum 选浅色还是深色取决于应用的 QPalette 明暗，而非 Plasma 会话下这个值来自平台主题，并不可靠。上游目录里浅深两态并存（`MacTahoe.kvconfig` / `MacTahoeDark.kvconfig`），Kvantum 的规则是“主题 T → `T.kvconfig`；若应用偏暗且存在 `TDark.kvconfig` 则改用它”——所以把深色那一对单独命名为主题 `MacTahoeDark` 后，选中它必然命中深色档（它要去找的 `MacTahoeDarkDark.kvconfig` 并不存在）。与本仓库其余部分“只用深色”一致。
+2. **主题名取 `MacTahoeDark` 而不是 `MacTahoe`。** Kvantum 选浅色还是深色取决于应用的 QPalette 明暗，而非 Plasma 会话下这个值来自平台主题，并不可靠。上游目录里浅深两态并存（`MacTahoe.kvconfig` / `MacTahoeDark.kvconfig`），Kvantum 的规则是“主题 T → `T.kvconfig`；若应用偏暗且存在 `TDark.kvconfig` 则改用它”——所以把深色那一对单独命名为主题 `MacTahoeDark` 后，选中它必然命中深色档（它要去找的 `MacTahoeDarkDark.kvconfig` 并不存在）。这里固定深色只用于绕开非 Plasma 会话下不可靠的 QPalette 判断（当前仓库整体是亮色）。
 
 3. **强调色对齐壳层。** 上游 kvconfig 用 `#a0b4f8`（浅紫蓝）作 highlight，而同一个作者的 GTK 主题用的是 `#0088FF`——同源却不同色。打包时把 highlight / inactive.highlight / link 统一到 `#0088FF`，与 GTK、Noctalia 的 `mPrimary` 一致（
    焦点环是例外，它故意不用强调色，见上文）。
 
-**`platformTheme` 保持 `adwaita` 不动**：Wayland 下 Qt 的窗口装饰由平台主题提供，与控件样式是两回事；换掉它会让自绘标题栏消失（`env.nix` 里就是为此才恢复 Qt 自绘）。所以现状是“控件 = Kvantum/MacTahoe，标题栏 = QAdwaitaDecorations”。
+**`platformTheme` 保持 `adwaita` 不动**：Wayland 下 Qt 的窗口装饰由平台主题提供，与控件样式是两回事；换掉它会让自绘标题栏消失（`env.nix` 里就是为此才恢复 Qt 自绘）。最初的理解是“控件 = Kvantum/MacTahoe，标题栏 = QAdwaitaDecorations”——但见下一段的实测修正。
 
 > 后续实测修正：niri 开了 `prefer-no-csd` 之后 Qt 6 根本不画标题栏（Qt 显式请求 server-side decoration，
 > 见下面「窗口按钮布局」一节），所以 QAdwaitaDecorations 在这台机器上其实没有被用到。
@@ -329,7 +329,7 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
 | 层 | 家族 | 元 |
 |---|---|---|
 | 壳层：niri 装饰 + GTK + Qt + Noctalia bar | macOS 中性灰 + 单一强调色 `#0088FF` | WhiteSur 的 `gtk-4.0/gtk.css` |
-| 工作区：终端 + 编辑器 + shell + 文件管理器 + 系统监控 | 暗 Catppuccin Frappe / 亮 Catppuccin Latte | **Noctalia 调色板的 `terminal` 色槽**；Neovim、yazi、btop、eza、fish 多处同源。例外：fastfetch 保留一套固定冷蓝色阶（见「fastfetch」一节） |
+| 工作区：终端 + 编辑器 + shell + 文件管理器 + 系统监控 | 暗 Catppuccin Frappe / 亮 Catppuccin Latte | **Noctalia 调色板的 `terminal` 色槽**；Neovim 同源，eza / fish 跟随终端 ANSI 16 色（btop / yazi 用各自默认主题）。例外：fastfetch 保留一套固定冷蓝色阶（见「fastfetch」一节） |
 
 > 工作区一族的终端配色仍由 Noctalia 的 `terminal` 色槽同源供给：暗色块 Frappe、亮色块 Latte，
 > 亮暗切换时随之切换。Noctalia 模板渲染已于 2026-11-17 停用，色槽现只供终端调色板与终端相关配色；
@@ -367,7 +367,7 @@ GTK 主题因此渲染成 黄-绿-红（红=关闭仍在最右），Chromium/Qt 
   `{size-percentage}` 把百分比内联进 `format`。还想更窄只剩两个杠杆：去掉
   `Font` / `Vulkan` / `OpenGL` / `BT Radio` 几行、把 logo 换窄一档。
 
-## Noctalia：调色板归 Nix，其余归 GUI
+## Noctalia：Nix 默认值与 GUI 状态
 
 这是最容易误解的一块，先讲清机制。
 
@@ -389,7 +389,7 @@ GUI 里的任何改动            →  ~/.local/state/noctalia/settings.toml ←
 | `audio.enable_sounds` | `false` | **`true`** —— 出厂默认被 GUI 推翻（见下） |
 | `audio.enable_overdrive` | `true` | 在 settings.toml 里 → 以 GUI 为准 |
 | `brightness.enable_ddcutil` | laptop 上 `false` | desktop 实测 `true`（laptop 需单独核） |
-| `shell.font_family` | `Noto Sans CJK SC` | 不在 settings.toml → **生效** ✅ |
+| `shell.font_family` | `PingFang SC` | 不在 settings.toml → **生效** ✅ |
 | `bar.default.background_opacity` / `start` / `center` / `end` | `0.30` / 三处控件清单 | state 里有旧值 → **遮蔽**，要删一次才生效 |
 
 audio 那组里 `sound_volume` / `volume_change_sound` / `notification_sound` 已删：它们服务的功能被
@@ -464,11 +464,11 @@ GUI 会把自己的 `[bar.default.monitor.*]` 写进 state，那时起就以 GUI
 
 ### bar 收敛（GUI 侧执行，一次性步骤）
 
-当前 19 个控件、`background_opacity = 0.15`。以应用层为主体后应当退到背景，但不是退回隐形。
+收敛前 19 个控件、`background_opacity = 0.80`；现在是 8 个控件、`0.30`。以应用层为主体后应当退到背景，但不是退回隐形。
 
 **透明度取 0.30（原为 0.80）。** 合成永远是“`opacity` × 底色 + (1−`opacity`) × 模糊后的壁纸”。0.30 是按曾纳管的两张默认壁纸（现已移除）的屏顶 5% 均值校准的：两张下 bar 文字（`#DEDEDE`）对比度都过 AA，同时还是玻璃而不是板子。默认集移除后壁纸回归自由变量——取到近纯白壁纸时对比度会掉到 AA 以下，这是有意的取舍；追求极致可读可在 GUI 里把 opacity 调高。
 
-（终端 `opacity 0.85` 维持不变：用 16×16 分块的最亮块当背后最坏情况，0.80 只到 4.8:1，0.85 是 5.5:1。表在 `frosted-glass.kdl`。）
+（终端 `opacity 0.80` 维持不变：按当前壁纸最亮 5% 区域（模糊 + saturation 1.10 只会更亮，即最坏情况）实测 `#DFD0CD` 计，0.80 是 4.94:1（过 AA），0.85 是 5.59:1。表在 `frosted-glass.kdl`。）
 
 控件 19 → 8：
 

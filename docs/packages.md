@@ -44,7 +44,7 @@ v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb�
 
 | 包 | 装在哪 |
 |----|--------|
-| `magpie` | 同上（desktop/laptop 桌面版）；`magpie-cli` 在 `hosts/wsl/default.nix` |
+| `magpie` | `modules/home-manager/gui/apps/linux/utilities.nix`（desktop/laptop 桌面版）；`magpie-cli` 在 `hosts/wsl/default.nix` |
 | `mcpp-m` | `modules/home-manager/dev/languages/cpp.nix`（所有 Linux 主机 + macbook） |
 | `flclash` | `modules/home-manager/gui/apps/linux/media.nix`（代理客户端，取代 clash-verge-rev） |
 | `dalibre` | `modules/home-manager/gui/apps/linux/productivity.nix`（calibre 书库管理器） |
@@ -54,11 +54,11 @@ v0.9.2，5.9 万 star，仍在活跃开发。故本包改走上游预编译 deb�
 | `whitesur-plasma-splash` | `modules/nixos/desktop/sddm.nix`（仅 Plasma 主机，装进系统 profile 供 ksplashqml 读取） |
 | `whitesur-sddm-theme` | `modules/nixos/desktop/sddm.nix`（SDDM 主题 `WhiteSur-dark`） |
 | `mactahoe-*` | 2026-11-22 起无消费方；定义与 overlay 惰性保留，便于回退 |
-| `pingfang-sc` | `modules/nixos/core/locale.nix`（`fonts.packages`，所有 Linux 主机的界面主字体；家族名常量 `myLib.theme.fontSans`） |
+| `pingfang-sc` | `modules/nixos/core/locale.nix`（`fonts.packages`，所有 Linux 主机的界面主字体；家族名常量 `myLib.theme.fontSans`）；`modules/home-manager/gui/apps/linux/communication.nix` 的微信 fontconfig 也引用该包 |
 | `windows-vm-media` | `modules/nixos/virtualization`（`mySystem.virtualization`） |
 
 不在本清单里的东西：nixpkgs 里的一切（跟着 `nix flake update` 走）、flake inputs
-（nixpkgs / nur / winapps / home-manager / noctalia / msime / zen-browser）。
+（nixpkgs / nur / winapps / home-manager / noctalia / msime / zen-browser / nixos-wsl / nix-darwin）。
 
 ## 「更新系统」时的固定动作
 
@@ -76,7 +76,7 @@ nix flake check
 nix build --dry-run .#magpie .#magpie-cli .#mcpp-m .#flclash .#dalibre .#pulse \
   .#misterdownloadmanager .#whitesur-kde .#whitesur-plasma-splash .#whitesur-sddm-theme \
   .#mactahoe-gtk-theme .#mactahoe-icon-theme .#mactahoe-kvantum .#mactahoe-sddm-theme \
-  .#windows-vm-media
+  .#pingfang-sc .#windows-vm-media
 nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 ```
 
@@ -86,7 +86,7 @@ nix build --dry-run .#nixosConfigurations.desktop.config.system.build.toplevel
 ## 查上游最新版本
 
 ```bash
-# 打 tag 的仓库（magpie / MacTahoe-*）
+# 打 tag 的仓库（magpie / MacTahoe-gtk-theme / MacTahoe-icon-theme）
 git ls-remote --tags --refs https://github.com/<owner>/<repo> \
   | sed 's#.*refs/tags/##' | sort -V | tail -3
 
@@ -112,12 +112,12 @@ nix flake prefetch --json github:<owner>/<repo>/<tag 或 rev> | jq -r .hash
 ### tag 钉法（`magpie`）
 
 ```nix
-version = "0.1.3449";   # ① 改版本
+version = "<版本>";   # ① 改版本
 ```
 
 ```bash
 # ② src 哈希
-nix flake prefetch --json github:yetone/magpie/v0.1.3449 | jq -r .hash
+nix flake prefetch --json github:yetone/magpie/v<版本> | jq -r .hash
 ```
 
 - `vendorHash`（magpie）只在 `go.mod`+`go.sum` 变化时需要重算，同样填
@@ -174,7 +174,7 @@ nix hash convert --hash-algo sha256 --to sri <hex>
 与 `flclash` 同型：上游发预编译 tar.gz + `SHA256SUMS`，只取 Linux 的两个：
 
 ```nix
-version = "0.2.2";
+version = "<版本>";
 
 sources = {
   x86_64-linux  = { asset = "amd64"; hash = "sha256-…"; };

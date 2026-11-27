@@ -5,7 +5,7 @@
 #   + 语言工具链（dev）
 #   + 跨平台 GUI 应用（vscode）
 #   + Linux 专属 GUI 应用（浏览器 / 通讯 / 媒体 / 开发 / 嵌入式 …）
-#   + Linux 桌面会话（Niri / Noctalia / 主题 / 输入法 / MIME / WinApps）
+#   + Linux 桌面会话（Niri / Noctalia / 主题 / WinApps）
 #
 # 主机（hosts/desktop、hosts/laptop）不再自己拼这套组合，只声明硬件与显示器
 # 等真实差异。服务器 / WSL / MacBook 不导入本文件，因此不会被动继承工作站能力。
@@ -30,8 +30,8 @@ in
     myHome.dev.enable = lib.mkDefault true;
     myHome.gui.enable = lib.mkDefault true;
     myHome.desktop.enable = lib.mkDefault true;
-    # 每日 AI 签到：systemd user timer 每天 09:07 跑 ~/checkin/run.sh。
-    # 数据目录 ~/checkin 由脚本侧管理，这里只管定时拉起。
+    # 每日 AI 签到：systemd user timer 每天 09:07 跑 ~/Projects/checkin/run.sh。
+    # 运行数据目录 ~/checkin 由脚本侧管理，这里只管定时拉起。
     myHome.cli.tools.daily-checkin.enable = lib.mkDefault true;
   };
 

@@ -32,7 +32,7 @@ in
       # 网络波动时自动重试
       settings = {
         # 下载根目录（yt-dlp 内部对 --paths 做 expanduser，~ 可用）。
-        # output 相对此目录 → ~/Videos/yt-dlp/<uploader>/...
+        # output 相对此目录 → ~/Videos/yt-dlp/<title>.<ext>
         paths = "~/Videos/yt-dlp";
         output = "%(title)s.%(ext)s";
 

@@ -44,7 +44,7 @@
 # 给的尺寸，视频在窗口内按原始比例留黑边。
 #
 # mpv.conf 里 vo=gpu-next / gpu-api=vulkan / hwdec=nvdec 是上游按 NVIDIA 给的。本仓库
-# 只有 desktop / laptop 导入 gui/，两台都是 NVIDIA（hosts/*/nvidia.nix），故可直接用；
+# 只有 desktop / laptop 导入 gui/apps/linux，两台都是 NVIDIA（hosts/*/nvidia.nix），故可直接用；
 # 换 AMD/Intel 主机时改成 hwdec=auto-safe 并按显卡调 gpu-api。
 {
   lib,

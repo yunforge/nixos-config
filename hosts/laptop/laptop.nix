@@ -17,7 +17,7 @@
     HandleLidSwitchExternalPower = "ignore"; # 外接电源时合盖
   };
 
-  # 禁用默认的 power-profiles-daemon，避免与 auto-cpufreq/tlp 冲突
+  # 禁用默认的 power-profiles-daemon，避免与 TLP 冲突
   services.power-profiles-daemon.enable = false;
 
   # 电源管理工具

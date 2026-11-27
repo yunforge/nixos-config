@@ -17,8 +17,9 @@
   mySystem.desktop.enable = lib.mkDefault true;
 
   # 虚拟化与代理曾在 hosts/<host>/default.nix 里按桌面能力逐台打开，后由
-  # desktop 聚合模块代管，现收口回角色层：libvirtd 是 WinApps / distrobox 的
-  # 依赖、代理为 mihomo 客户机转发的前置条件——这是「工作站」的组合，而非
+  # desktop 聚合模块代管，现收口回角色层：libvirtd 是 WinApps 的依赖
+  # （distrobox 走 podman、由 distrobox.nix 自管）、代理为 mihomo 客户机转发
+  # 的前置条件——这是「工作站」的组合，而非
   # 桌面能力本身的要求（server 即便开桌面也不该隐式带出它们）。
   mySystem.virtualization.enable = lib.mkDefault true;
   mySystem.proxy.enable = lib.mkDefault true;

@@ -3,8 +3,8 @@
 # 为什么自己打包：nixpkgs 在 26.05 分支收录过 flclash（0.8.92），2026-08-17 以
 # 「用户少 + 无人维护」为由从 master 移除，pkgs/top-level/aliases.nix 里留了
 # throw 的墓碑。本仓库的 nixpkgs 输入跟 master，故 `pkgs.flclash` 一度不存在。
-# 烂掉的是 nixpkgs 那份打包，不是软件本身——上游活得好好的（v0.9.2 / 2026-10-24，
-# 5.9 万 star，GPL-3.0）。
+# 烂掉的是 nixpkgs 那份打包，不是软件本身——上游活得好好的（现为 v0.9.4，5.9 万
+# star，GPL-3.0；本包因 0.9.4 渲染回归暂时回退到 0.9.3，见 docs/packages.md）。
 #
 # 为什么用上游预编译 deb 而不是源码构建：nixpkgs 那份走
 # flutter335.buildFlutterApplication 从源码编，每个上游版本要同步三份钉子——

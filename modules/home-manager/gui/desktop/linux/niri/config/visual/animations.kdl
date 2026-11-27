@@ -165,7 +165,7 @@ animations {
     // 多任务的同类展开是 350–420ms ease-in-out。
     // 临界阻尼弹簧天然是"两端慢中间快"，等价 ease-in-out，
     // 所以只降刚度即可：k=300 → ≈230ms。
-    // zoom 一并从 0.40 提到 0.50（见 modules/home-manager/gui/wm/default.nix
+    // zoom 一并从 0.40 提到 0.50（见 modules/home-manager/gui/desktop/linux/niri/default.nix
     // 生成的 overview.kdl）：缩略图文字恢复可读，信息量不再损失。
     overview-open-close {
         spring damping-ratio=1.0 stiffness=300 epsilon=0.0001

@@ -3,8 +3,8 @@
 #
 # 为什么需要这一层：主题取值此前全部钉死在 Nix 里（单一深色主题 / 深色调色板），
 # 而运行时切换需要**可写的目标文件**，那几个文件都是 HM 的 store 软链
-# （gtk-3.0/settings.ini、gtk-4.0/{settings.ini,gtk.css}、Kvantum/kvantum.kvconfig、
-# niri-colors/*.kdl）。做法：把**两套变体都生成到 store**，脚本只把当前模式对应的
+# （gtk-3.0/settings.ini、gtk-4.0/settings.ini、Kvantum/kvantum.kvconfig、
+# niri-colors/overview.kdl）。做法：把**两套变体都生成到 store**，脚本只把当前模式对应的
 # 软链指过去 —— Nix 仍然持有全部取值，运行时只有一个「哪一套」的选择。
 #
 # 归属约定（一个文件只有一个主人）：
@@ -211,7 +211,7 @@ let
               [ "$(readlink "$1" 2>/dev/null)" = "$2" ] || ln -sfn "$2" "$1"
             }
 
-            # 本模块自己那五个 + 各层登记进来的（fastfetch / nvim）：case 同时把模式相关的
+            # 本模块自己那四个 + 各层登记进来的（fastfetch / nvim）：case 同时把模式相关的
             # 取值（dconf 的 scheme 与 gtk/icon 主题名）定下来
             case "$mode" in
               dark)
@@ -268,9 +268,9 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && desktopCfg.enable) {
-    # 本模块自己那五个活文件也走同一张表（见 modules/home-manager/default.nix 的
+    # 本模块自己的 4 个活文件走同一张表（见 modules/home-manager/default.nix 的
     # myHome.appearance.switchTargets）：theme-apply 只做「指软链」，不认具体应用。
-    # gtk.css 不在表里：它是模式无关的单一文件（见上面 gtk4UserCss）。
+    # 第 5 个活文件 gtk.css 不入表：它是模式无关的单一文件（见上面 gtk4UserCss）。
     myHome.appearance.switchTargets = [
       {
         live = ".config/gtk-3.0/settings.ini";

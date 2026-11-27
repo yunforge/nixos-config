@@ -1,7 +1,7 @@
 # 嵌入式单片机开发环境（STM32 / ESP32 / AVR / RP2040）
 # 覆盖：交叉编译工具链 + 烧录/调试工具 + PlatformIO 统一构建框架
 # 归属 GUI 层：探针/串口都在桌面场景下用，无图形环境的主机（server/wsl）不需要，
-# 故由 gui/apps 聚合而非 cli/dev。
+# 故由 gui/apps 聚合而非 dev/。
 {
   lib,
   config,

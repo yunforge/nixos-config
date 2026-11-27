@@ -9,7 +9,7 @@
 # proxy 模块静态注入的 127.0.0.1 退化为 mirrored 模式的默认值：
 # EnvironmentFile 的条目优先级高于 Environment=，NAT 模式下被探测结果覆盖。
 # 代理地址不可达时 http_proxy 语义是“只用代理且直接失败”，nix 不会回退直连，
-# 只能转源码构建——autoUpgrade 每日滚 flake.lock 会因此触发巨量本地编译，
+# 只能转源码构建——autoUpgrade 每周滚 flake.lock 会因此触发巨量本地编译，
 # 所以 nix-daemon 与 nixos-upgrade 必须拿到正确地址。
 {
   lib,

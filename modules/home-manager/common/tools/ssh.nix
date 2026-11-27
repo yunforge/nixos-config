@@ -4,8 +4,9 @@
 # 直连 GitHub 的 22 端口在部分网络下被 QoS 限速。这里用 ProxyCommand 让 SSH
 # 复用 mihomo 的 mixed 端口，与 HTTPS 走同一条线路。
 #
-# 只在开启 mySystem.proxy 且代理地址稳定的主机生成；WSL 在 NAT 模式下的代理
-# 地址是宿主网关（见 hosts/wsl/proxy.nix），不能写死 127.0.0.1，故跳过。
+# 只在开启 mySystem.proxy 且代理地址稳定的主机生成。WSL 的代理地址要按模式
+# 运行时探测（mirrored 为 127.0.0.1，NAT 为默认网关，见 hosts/wsl/proxy.nix），
+# 静态 ProxyCommand 适配不了，故整个 WSL 跳过。
 {
   lib,
   config,

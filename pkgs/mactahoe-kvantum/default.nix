@@ -2,8 +2,8 @@
 # nixpkgs 未收录，此处仿照 MacTahoe GTK / 图标主题打包。
 #
 # 上游仓库是整套 KDE 主题包，这里只取其中的 Kvantum 部分：plasma /
-# aurorae / look-and-feel 面向 Plasma 桌面，与本机（niri + Noctalia）无关，
-# 装进来只会增大闭包。
+# aurorae / look-and-feel 面向 Plasma 桌面，与 niri + Noctalia 会话无关
+# （desktop 虽也启 Plasma，但外观走 whitesur-kde），装进来只会增大闭包。
 {
   lib,
   stdenv,
@@ -37,8 +37,8 @@ stdenv.mkDerivation {
     # 会话下这个值来自平台主题（本机是 qadwaitadecorations），并不可靠。
     # Kvantum 的查找规则是"主题 T → T.kvconfig；若应用偏暗且存在 TDark.kvconfig
     # 则改用它"。所以把深色那对命名为主题 MacTahoeDark 后，选中它必然命中
-    # MacTahoeDark.kvconfig（它要去找的 MacTahoeDarkDark.kvconfig 并不存在），
-    # 与本仓库其余部分"只用深色"的做法一致。
+    # MacTahoeDark.kvconfig（它要去找的 MacTahoeDarkDark.kvconfig 并不存在）。
+    # 这里固定深色变体，是为了绕开非 Plasma 会话下不可靠的 QPalette 明暗判断。
     mkdir -p $out/share/Kvantum/MacTahoeDark
     cp Kvantum/MacTahoe/MacTahoeDark.kvconfig Kvantum/MacTahoe/MacTahoeDark.svg \
       $out/share/Kvantum/MacTahoeDark/
@@ -47,8 +47,8 @@ stdenv.mkDerivation {
 
     # 强调色对齐壳层。
     # 上游的 kvconfig 用 #a0b4f8（浅紫蓝）作 highlight，而同一个作者的 GTK 主题
-    # 用的是 #0088FF —— 两套主题同源却不同色。这里统一到壳层值，与 niri 焦点环、
-    # GTK、Noctalia 调色板的 mPrimary 一致。
+    # 用的是 #0088FF —— 两套主题同源却不同色。这里统一到壳层值，与 GTK、
+    # Noctalia 调色板的 mPrimary 一致（niri 焦点环是例外，用内置默认 #7fc8ff）。
     # 注意替换顺序：'inactive.highlight.color=...' 必须先于 'highlight.color=...'，
     # 因为后者是前者的子串（substituteInPlace 替换的是字面量，不是单词边界）。
     substituteInPlace \

@@ -13,19 +13,19 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
 │  ├─ nixos/                # NixOS 系统层
 │  │  ├─ core/              # 真正通用的系统基础（引导 / Nix / 用户 / SSH / locale）
 │  │  ├─ hardware/          # 硬件能力（蓝牙 / 音频 / 网络 / MCU / NVIDIA）
-│  │  ├─ desktop/           # Linux 桌面能力（SDDM / Niri / 输入法 / Distrobox / Steam）
-│  │  ├─ networking/        # 代理（本机 / 客户机转发）
+│  │  ├─ desktop/           # Linux 桌面能力（SDDM / Niri / Plasma / 输入法 / Distrobox / Steam）
+│  │  ├─ networking/        # 代理（本机 / 客户机转发）+ Tailscale 组网
 │  │  ├─ virtualization/    # QEMU/KVM 虚拟化
 │  │  └─ profiles/          # 角色配置（workstation / server / wsl）
 │  ├─ shared/               # NixOS / nix-darwin 共享的 nix 设置与 overlay 注入（单一真源）
 │  ├─ darwin/               # macOS 系统层：base / users / gui（Homebrew casks + 系统设置）
 │  └─ home-manager/         # 用户层（跨平台共享）
-│     ├─ common/            # 公共用户环境：shell / editors / tools（所有主机）
+│     ├─ common/            # 公共用户环境：shell / editors / tools / ai（所有主机）
 │     ├─ dev/               # 语言工具链（languages/）
 │     ├─ gui/
 │     │  ├─ apps/shared/    # 跨平台 GUI 应用配置（VSCode）
 │     │  ├─ apps/linux/     # Linux 专属 GUI 应用
-│     │  └─ desktop/linux/  # Linux 桌面会话（niri / themes / winapps）
+│     │  └─ desktop/linux/  # Linux 桌面会话（niri / noctalia / themes / kde-appearance / winapps）
 │     ├─ platform/          # 平台专属适配（linux.nix / darwin.nix）
 │     └─ profiles/          # 角色配置（workstation / server / wsl / macbook）
 ├─ overlays/ + pkgs/        # 自维护包的单一注入点与包本体
@@ -61,8 +61,10 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
   其余选项都在各自功能模块里。
   Nix 设置（experimental-features / 镜像源 / 公钥 / allowUnfree）与 overlay 注入
   在 `modules/shared/nix.nix`，NixOS core 与 darwin base 共享同一份。
-- **能力域**（hardware / desktop / networking / virtualization）：由各自
-  `default.nix` 用 `mkDefault` 给出域内默认开关，主机只写例外（关单项用 `lib.mkForce`）。
+- **能力域**（hardware / desktop / networking / virtualization）：hardware 与 desktop
+  的 `default.nix` 用 `mkDefault` 给出域内默认开关；networking 只做导入聚合，
+  virtualization 由 `mySystem.virtualization.enable` 控制。主机只写例外
+  （关单项用 `lib.mkForce`）。
 - **角色**（`modules/nixos/profiles/`）：决定某类设备启用哪些系统能力，
   并承载角色级安全策略（见下方「角色组合」）。
 
@@ -84,7 +86,8 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
   - `apps/linux/`：Linux 专属 GUI 应用（浏览器 / 通讯 / 媒体 / mpv /
     生产力 / Steam / 开发 / 嵌入式 / 工具）。
   - `desktop/linux/`：Linux 桌面会话（Niri / Noctalia / 主题与亮暗切换 /
-    MIME 关联 / WinApps）。输入法只在系统层接线（`modules/nixos/desktop`）。
+    WinApps）。输入法只在系统层接线（`modules/nixos/desktop`），默认应用（MIME
+    关联）由桌面设置自行管理、不写死在仓库。
 - **platform**（`modules/home-manager/platform/`）：平台专属用户级适配
   （Linux 的 XDG 用户目录等）。
 - **profiles**（`modules/home-manager/profiles/`）：角色的用户层组合。
@@ -95,14 +98,15 @@ flake.nix / flake.lock      # 唯一入口：inputs + 各主机输出 + overlays
 
 | 设备 | 系统角色 | HM 角色 | 说明 |
 |------|----------|---------|------|
-| desktop | `nixos/profiles/workstation.nix` | `profiles/workstation.nix` | 完整工作站：硬件 + 桌面 + 虚拟化 + 代理 + GUI 应用 + 桌面会话 |
-| laptop | `nixos/profiles/workstation.nix` | `profiles/workstation.nix` | 与 desktop 同一角色，仅硬件/显示器/电源差异 |
+| desktop | `nixos/profiles/workstation.nix` | `profiles/workstation.nix` | 完整工作站：硬件 + 桌面 + 虚拟化 + 代理 + tailnet + GUI 应用 + 桌面会话 |
+| laptop | `nixos/profiles/workstation.nix` | `profiles/workstation.nix` | 与 desktop 共用工作站角色，使用 Niri；具体差异见「主机差异」 |
 | server | `nixos/profiles/server.nix` | `profiles/server.nix` | 最小系统基础 + 服务器安全策略（SSH 密钥认证）；无桌面、无 GUI、无音视频 |
 | wsl | `nixos/profiles/wsl.nix` | `profiles/wsl.nix` | NixOS-WSL 集成 + 代理探测；无桌面、无 GUI |
 
 server 角色的明确策略：
 - SSH 关闭密码认证（`PasswordAuthentication = false`，只允许密钥），
-  `PermitRootLogin = prohibit-password`；防火墙只放行 22（core）。
+  `PermitRootLogin = prohibit-password`；防火墙只放行 22 与 3425（Magpie 网关，
+  在 core 的 `allowedTCPPorts` 里）。
 - 不启用桌面 / 硬件 / 虚拟化；代理默认关闭，需要时在主机文件里开。
 - 自动升级与回滚沿用 core 的全局策略（autoUpgrade 走 flake、`allowReboot = false`
   靠 `configurationLimit = 10` 的代际回滚，GC 7 天）。
@@ -134,8 +138,8 @@ HM 侧导入：common + dev + `gui/apps/shared`（跨平台 GUI 应用配置）+
 
 | Host | System | 相对其它主机的差异 |
 |------|--------|-------------------|
-| desktop | x86_64-linux | 多 `desktop.steam.enable`；i2c（DDC 调光）+ EDID 冷启动自愈补丁；RTX 3060Ti，4K@150Hz |
-| laptop | x86_64-linux | 内屏 1080p；额外 libvirt TPM2 凭证解密修复；MX150（legacy 驱动，PRIME offload），btrfs，TLP |
+| desktop | x86_64-linux | 多 `desktop.steam.enable` 与 `desktop.plasma.enable`（默认登录 Plasma）；i2c（DDC 调光）+ EDID 冷启动自愈补丁；RTX 3060Ti，4K@150Hz |
+| laptop | x86_64-linux | 内屏 1080p；额外 libvirt TPM2 凭证解密修复；MX150（legacy 驱动，PRIME offload），TLP |
 | server | x86_64-linux | 新主机（无桌面）：`hosts/server/default.nix` 只含主机名与占位文件系统；`hardware-configuration.nix` 需在目标机器生成后导入 |
 | wsl | x86_64-linux | CLI-only，`boot.isContainer`，额外 WSL2 代理地址探测（`hosts/wsl/proxy.nix`） |
 | macbook | aarch64-darwin | nix-darwin，Homebrew casks |

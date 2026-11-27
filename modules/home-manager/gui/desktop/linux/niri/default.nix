@@ -19,11 +19,12 @@ let
   # niri 的 environment 段只作用于它启动的进程（Noctalia 及其应用启动器派生的
   # 应用、xwayland-satellite 都在其中）；KDE 会话不读这份配置。
   #
-  # XCURSOR_SIZE 取物理像素：libXcursor 不认逻辑像素，分数缩放下要按 scale 翻倍
-  # （niri 的 cursor.kdl 仍是 24 逻辑像素）。
+  # XCURSOR_SIZE 取物理像素：libXcursor 不认逻辑像素。当前实现是「任何 >1 的
+  # 分数缩放统一按 2×」（desktop 1.5× 与 laptop 1.25× 都得到 48），不是按 scale
+  # 精确换算（niri 的 cursor.kdl 仍是 24 逻辑像素）。
   xcursorSize = 24 * (if osConfig.mySystem.desktop.scale > 1 then 2 else 1);
   environmentKdl = ''
-    // niri 会话专有的环境变量（由 HM 生成；KDE 会话不读，见 env.nix）
+    // niri 会话专有的环境变量（由 HM 生成；KDE 会话不读，见 modules/nixos/desktop/env.nix）
     environment {
         XCURSOR_THEME "${myLib.theme.cursor}"
         XCURSOR_SIZE "${toString xcursorSize}"
@@ -34,8 +35,8 @@ let
   # ── 概览底色 ────────────────────────────────────────────────────────────
   # niri 装饰颜色不再由外部渲染（Noctalia 模板已停用，2026-11-17），用 niri 内置默认；
   # HM 侧只显式维护概览（overview）的工作区底色。
-  # 取自 GTK/Qt 侧同一来源 MacTahoe：暗色 view_bg #242424、亮色 view_bg #FFFFFF
-  # （share/themes/MacTahoe-{Dark,Light}/gtk-4.0/gtk.css 的 @define-color）。
+  # 取值沿用旧主题 MacTahoe 的 view_bg（暗 #242424、亮 #FFFFFF）；换成
+  # WhiteSur-GTK（2026-11-22）后未重新取值，仅作概览底色用。
   shell = {
     backdrop = "#242424";
   };
@@ -308,7 +309,7 @@ in
     xdg.configFile."niri-outputs/outputs.kdl".text = outputsKdl;
 
     # overview 的亮/暗两套也各生成一份到 store：运行时由 theme-apply 把上面的软链
-    # 指过来（见 gui/themes/variants.nix，那里是唯一的切换入口）
+    # 指过来（见 gui/desktop/linux/themes/variants.nix，那里是唯一的切换入口）
     xdg.configFile = {
       "theme-variants/niri/overview-dark.kdl".text = mkOverview shell.backdrop;
       "theme-variants/niri/overview-light.kdl".text = mkOverview shellLight.backdrop;

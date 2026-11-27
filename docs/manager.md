@@ -3,7 +3,7 @@
 ## 部署新配置
 
 ```bash
-# desktop 主机（Niri 桌面）
+# desktop 主机（Niri / KDE Plasma，默认 Plasma）
 sudo nixos-rebuild switch --flake ~/Projects/nixos-config#desktop
 
 # laptop 主机（Niri 桌面）
@@ -19,7 +19,7 @@ sudo nixos-rebuild switch --flake ~/Projects/nixos-config#wsl
 darwin-rebuild switch --flake ~/Projects/nixos-config#macbook
 ```
 
-部署成功后会生成新系统环境，旧环境保留并加入 systemd-boot 启动项（最多保留 10 个，见 `boot.loader.systemd-boot.configurationLimit`）。
+启用 systemd-boot 的 NixOS 主机可从启动菜单选择旧代际。系统代际启动项默认最多保留 10 个（见 `boot.loader.systemd-boot.configurationLimit`）。
 
 > Fish 别名：`updatedp` / `updatedplog` / `updatelp` / `updatelplog` / `updatewsl`
 

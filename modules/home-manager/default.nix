@@ -6,12 +6,12 @@
 #   gui/      GUI 应用与 Linux 桌面会话
 #             - apps/shared/   跨平台 GUI 应用配置（vscode）
 #             - apps/linux/    Linux 专属 GUI 应用
-#             - desktop/linux/ Linux 桌面会话（niri / noctalia / 主题 / 输入法）
+#             - desktop/linux/ Linux 桌面会话（niri / noctalia / 主题）
 #   platform/ 平台专属适配（linux / darwin）
 #   profiles/ 角色配置：决定某类设备需要哪些能力
 #             （workstation / server / wsl / macbook，由各主机经 flake.nix 导入）
 #
-# 本文件只做两件事：定义公共选项（myHome.cli / myHome.gui / 主题切换登记表），
+# 本文件只做两件事：定义公共选项（myHome.cli / dev / gui / desktop / 主题切换登记表），
 # 以及导入所有主机共享的 common 层。dev 与 gui 层由各角色 profile 组合，
 # 不在这里无条件导入——服务器/WSL 不应被动继承工作站能力。
 {
@@ -41,7 +41,7 @@
   options.myHome.desktop.enable = lib.mkOption {
     type = lib.types.bool;
     default = true;
-    description = "启用 Linux 桌面会话（Niri / Noctalia / 主题 / 输入法）";
+    description = "启用 Linux 桌面会话（Niri / Noctalia / 主题）";
   };
 
   options.myHome.appearance.switchTargets = lib.mkOption {
@@ -54,7 +54,7 @@
           };
           dark = lib.mkOption {
             type = lib.types.str;
-            description = "暗色变体，相对 $HOME（如 theme-variants/gtk-3.0/dark.ini）";
+            description = "暗色变体，相对 $HOME（如 .config/theme-variants/gtk-3.0/dark.ini）";
           };
           light = lib.mkOption {
             type = lib.types.str;
@@ -67,10 +67,11 @@
     description = ''
       亮/暗切换时要翻的软链。真源是 Noctalia 的 theme mode，执行者是
       gui/desktop/linux/themes/variants.nix 里的 theme-apply：它只做「live 指到当前
-      模式的变体」这件事，各层（GTK/Qt/niri、btop…）把自己的两个变体生成到 store
-      并在这里登记。
-      登记者自己负责让 live 文件首次存在（HM 初始值 = 暗色）；rebuild 会把 live 还原成
-      暗色，登录时的 theme-apply 再按 Noctalia 的 mode 纠正，不需要额外的状态文件。
+      模式的变体」这件事，各层（GTK/Qt/niri、fastfetch、nvim…）把自己的两个变体
+      生成到 store 并在这里登记（btop 用内置主题，不参与）。
+      登记者自己负责让 live 文件首次存在（HM 初始值由各登记模块决定，当前均为亮色）；
+      rebuild 会把 live 还原成初始值，登录时的 theme-apply 再按 Noctalia 的 mode 纠正，
+      不需要额外的状态文件。
     '';
   };
 

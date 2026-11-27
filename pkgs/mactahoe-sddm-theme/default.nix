@@ -12,7 +12,7 @@
 # Plasma 6.8 从 org.kde.breeze.components 删掉了 VirtualKeyboardLoader，而本主题
 # 仍直接实例化它（缺类型时 greeter 会 "Fallback to embedded theme"）。故把
 # plasma-workspace v6.0.0 的该组件（Wayland 实现）作为本地 QML 类型随主题一起装，
-# 详见 virtualkeyboard/ 里的文件头。
+# 详见 pkgs/sddm-virtualkeyboard/ 里的文件头。
 {
   lib,
   stdenvNoCC,

@@ -17,7 +17,7 @@ let
       # 单入口应用维持 binary= 用法不变。
       binaries ? [ ],
       # 可选：若应用运行窗口的 WM_CLASS 与桌面文件 ID 不一致（如欧陆词典窗口类为
-      # eudic 而桌面文件是 eusoft-eudic.desktop），GNOME Shell / Dash to Panel 会
+      # eudic 而桌面文件是 eusoft-eudic.desktop），KDE / niri 的任务栏会
       # 无法把窗口与桌面文件关联，导致任务栏显示成通用图标。传入该窗口类名可为
       # 桌面文件补充 StartupWMClass 解决。
       startupWMClass ? null,
@@ -94,7 +94,7 @@ in
   };
 
   # 为所有支持的平台生成属性集
-  # 用法: forAllSystems (system: pkgs: ...)
+  # 用法: forAllSystems (system: ...)
   forAllSystems = lib.genAttrs [
     "x86_64-linux"
     "aarch64-darwin"

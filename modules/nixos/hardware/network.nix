@@ -23,8 +23,8 @@ in
     # NM 的 [connection] 默认值不支持 ignore-auto-dns（启动日志 unknown key，纯 no-op），
     # 压不掉路由器 RA 下发的 v6 DNS；修法在路由器上游 DNS 或单连接配置，见 docs/quirks.md。
 
-    # 本机启动后无强依赖网络的服务（SSH/代理均在用户登录后拉起），
-    # 等待全部接口上线纯属浪费时间，禁用以省下约 4.7s 启动耗时
+    # 本机无强依赖网络的服务（sshd 开机即起但绑 0.0.0.0、无需等接口上线；
+    # 代理才在用户登录后拉起），等待全部接口上线纯属浪费时间，禁用以省下约 4.7s 启动耗时
     systemd.services.NetworkManager-wait-online.enable = false;
   };
 }

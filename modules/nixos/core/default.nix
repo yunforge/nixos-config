@@ -60,14 +60,14 @@ in
 
     # 保持NixOS系统自动更新
     # 必须显式指向本机 flake：未设 flake 时 nixos-rebuild 回退 classic 路径，
-    # 而本机 NIX_PATH 无 nixos-config，daily timer 只会反复失败。
+    # 而本机 NIX_PATH 无 nixos-config，每周的 timer 只会反复失败。
     # 各主机 networking.hostName 与 flake 输出属性同名，据此自动选择目标主机。
     system.autoUpgrade = {
       enable = true;
       allowReboot = false;
       # 每周日中午触发一次，避开凌晨无人期。
       dates = "Sun 12:00";
-      # 关闭「漏跑补执行」：persistent=true（默认）会把错过的 04:40 升级在下次
+      # 关闭「漏跑补执行」：persistent=true（默认）会把错过的周日 12:00 升级在下次
       # 开机/休眠唤醒的瞬间立刻补跑一次 nixos-rebuild switch（重启
       # home-manager 等单元），表现为长时间休眠后唤醒特别卡顿。设 false 后
       # 错过的运行直接跳过，不再在唤醒瞬间补跑。
@@ -269,7 +269,7 @@ in
 
     # nixos-upgrade.service 以 root 运行且 HOME=/root，读不到用户 ~/.gitconfig，
     # libgit2 因仓库属主非 root 而拒绝访问。必须在系统级 /etc/gitconfig 放开
-    # safe.directory，否则 autoUpgrade 每日必然失败。
+    # safe.directory，否则 autoUpgrade 每周必然失败。
     # programs.git.enable 默认为 false：不开启则 /etc/gitconfig 根本不会生成。
     programs.git.enable = true;
     programs.git.config.safe.directory = [

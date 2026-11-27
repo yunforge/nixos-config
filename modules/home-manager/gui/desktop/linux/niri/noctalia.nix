@@ -49,8 +49,9 @@ in
       # ⚠️ 这里的 settings 只是**出厂默认值**：GUI 里的改动会写进
       # ~/.local/state/noctalia/settings.toml（运行时状态），并覆盖本文件对应键。
       # 模块文档原话："these settings can still be overwritten at runtime via the
-      # settings menu"。故 bar 的布局（控件列表、胶囊、透明度）与插件配置不在此
-      # 维护，那部分归 GUI；本模块只负责需要在版本控制里钉死的东西：调色板。
+      # settings menu"。故 bar 的其余布局（capsule / enabled / margin_edge / members
+      # 等）与插件配置不在此维护，那部分归 GUI；本模块只钉需要在版本控制里确定
+      # 下来的东西：调色板，以及下方少量必须声明式生效的 bar 默认值。
       # 实测被运行时覆盖的键见 docs/themes.md 的"Noctalia"一节。
       settings = {
         shell = {
@@ -73,7 +74,7 @@ in
         };
         theme = {
           # 桌面整体亮色。真源仍是 Noctalia 的 theme mode：theme-apply 按它切换
-          # GTK/Qt/图标/niri（见 gui/themes/variants.nix）；壳层调色板用下面
+          # GTK/Qt/图标/niri（见 gui/desktop/linux/themes/variants.nix）；壳层调色板用下面
           # customPalettes.mactahoe.light。想整体切回暗色只改这一行。
           mode = "light";
           # 用下面的自定义调色板，而不是内置/社区方案：只有自定义调色板能同时钉住
@@ -97,7 +98,8 @@ in
         };
         # bar 布局：这四项可以声明式 —— 它们没有密钥（明文 API key 在 state 的
         # [plugin_settings."coder/deepseek_usage"] 段里，与本组无关）。bar 的其余键
-        # （capsule / enabled / margin_edge / members …）仍归 GUI，本模块只钉这四项。
+        # （capsule / enabled / margin_edge / members …）仍归 GUI。
+        # 本模块也根据主机配置声明下方的逐屏开关。
         # 取值理由与对比度算据见 docs/themes.md 的「bar 收敛」。
         # 注意：运行时 state 里已有同键会遮蔽这里，首次生效需把 state 那四行删一次
         # （见 docs/manager.md）。
@@ -151,8 +153,9 @@ in
         };
       };
 
-      # 壳层调色板：与 GTK / Qt / niri 装饰同源，全部取自 MacTahoe-Dark 的
-      # share/themes/MacTahoe-Dark/gtk-4.0/gtk.css（括号内是该色在 CSS 里的出现次数）。
+      # 壳层调色板：色值取自旧主题 MacTahoe-Dark 的
+      # share/themes/MacTahoe-Dark/gtk-4.0/gtk.css（括号内是该色在 CSS 里的出现次数）；
+      # 换 WhiteSur（2026-11-22）后仍沿用，niri 装饰现为内置默认、不同源。
       #
       # 为什么不直接用社区方案的 ADW：它的 mSurface 恰好也是 #242424，但
       #   mOnSurfaceVariant = mOnSurface = #ffffff   → 没有文字层级

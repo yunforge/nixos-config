@@ -46,5 +46,5 @@
 - skill：`~/.agents/skills/`（`agent-desktop` / `commit` / `study`），`~/.claude/skills/` 里是软链
 - `agent-desktop` / `agent-browser` 工具自身的安装与配置
 
-若要声明式接管，需要先决定这些内容如何落库（与 `.gitignore` 的 `/.agents/`、`/.claude/`
+若要声明式接管，需要先决定这些内容如何落库（与 `.gitignore` 的 `.agents/`、`.claude/`
 条目冲突），再在 `common/ai/` 下按 `home.file` / `xdg.dataFile` 托管——属于后续独立工作。

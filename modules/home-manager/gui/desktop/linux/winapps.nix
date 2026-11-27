@@ -36,7 +36,7 @@ let
   rdpPassFile = "${homeDir}/.config/winapps/rdp-pass";
 
   # WinApps 只接受 100/140/180 三档，按桌面声明的缩放取最近值：
-  # 1.5 倍屏 → 140，2 倍及以上 → 180，其余 → 100。可用 cfg.rdpScale 覆盖。
+  # ≥1.7 → 180，1.3–1.7 → 140，其余 → 100。可用 cfg.rdpScale 覆盖。
   desktopScale = osConfig.mySystem.desktop.scale;
   derivedScale =
     if desktopScale >= 1.7 then
@@ -87,7 +87,7 @@ let
     USAGE
     }
 
-    # 宿主可见设备：读 sysfs，不依赖未安装的 usbutils；跳过根控制器与 hub
+    # 宿主可见设备：读 sysfs，不依赖 usbutils（embedded 应用默认会装，但这里不假设）；跳过根控制器与 hub
     host_devices() {
       local d idv idp name cls
       for d in /sys/bus/usb/devices/*/; do
@@ -265,7 +265,7 @@ in
     };
 
     xdg.configFile."winapps/winapps.conf".text = ''
-      # 由 home-manager 托管（modules/home-manager/gui/winapps.nix），请改配置而非本文件
+      # 由 home-manager 托管（modules/home-manager/gui/desktop/linux/winapps.nix），请改配置而非本文件
       RDP_USER="${cfg.windowsUser}"
       RDP_ASKPASS="${homeDir}/.local/bin/winapps-askpass"
       RDP_DOMAIN=""

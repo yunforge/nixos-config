@@ -45,6 +45,7 @@ final: prev: {
   # 无消费场景；上游亦拒收此修复（PR #44）。根因记录见 docs/quirks.md。
 
   # 自打包主题（nixpkgs 未收录）：MacTahoe GTK / 图标主题 / Kvantum(Qt) / SDDM 登录主题
+  # 2026-11-22 起无消费方；定义与 overlay 惰性保留，便于回退
   mactahoe-gtk-theme = prev.callPackage ../pkgs/mactahoe-gtk-theme { };
   mactahoe-icon-theme = prev.callPackage ../pkgs/mactahoe-icon-theme { };
   mactahoe-kvantum = prev.callPackage ../pkgs/mactahoe-kvantum { };
@@ -76,7 +77,7 @@ final: prev: {
   pingfang-sc = prev.callPackage ../pkgs/pingfang-sc { };
 
   # magpie：多个 AI agent 的统一模型选择器（上游 yetone/magpie，nixpkgs 未收录）。
-  # 桌面版经 cgo 链接 GTK3 + WebKitGTK 4.1（闭包 847 MiB），只给有图形会话的主机；
+  # 桌面版经 cgo 链接 GTK3 + WebKitGTK 4.1（闭包约 970 MiB），只给有图形会话的主机；
   # magpie-cli 是同源码的 nogui/CGO_ENABLED=0 终端版，给 WSL 这类主机。
   # 注意：它自带 `magpie update` 自更新，在 store 里必然失败，升级改包的 version。
   magpie = prev.callPackage ../pkgs/magpie { };

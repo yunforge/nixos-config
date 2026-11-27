@@ -54,9 +54,9 @@ stdenv.mkDerivation {
     # 提供假 home 目录，避免读取真实用户信息
     substituteInPlace libs/lib-core.sh --replace-fail 'MY_HOME=$(getent passwd "''${MY_USERNAME}" | cut -d: -f6)' 'MY_HOME=/tmp'
 
-    # 把「顶层窗口装饰」压成直角（原来是 $wm_radius = 24）。KDE 下 KWin 的
-    # 服务端装饰已改直角；GTK 自绘窗口不能再保留 8/24px，否则同一个桌面里
-    # 会出现两种圆角。只改顶层窗口框：
+    # 把「顶层窗口装饰」压成直角（原来是 $wm_radius = 24）。KDE 侧 KWin 现在用
+    # 圆角 opaque 窗饰（kde-appearance.nix）；本包若启用，直角 GTK 窗口会与
+    # KDE 的圆角不一致，启用前需先核对外观。只改顶层窗口框：
     # GTK3 `decoration` / `.ssd`、GTK4 `window.csd` 及其 headerbar 顶角、
     # GTK4 Chromium/Edge 的 `headerbar.titlebar`。内层 19/18/16/14/12、
     # popup / tooltip / messagedialog，以及 $wm_radius 变量本身都不动。

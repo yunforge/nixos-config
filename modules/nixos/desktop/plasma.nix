@@ -47,7 +47,7 @@ in
           kfinal: kprev: {
             kwin = kprev.kwin.overrideAttrs (old: {
               # 6.8.4 起上游已含修复；版本守卫让 nixpkgs 滚动到 6.8.4 后
-              # 补丁自动失效，不会因上下文不匹配让每日 autoUpgrade 构建失败。
+              # 补丁自动失效，不会因上下文不匹配让每周 autoUpgrade 构建失败。
               patches =
                 (old.patches or [ ])
                 ++ lib.optionals (lib.versionOlder old.version "6.8.4") [
@@ -68,7 +68,7 @@ in
       okular # 文档/PDF → Papers
       elisa # 音乐播放（仓库不装独立播放器）
       ark # 压缩包管理 → File Roller
-      ffmpegthumbs # 视频缩略图（配合 Dolphin，已移除）
+      ffmpegthumbs # 视频缩略图（Dolphin 的缩略图能力一并排除）
       khelpcenter # 帮助中心
       krdp # 远程桌面服务端
       qrca # 二维码扫描

@@ -2,7 +2,6 @@
 #
 # 与 desktop 同为 workstation：系统能力与用户环境由角色模块给出默认值；
 # 本文件只声明笔记本的真实差异：内屏、电源管理与 libvirt 修复。
-# 曾写的「GNOME 桌面」注释已过时：本机同为 Niri 会话。
 {
   config,
   pkgs,

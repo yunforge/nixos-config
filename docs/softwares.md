@@ -36,17 +36,18 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | 类别 | 软件 |
 |------|------|
 | 浏览器 | Zen Browser（`Mod`+`Shift`+`Return`，仓库声明）、Brave（`~/Apps` 自维护，非仓库声明） |
-| 通讯 | Discord、Telegram、微信（XWayland 适配）、QQ |
+| 通讯 | Discord、Telegram、微信（XWayland 适配）、QQ、腾讯会议（wemeet） |
 
 ## 开发工具
 
 | 类别 | 软件 |
 |------|------|
-| 编辑器 | Neovim、VSCode（**只装本体**，扩展由 VSCode 自带的 Settings Sync 管理，不再由 Nix 声明） |
+| 编辑器 | Neovim、VSCode（**只装本体**，扩展由 VSCode 自带的 Settings Sync 管理，不再由 Nix 声明）、Zed |
 | IDE | JetBrains CLion（打包时补 skiko 渲染库）、Qt Creator |
-| AI 编程 | Claude Code、pi-coding-agent、CodeX |
+| AI 编程 | Claude Code、pi-coding-agent、CodeX、herdr |
 | Git | git、lazygit |
-| 容器 | Distrobox + Podman、Docker 扩展、lazydocker |
+| 容器 | Distrobox + Podman、lazydocker |
+| 嵌入式 | PlatformIO（STM32 / ESP32 / AVR / RP2040 工程框架）、gcc-arm-embedded、pyocd、probe-rs、esptool / espflash、avrdude（配 avr-gcc 交叉链）、picotool、stlink |
 | 数据库 | HeidiSQL |
 
 ## 生产力与笔记
@@ -76,7 +77,12 @@ CLI / TUI / 工具链见 `docs/environment.md`。
 | 欧陆词典 | 查词 |
 | Mister Download Manager | 下载管理器（Rust 原生，支持浏览器集成 / BT / 视频站点；自维护包见 `pkgs/misterdownloadmanager`） |
 | Logisim Evolution | 数字电路模拟 |
+| FlClash | 代理客户端（`media.nix`，取代 clash-verge-rev；仅系统代理模式） |
+| bilibili | B 站桌面客户端 |
+| disktree | 磁盘占用树状图 |
+| gnome-text-editor | 轻量文本编辑器（`note` 别名打开便签） |
 | file-roller | 压缩包管理 |
+| Magpie | 各 AI agent 的模型选择器（带托盘的桌面版，链接 WebKitGTK；自维护包见 `pkgs/magpie`） |
 
 ## 游戏
 
