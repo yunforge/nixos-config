@@ -164,6 +164,9 @@ shadow {
 
 ### KDE 外观（仓库声明部分，2026-11-22）
 
+启用 Plasma 的主机由 Plasma 同步旧版 GTK2 样式，Home Manager 继续管理 GTK3/4。
+纯 Niri 主机的 GTK2 样式仍由 Home Manager 管理。
+
 NixOS/HM 维护 niri 会话的完整外观；KDE Plasma 的外观也由仓库按 WhiteSur-kde
 声明（`kdeglobals`、`kwinrc`、`kcminputrc`、`plasmarc` 仍由 KDE 运行时维护，
 仓库只写下面这些键），因为系统设置里没有稳定的「一次配置」入口，或改完会被

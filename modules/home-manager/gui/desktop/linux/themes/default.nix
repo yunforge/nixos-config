@@ -2,6 +2,7 @@
 {
   lib,
   config,
+  osConfig,
   pkgs,
   myLib,
   ...
@@ -28,6 +29,8 @@ in
     # 图标独立于 GTK 主题：统一用 WhiteSur-light（亮暗不变），见 variants.nix。
     gtk = {
       enable = true;
+      # Plasma 的 GTK 同步服务会替换 ~/.gtkrc-2.0，交给它管理以免 HM 激活时冲突。
+      gtk2.enable = !osConfig.services.desktopManager.plasma6.enable;
       theme = {
         package = pkgs.whitesur-gtk-theme;
         name = "WhiteSur-Light";
