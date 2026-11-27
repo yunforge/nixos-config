@@ -12,7 +12,7 @@
 
 stdenv.mkDerivation {
   pname = "mactahoe-kvantum";
-  version = "2026-08-16";
+  version = "unstable-2026-08-16";
 
   src = fetchFromGitHub {
     owner = "vinceliuice";
