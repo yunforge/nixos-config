@@ -18,6 +18,7 @@
 {
   lib,
   config,
+  osConfig,
   pkgs,
   myLib,
   ...
@@ -25,6 +26,7 @@
 let
   cfg = config.myHome.gui.themes;
   desktopCfg = config.myHome.desktop;
+  noctaliaEnabled = config.programs.noctalia.enable;
 
   home = config.home.homeDirectory;
   variantDir = "theme-variants";
@@ -184,14 +186,12 @@ let
             if [ -z "$mode" ]; then
               state="''${XDG_STATE_HOME:-$HOME/.local/state}/noctalia/settings.toml"
               # 先读运行时 state 的 [theme] 段（GUI 切换会把 mode 写在这里）。
-              mode="$(awk -F'"' '/^\[/{s=($0=="[theme]")} s && /^mode *=/ {print $2; exit}' "$state" 2>/dev/null)"
-              # state 里还没写过 mode（用户从未切换过）时，回落到 HM 生成的
-              # config.toml —— 那是版本控制里的默认值（noctalia.nix 的 theme.mode）。
-              # 不回落到这里的话 mode 取空串，下面 case 直接报「未知模式」退出，
-              # 登录后 GTK/Qt/niri 就停在 HM 初始值不动（实测 theme-apply.service
-              # 目前正是因此 failed）。
+              if [ -f "$state" ]; then
+                mode="$(awk -F'"' '/^\[/{s=($0=="[theme]")} s && /^mode *=/ {print $2; exit}' "$state")"
+              fi
+              # state 文件还不存在或缺少 mode 时，使用 HM 生成的默认值。
               if [ -z "$mode" ]; then
-                mode="$(awk -F'"' '/^\[/{s=($0=="[theme]")} s && /^mode *=/ {print $2; exit}' "$HOME/.config/noctalia/config.toml" 2>/dev/null)"
+                mode="$(awk -F'"' '/^\[/{s=($0=="[theme]")} s && /^mode *=/ {print $2; exit}' "$HOME/.config/noctalia/config.toml")"
               fi
             fi
             case "$mode" in
@@ -271,45 +271,45 @@ in
     # 本模块自己的 4 个活文件走同一张表（见 modules/home-manager/default.nix 的
     # myHome.appearance.switchTargets）：theme-apply 只做「指软链」，不认具体应用。
     # 第 5 个活文件 gtk.css 不入表：它是模式无关的单一文件（见上面 gtk4UserCss）。
-    myHome.appearance.switchTargets = [
-      {
-        live = ".config/gtk-3.0/settings.ini";
-        dark = ".config/${variantDir}/gtk-3.0/dark.ini";
-        light = ".config/${variantDir}/gtk-3.0/light.ini";
-      }
-      {
-        live = ".config/gtk-4.0/settings.ini";
-        dark = ".config/${variantDir}/gtk-4.0/dark.ini";
-        light = ".config/${variantDir}/gtk-4.0/light.ini";
-      }
-      {
-        live = ".config/Kvantum/kvantum.kvconfig";
-        dark = ".config/${variantDir}/kvantum/dark.kvconfig";
-        light = ".config/${variantDir}/kvantum/light.kvconfig";
-      }
-      # niri 概览底色，niri 自己会 watch 到 include 的文件并重载。
-      # （窗口装饰颜色不在此：Noctalia 模板已停用，用 niri 内置默认。）
-      {
+    myHome.appearance.switchTargets =
+      lib.optionals noctaliaEnabled [
+        {
+          live = ".config/gtk-3.0/settings.ini";
+          dark = ".config/${variantDir}/gtk-3.0/dark.ini";
+          light = ".config/${variantDir}/gtk-3.0/light.ini";
+        }
+        {
+          live = ".config/gtk-4.0/settings.ini";
+          dark = ".config/${variantDir}/gtk-4.0/dark.ini";
+          light = ".config/${variantDir}/gtk-4.0/light.ini";
+        }
+        {
+          live = ".config/Kvantum/kvantum.kvconfig";
+          dark = ".config/${variantDir}/kvantum/dark.kvconfig";
+          light = ".config/${variantDir}/kvantum/light.kvconfig";
+        }
+      ]
+      # niri 会在概览底色文件切换后重载配置。
+      ++ lib.optional (noctaliaEnabled && osConfig.programs.niri.enable) {
         live = ".config/niri-colors/overview.kdl";
         dark = ".config/${variantDir}/niri/overview-dark.kdl";
         light = ".config/${variantDir}/niri/overview-light.kdl";
-      }
-    ];
+      };
 
-    xdg.configFile = variants // {
+    xdg.configFile = lib.optionalAttrs noctaliaEnabled variants // {
       # 模式无关：GTK4 的亮/暗在同一份文件里靠 @media 切（不能靠换文件，见 gtk4UserCss）
       # source 必须指到文件：直接把 derivation 交给 HM 会软链整个输出目录。
       "gtk-4.0/gtk.css".source = "${gtk4UserCss}/gtk.css";
     };
 
-    home.packages = [ applyScript ];
+    home.packages = lib.optional noctaliaEnabled applyScript;
 
     # 窗口按钮位置：dconf 才是真源（settings.ini 那个键对 libadwaita 应用无效，
     # 见上面 buttonLayout 的注释）
     dconf.settings."org/gnome/desktop/wm/preferences".button-layout = buttonLayout;
 
     # 登录时按当前模式应用一次；此后 Noctalia 的 state 目录一变就再来一次
-    systemd.user.services.theme-apply = {
+    systemd.user.services.theme-apply = lib.mkIf noctaliaEnabled {
       Unit = {
         Description = "应用 Noctalia 的亮/暗模式到 GTK/Qt/图标/niri";
         # 不要限流：一旦失败，systemd 会让 path 单元后续触发全丢
@@ -326,7 +326,7 @@ in
       Install.WantedBy = [ "default.target" ];
     };
 
-    systemd.user.paths.theme-apply = {
+    systemd.user.paths.theme-apply = lib.mkIf noctaliaEnabled {
       Unit.Description = "监听 Noctalia theme mode 的变化（temp+rename，故盯目录）";
       Path.PathModified = "${home}/.local/state/noctalia";
       Install.WantedBy = [ "default.target" ];

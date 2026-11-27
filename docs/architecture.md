@@ -122,6 +122,7 @@ HM 侧导入：common + dev + `gui/apps/shared`（跨平台 GUI 应用配置）+
 - 选项**就近定义在实现该功能的模块里**，不集中到 core。
 - 每个域的**聚合模块**（如 `hardware/default.nix`、`desktop/default.nix`）用 `lib.mkDefault`
   给出该域的默认开关组合，主机文件因此只写**例外**（关单项用 `lib.mkForce`）。
+  硬件域的音频、蓝牙、网络和 MCU 能力可各自开启；NVIDIA 仍需要硬件域提供图形栈。
 - 主机数据（如 `mySystem.desktop.monitors`）留在 `hosts/`；共享模块只做生成器与消费方。
 - 选项根按平台层分：系统层（NixOS / nix-darwin）用 `mySystem.*`，用户层（HM）用
   `myHome.*`。两者都不含用户名——账户名只由 `mySystem.primaryUser` /
@@ -130,6 +131,7 @@ HM 侧导入：common + dev + `gui/apps/shared`（跨平台 GUI 应用配置）+
   `myHome.ai.enable`（common/ai，Agent 用户环境，与 cli 解耦）、
   `myHome.gui.enable`（GUI 应用）、`myHome.desktop.enable`（Linux 桌面会话）。
   这些开关由角色 profile 用 `mkDefault` 给出，主机可用 `mkForce` 覆盖。
+  工作站的 `myHome.desktop.enable` 默认跟随 `mySystem.desktop.enable`；GUI 应用单独控制。
 
 **选项清单不在文档里维护**：`rg 'mkEnableOption|mkOption' modules/` 是唯一权威。
 手抄的表一定会漂，所以这里没有它。
@@ -170,8 +172,8 @@ virtualization / proxy）由角色与 `desktop.enable` 的聚合默认值给出�
 
 - NixOS 系统级：`modules/shared/nix.nix`（经 core 与 darwin base 共同导入）
 - macOS 系统级：同上（同一份单一真源，不再两边各注一份）
-- flake 输出：`overlays.default` 与 `packages.*`（`nix flake check` 会逐一评估，
-  nixpkgs 滚动带来的包级回归在 CI 即暴露）
+- flake 输出：`overlays.default` 与 `packages.*`（`nix flake check` 会评估包的派生，
+  源码哈希与构建步骤需要实际构建验证）
 
 Home Manager 走 `useGlobalPkgs = true` 复用系统级实例，不单独注入 overlay。
 

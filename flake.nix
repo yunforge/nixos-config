@@ -198,8 +198,7 @@
       # packages 供 `nix build .#<name>` 单独构建验证某个自维护包；overlays 供
       # 外部 flake 复用。两者与系统级注入（modules/nixos/core 与 modules/darwin/base
       # 的 nixpkgs.overlays）共用同一份 overlays/default.nix，包清单只维护这一处。
-      # nix flake check 会逐一评估 packages.*，nixpkgs 滚动带来的包级回归
-      # （fetch 哈希失配、依赖 API 变更）在 CI 即暴露，不再只靠主机 dry-build 兜底。
+      # nix flake check 会求值 packages.*；验证源码哈希和构建步骤仍需要实际构建包。
       overlays.default = import ./overlays { inherit inputs; };
 
       packages =
@@ -248,7 +247,12 @@
         let
           # niri 校验只在 linux 桌面主机上有意义（niri 为 linux-only 包）
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-          niriHosts = lib.filterAttrs (_: c: c.config.mySystem.desktop.niri.enable) self.nixosConfigurations;
+          niriHosts = lib.filterAttrs (
+            _:
+            { config, ... }:
+            config.programs.niri.enable
+            && config.home-manager.users.${config.mySystem.primaryUser}.myHome.desktop.enable
+          ) self.nixosConfigurations;
           mkNiriValidate =
             host:
             let

@@ -10,7 +10,7 @@ in
 {
   options.mySystem.hardware.mcu.enable = lib.mkEnableOption "单片机烧录/调试器 USB 设备访问";
 
-  config = lib.mkIf (cfg.enable && cfg.mcu.enable) {
+  config = lib.mkIf cfg.mcu.enable {
     services.udev.extraRules = ''
       # === 烧录/调试器 ===
       # ST-Link / STM32 DFU（ST 自家 debug probe 与内置 DFU 下载器）

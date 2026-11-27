@@ -6,7 +6,7 @@ in
 {
   options.mySystem.hardware.audio.enable = lib.mkEnableOption "PipeWire 音频服务";
 
-  config = lib.mkIf (cfg.enable && cfg.audio.enable) {
+  config = lib.mkIf cfg.audio.enable {
     services.pipewire = {
       enable = true;
       pulse.enable = true;

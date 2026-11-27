@@ -11,7 +11,7 @@ in
 {
   options.mySystem.hardware.bluetooth.enable = lib.mkEnableOption "蓝牙支持";
 
-  config = lib.mkIf (cfg.enable && cfg.bluetooth.enable) {
+  config = lib.mkIf cfg.bluetooth.enable {
     hardware.bluetooth.enable = true;
     hardware.bluetooth.powerOnBoot = true;
     hardware.enableRedistributableFirmware = true;

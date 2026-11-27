@@ -10,7 +10,7 @@
 }:
 let
   desktopCfg = config.myHome.desktop;
-  niriConfigPath = "${config.home.homeDirectory}/Projects/nixos-config/modules/home-manager/gui/desktop/linux/niri/config";
+  niriConfigPath = "${osConfig.mySystem.configDir}/modules/home-manager/gui/desktop/linux/niri/config";
 
   # niri 会话专有的环境变量：光标与 Qt 平台主题都属于「niri 的外观」。
   # 不能放进系统级 environment.sessionVariables —— KWin 在 XCURSOR_THEME 非空时
@@ -279,8 +279,7 @@ in
     ./noctalia.nix
   ];
 
-  # 门控：myHome.desktop.enable 控制整个桌面会话层，无中间层开关
-  config = lib.mkIf desktopCfg.enable {
+  config = lib.mkIf (desktopCfg.enable && osConfig.programs.niri.enable) {
     # Symlink 整个 Niri 配置目录到 git 仓库（保持可编辑性）
     xdg.configFile."niri".source = config.lib.file.mkOutOfStoreSymlink niriConfigPath;
 

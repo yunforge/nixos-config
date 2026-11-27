@@ -8,13 +8,17 @@
 #
 # 只对启用 Plasma 的主机生效；脚本安装在用户数据目录，不覆盖 KWin 包。
 {
+  config,
   lib,
   osConfig,
   pkgs,
   ...
 }:
+let
+  plasmaEnabled = config.myHome.desktop.enable && osConfig.services.desktopManager.plasma6.enable;
+in
 {
-  config = lib.mkIf osConfig.mySystem.desktop.plasma.enable {
+  config = lib.mkIf plasmaEnabled {
     xdg.dataFile = {
       "kwin/scripts/kwin-tile-gaps/metadata.json".text = builtins.toJSON {
         KPlugin = {

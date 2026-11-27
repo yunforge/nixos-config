@@ -11,32 +11,21 @@
 # 等真实差异。服务器 / WSL / MacBook 不导入本文件，因此不会被动继承工作站能力。
 {
   lib,
-  config,
+  osConfig,
   ...
 }:
-let
-  inherit (config.myHome)
-    cli
-    dev
-    gui
-    desktop
-    ;
-in
 {
-  # 工作站默认全开：CLI/TUI、完整语言工具链、GUI 应用与 Linux 桌面会话。
-  # 主机可用 mkForce 关单项（如某台暂时不装桌面）。
+  # CLI/TUI、开发工具链与 GUI 应用独立于本机是否提供桌面会话。
   config = {
     myHome.cli.enable = lib.mkDefault true;
     myHome.dev.enable = lib.mkDefault true;
     myHome.gui.enable = lib.mkDefault true;
-    myHome.desktop.enable = lib.mkDefault true;
+    myHome.desktop.enable = lib.mkDefault osConfig.mySystem.desktop.enable;
   };
 
   imports = [
     ../dev
-    ../gui/apps/shared
-    ../gui/apps/linux
-    ../gui/desktop/linux
+    ../gui
     ../platform/linux.nix
   ];
 }

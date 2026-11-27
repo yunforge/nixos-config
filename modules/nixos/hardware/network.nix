@@ -11,7 +11,7 @@ in
 {
   options.mySystem.hardware.network.enable = lib.mkEnableOption "WiFi 和网络管理（NetworkManager + iwd）";
 
-  config = lib.mkIf (cfg.enable && cfg.network.enable) {
+  config = lib.mkIf cfg.network.enable {
     # iwd 是 NetworkManager 的 WiFi 后端，包随服务走（曾在 core 给所有主机
     # 装二进制，包括不开网络能力的 server/wsl）
     environment.systemPackages = [ pkgs.iwd ];

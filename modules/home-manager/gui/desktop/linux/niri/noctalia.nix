@@ -42,7 +42,7 @@ in
     description = "启用 Noctalia Shell 用户级配置";
   };
 
-  config = lib.mkIf (cfg.enable && desktopCfg.enable) {
+  config = lib.mkIf (cfg.enable && desktopCfg.enable && osConfig.programs.niri.enable) {
     programs.noctalia = {
       enable = true;
 

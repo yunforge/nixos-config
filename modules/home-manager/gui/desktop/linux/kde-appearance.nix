@@ -30,6 +30,7 @@
 # GTK 应用自身的圆角由 WhiteSur-GTK 决定，不走 KWin 装饰；niri 不读 kwinrc，
 # 继续用 geometry-corner-radius 8 裁角。
 {
+  config,
   lib,
   osConfig,
   pkgs,
@@ -37,6 +38,7 @@
   ...
 }:
 let
+  plasmaEnabled = config.myHome.desktop.enable && osConfig.services.desktopManager.plasma6.enable;
   kwriteconfig = "${pkgs.kdePackages.kconfig}/bin/kwriteconfig6";
   font = myLib.theme.fontSans;
   # 配色与桌面主题用 Plasma 官方 CLI：配色必须整份写入 [Colors:*]，
@@ -171,7 +173,7 @@ let
   '';
 in
 {
-  config = lib.mkIf osConfig.mySystem.desktop.plasma.enable {
+  config = lib.mkIf plasmaEnabled {
     home.packages = [
       whitesurKde
       # 图标主题要落在 XDG_DATA_DIRS 里 KDE 才能按名找到；GTK 侧由

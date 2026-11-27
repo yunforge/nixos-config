@@ -9,6 +9,7 @@
 {
   lib,
   config,
+  osConfig,
   pkgs,
   ...
 }:
@@ -19,7 +20,7 @@ in
 {
   options.myHome.cli.tools.distrobox.enable = lib.mkOption {
     type = lib.types.bool;
-    default = true;
+    default = (osConfig.mySystem.desktop.enable or false) && osConfig.mySystem.desktop.distrobox.enable;
     description = "启用 Distrobox 用户级配置（容器 home 与宿主隔离）";
   };
 

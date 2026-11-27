@@ -8,9 +8,7 @@
 # 门控沿用既有约定：myHome.gui.enable 控制 apps 层，myHome.desktop.enable 控制
 # desktop 层；目录导入即生效，无中间层开关。具体某个应用用该叶子自己的 enable。
 #
-# 注意：当前角色 profile 直接导入子目录（workstation 导 apps/shared + apps/linux
-# + desktop/linux，macbook 只导 apps/shared，server / wsl 不导入），本文件目前
-# 不在任何导入链上，保留为将来统一入口。
+# 工作站走本入口，MacBook 只导入 apps/shared，server / WSL 均不导入。
 { ... }:
 {
   imports = [

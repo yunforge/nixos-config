@@ -4,8 +4,7 @@
 #   - NixOS 系统级：modules/nixos/core/default.nix 的 nixpkgs.overlays
 #   - macOS 系统级：modules/darwin/base.nix 的 nixpkgs.overlays
 #   - flake 输出：overlays.default 与 packages.*（见 flake.nix），
-#     nix flake check 会逐一评估 packages.*，nixpkgs 滚动时包级回归
-#     （fetch 哈希失配、依赖 API 变更）在 CI 即暴露，不再只靠主机 dry-build 兜底
+#     nix flake check 会评估 packages.*；源码哈希和构建步骤由实际构建验证
 #
 # 为什么是 { inputs }: final: prev: 而不是裸 final: prev:：
 #   windows-vm-media 需要按 flake.lock 的 winapps 输入 rev 固定抓取 oem 脚本，
