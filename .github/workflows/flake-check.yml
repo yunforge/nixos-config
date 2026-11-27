@@ -2,9 +2,8 @@ name: "Flake checks"
 
 # 两种触发共用同一套检查，区别只在 flake.lock 的新鲜度：
 #   push / PR  → 验已提交的 flake.lock
-#   schedule（每天 03:40 CST，早于每周日 12:00 的 autoUpgrade）/ workflow_dispatch
-#              → 先把 nixpkgs 刷到 master HEAD 再验，拦截滚动通道上的上游回归；
-#                autoUpgrade 用 --refresh 跟踪 master，只验 lock 看不到那些新提交。
+#   schedule（每天 03:40 CST）/ workflow_dispatch
+#              → 先把 nixpkgs 刷到 master HEAD 再验，提前发现锁文件之外的上游回归。
 #
 # 主机清单不在这里硬编码（原 flake-check / flake-update-check 各有一份矩阵，
 # 新增主机要改三处才不漏）：dry-build 从 flake 输出枚举，新增主机只改 flake.nix。
@@ -41,12 +40,11 @@ jobs:
       - name: "刷新 nixpkgs 到 master HEAD（仅滚动通道）"
         if: github.event_name != 'push' && github.event_name != 'pull_request'
         run: nix flake update nixpkgs
-      # 格式检查：跑一遍 nix fmt（formatter = nixfmt-tree）再看工作树是否被改动，
-      # 有 diff 即说明存在未格式化的文件。放在 flake check 前快速失败。
+      # nixfmt-tree 只格式化 Nix 源码。滚动检查前已主动更新 flake.lock。
       - name: "格式检查（nix fmt，产生 diff 即失败）"
         run: |
           nix fmt
-          git diff --exit-code
+          git diff --exit-code -- '*.nix'
       - name: "nix flake check"
         run: nix flake check --no-write-lock-file
 
