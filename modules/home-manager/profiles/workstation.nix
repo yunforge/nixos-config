@@ -30,9 +30,6 @@ in
     myHome.dev.enable = lib.mkDefault true;
     myHome.gui.enable = lib.mkDefault true;
     myHome.desktop.enable = lib.mkDefault true;
-    # 每日 AI 签到：systemd user timer 每天 09:07 跑 ~/Projects/checkin/run.sh。
-    # 运行数据目录 ~/checkin 由脚本侧管理，这里只管定时拉起。
-    myHome.cli.tools.daily-checkin.enable = lib.mkDefault true;
   };
 
   imports = [
