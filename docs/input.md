@@ -134,9 +134,10 @@ niri 与 KDE Plasma 两个会话对 fcitx5 的启动方式不同，`modules/nixo
 为 KDE 会话覆盖了 XDG autostart：
 
 - **KDE（Wayland）**：KWin 的输入法后端只承认**由它自己拉起**的 fcitx——启动时按
-  `kwinrc` 的 `[Wayland] InputMethod`（本机已指向 `org.fcitx.Fcitx5.desktop`）以
+  `kwinrc` 的 `[Wayland] InputMethod` 以
   `QProcess` 启动并给一条专用 `WAYLAND_SOCKET`，只有这条连接能承担 input-method-v2
-  角色，text-input 上下文才送得到 fcitx。因此 `plasma.nix` 把
+  角色，text-input 上下文才送得到 fcitx。`plasma.nix` 在 `/etc/xdg/kwinrc` 为新账户
+  默认选中 Fcitx 5；用户在「系统设置 → 虚拟键盘」里的选择仍优先。该模块还把
   `/etc/xdg/autostart/org.fcitx.Fcitx5.desktop` 覆盖成「`XDG_CURRENT_DESKTOP=KDE`
   时直接退出」，交给 KWin 拉起。否则（让 systemd 单元先起普通实例）应用就只剩英文：
   实测 fcitx 端 `Group [wayland:] has 0 InputContext(s)`、`fcitx5-remote` 恒为 0，

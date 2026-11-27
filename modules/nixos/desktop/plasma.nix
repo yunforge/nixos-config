@@ -91,8 +91,14 @@ in
     # 上生效（纯 niri 主机不受影响，仍是 niri 默认）。
     services.displayManager.defaultSession = "plasma";
 
+    # KConfig 先读取用户的 kwinrc；系统级默认值也适用于还没有选过输入法的账户。
+    environment.etc."xdg/kwinrc".text = ''
+      [Wayland]
+      InputMethod=/run/current-system/sw/share/applications/org.fcitx.Fcitx5.desktop
+    '';
+
     # 输入法（fcitx5）在 KDE Wayland 下必须由 KWin 亲自拉起：KWin 只在 startSession
-    # 时按 kwinrc `[Wayland] InputMethod`（本机已指向 org.fcitx.Fcitx5.desktop）用
+    # 时按 kwinrc `[Wayland] InputMethod` 用
     # QProcess 启动配置的命令，并给它一条专用 Wayland 连接（WAYLAND_SOCKET）；只有承担
     # input-method-v2 角色的那条连接，text-input 上下文才会被送到 fcitx。若让 XDG
     # autostart 的 systemd 单元先拉起一个普通 fcitx 实例，KWin 拿不到该角色，应用就只剩
