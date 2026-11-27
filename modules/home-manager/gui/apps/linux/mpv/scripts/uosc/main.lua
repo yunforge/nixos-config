@@ -102,6 +102,7 @@ defaults = {
 	chapter_range_patterns = 'openings:オープニング;endings:エンディング',
 	languages = 'slang,en',
 	subtitles_directory = '~~/subtitles',
+	enable_updater = true,
 	disable_elements = '',
 }
 options = table_copy(defaults)
@@ -332,7 +333,7 @@ function create_default_menu_items()
 		},
 		{
 			title = t('Utils'),
-			items = {
+			items = itable_join({
 				{
 					title = t('Aspect ratio'),
 					items = {
@@ -348,8 +349,9 @@ function create_default_menu_items()
 				{title = t('Key bindings'), value = 'script-binding uosc/keybinds'},
 				{title = t('Show in directory'), value = 'script-binding uosc/show-in-directory'},
 				{title = t('Open config folder'), value = 'script-binding uosc/open-config-directory'},
+			}, options.enable_updater and config.ziggy_available and {
 				{title = t('Update uosc'), value = 'script-binding uosc/update'},
-			},
+			} or {}),
 		},
 		{title = t('Quit'), value = 'quit'},
 	}
@@ -445,7 +447,11 @@ require('lib/menus')
 -- Determine path to ziggy
 do
 	local bin = 'ziggy-' .. (state.platform == 'windows' and 'windows.exe' or state.platform)
-	config.ziggy_path = os.getenv('MPV_UOSC_ZIGGY') or join_path(mp.get_script_directory(), join_path('bin', bin))
+	local override = os.getenv('MPV_UOSC_ZIGGY')
+	if override == '' then override = nil end
+	config.ziggy_path = override or join_path(mp.get_script_directory(), join_path('bin', bin))
+	local bundled = not override and utils.file_info(config.ziggy_path)
+	config.ziggy_available = override ~= nil or (bundled and bundled.is_file)
 end
 
 --[[ STATE UPDATERS ]]
@@ -830,7 +836,7 @@ bind_command('keybinds', function()
 		open_command_menu({type = 'keybinds', items = get_keybinds_items(), search_style = 'palette'})
 	end
 end)
-bind_command('download-subtitles', open_subtitle_downloader)
+if config.ziggy_available then bind_command('download-subtitles', open_subtitle_downloader) end
 bind_command('load-subtitles', create_track_loader_menu_opener({
 	prop = 'sub',
 	title = t('Load subtitles'),
@@ -856,7 +862,7 @@ bind_command('subtitles', create_select_tracklist_type_menu_opener({
 	enable_prop = 'sub-visibility',
 	secondary = {prop = 'secondary-sid', icon = 'vertical_align_top', enable_prop = 'secondary-sub-visibility'},
 	load_command = 'script-binding uosc/load-subtitles',
-	download_command = 'script-binding uosc/download-subtitles',
+	download_command = config.ziggy_available and 'script-binding uosc/download-subtitles' or nil,
 }))
 bind_command('audio', create_select_tracklist_type_menu_opener({
 	title = t('Audio'), type = 'audio', prop = 'aid', load_command = 'script-binding uosc/load-audio',
@@ -1078,7 +1084,9 @@ bind_command('open-config-directory', function()
 	end
 end)
 bind_command('update', function()
-	if not Elements:has('updater') then require('elements/Updater'):new() end
+	if options.enable_updater and config.ziggy_available and not Elements:has('updater') then
+		require('elements/Updater'):new()
+	end
 end)
 
 --[[ MESSAGE HANDLERS ]]

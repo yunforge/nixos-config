@@ -15,7 +15,9 @@
 
 先备份现有配置，再将仓库内容放入 `~/.config/mpv/`。**不要用上游 uosc 安装器覆盖本仓库的定制 Lua 文件。**
 
-uosc 的平台辅助程序没有纳入仓库。需要在线字幕搜索、下载等辅助功能时，从 [uosc 5.13.0 release](https://github.com/tomasklaen/uosc/releases/tag/5.13.0) 下载发行包，将其中 `scripts/uosc/bin/` 复制到本地同名目录。辅助程序源码位于 [uosc src/ziggy](https://github.com/tomasklaen/uosc/tree/5.13.0/src/ziggy)。
+uosc 的平台辅助程序没有纳入仓库。在线字幕入口在找到辅助程序后才会显示。可从发行包取出 `ziggy-linux`，放到可执行的位置，在启动 mpv 时设置 `MPV_UOSC_ZIGGY` 为它的绝对路径。独立使用可写配置目录时，也可以将发行包中的 `scripts/uosc/bin/` 复制到本地同名目录。参见 [uosc 5.13.0 发行包](https://github.com/tomasklaen/uosc/releases/tag/5.13.0)和 [Ziggy 源码](https://github.com/tomasklaen/uosc/tree/5.13.0/src/ziggy)。
+
+Home Manager 部署的配置在只读 Nix store 中，uosc 的内置更新已关闭。更新定制脚本时修改仓库再重建。
 
 `mpv.conf` 当前为 NVIDIA/Linux 设置了 `vo=gpu-next`、`gpu-api=vulkan` 和 `hwdec=nvdec`。其他显卡可将硬件解码改为 `hwdec=auto-safe`，并按系统调整 GPU 后端。窗口外部圆角由桌面合成器提供。
 
