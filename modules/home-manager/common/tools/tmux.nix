@@ -53,7 +53,8 @@ let
 
     # 实际目录取自 server 选项（与 restore 同源），不写死 Nix 里的那份
     log "保存会话快照到 $("$tmux" show-option -gqv @resurrect-dir)"
-    exec ${pkgs.bash}/bin/bash ${resurrectSave} quiet
+    # resurrect 的末尾状态可能掩盖 mkdir、快照写入或更新 last 的错误。
+    exec ${pkgs.bash}/bin/bash -e ${resurrectSave} quiet
   '';
 
   # 登录时拉起 server 并**显式**执行一次恢复。
@@ -118,12 +119,15 @@ let
         "$(${pkgs.coreutils}/bin/date -Is)" "$*" >&2
     }
 
-    ${saveScript}/bin/tmux-persist-save || true
+    if ! ${saveScript}/bin/tmux-persist-save; then
+      log "快照保存失败，保留 tmux server"
+      exit 1
+    fi
 
     tmux=${pkgs.tmux}/bin/tmux
     if "$tmux" list-sessions >/dev/null 2>&1; then
       log "注销/关机：关闭 tmux server（快照已存，下次登录自动恢复）"
-      "$tmux" kill-server || true
+      "$tmux" kill-server
     fi
   '';
 

@@ -89,7 +89,7 @@ myHome.cli.tools.tmux.persistence = {
 | `tmux-persist-save` | 命令行手动保存（没有 server 时安全跳过） |
 | `tmux-persist-start` | 手动跑一次"登录恢复"（排错用） |
 | `systemctl --user status tmux-persist.service` | 看登录恢复/注销保存的日志 |
-| `tests/tmux-persistence.sh` | 隔离 socket 上的冒烟测试（存→防误清→重建→登录路径→注销路径） |
+| `tests/tmux-persistence.sh` | 隔离 socket 上的冒烟测试（保存、恢复、注销与写入失败） |
 
 恢复后你所在的位置取决于快照里有什么：登录时若快照里存在名为 `main` 的会话，它会被
 直接复用；否则恢复完就收掉占位会话。日常建议固定一个主页会话：
@@ -112,6 +112,8 @@ myHome.cli.tools.tmux.persistence = {
 - **无 server 时保存会毁快照**：`resurrect/scripts/save.sh` 不检查 server 是否存在，
   此时 dump 全空、`files_differ` 判为"快照变了"，会把**空快照**写成 `last`。所以
   `tmux-persist-save` 先 `list-sessions` 探测，没有 server 就直接跳过。
+- **保存失败时保留会话**：resurrect 的保存脚本可能在快照写入失败后返回成功。封装脚本
+  用 `bash -e` 传递写入错误，注销脚本收到错误时会退出并保留 tmux server。
 - **插件在 HM 生成配置里的位置**：`programs.tmux.plugins` 排在 `extraConfig`（即
   `tmux.conf`）**之前**，所以 `tmux.conf` 末尾的 `set -g status-right` 会覆盖掉
   continuum 注入的自动保存钩子 → 本仓库因此把 `@continuum-save-interval` 设为 `0`，

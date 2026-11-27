@@ -113,7 +113,11 @@ sleep 2
 
 save_t
 sleep 1
-[ -f "$snapshot" ] && ok "快照文件已生成：$snapshot" || bad "快照文件未生成"
+if [ -f "$snapshot" ]; then
+  ok "快照文件已生成：$snapshot"
+else
+  bad "快照文件未生成"
+fi
 
 snap=$(cat "$snapshot" 2>/dev/null || echo "")
 assert_contains "快照里有会话 work" "$snap" "pane	work	"
@@ -207,6 +211,22 @@ else
   bad "注销时未写下新快照（旧：$old_snapshot，现：$new_snapshot）"
 fi
 assert_contains "存档日志来自真实的 @resurrect-dir" "$(cat "$work/stop.log")" "保存会话快照到 $work/resurrect"
+
+# ── T7 快照写入失败时保留 server ────────────────────────
+step "T7 注销脚本：快照目录无效时报告失败并保留会话"
+tmux_t new-session -d -s unsaved -c "$work/wd1"
+touch "$work/blocked-dir"
+tmux_t set-option -g @resurrect-dir "$work/blocked-dir/snapshots"
+if HOME="$work/home" XDG_CONFIG_HOME="$work/home/.config" "$stop_bin" >"$work/stop-failed.log" 2>&1; then
+  bad "保存失败时 tmux-persist-stop 返回了成功"
+else
+  ok "保存失败时 tmux-persist-stop 返回了错误"
+fi
+if tmux_t has-session -t unsaved 2>/dev/null; then
+  ok "未保存的会话仍在运行"
+else
+  bad "未保存的会话被关闭了"
+fi
 
 # ── 汇总 ─────────────────────────────────────────────────
 printf '\n=== 汇总：%d 项通过，%d 项失败 ===\n' "$pass_count" "$fail"
