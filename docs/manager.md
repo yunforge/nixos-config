@@ -79,7 +79,8 @@ sudo nix-collect-garbage --delete-old
 nix store optimise
 ```
 
-> 系统已配置自动每周 GC（`--delete-older-than 7d`）与自动升级（`system.autoUpgrade`）。
+> 系统每周自动 GC（`--delete-older-than 7d`）。周日 12:00 按本地 `flake.lock` 重建并切换系统，
+> 输入更新和锁文件提交由维护者手动执行。内核更新后需手动重启。
 
 ## 其他常用命令
 

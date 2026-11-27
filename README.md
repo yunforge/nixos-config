@@ -89,8 +89,8 @@ nix store optimise
   magpie、windows-vm-media 等）版本钉在仓库内，`nix flake update` 带不动它们。
 > 清单与按包升级步骤见 [`docs/packages.md`](docs/packages.md)。
 
-系统已配置每周自动 GC（`--delete-older-than 7d`）与每周自动升级
-（`system.autoUpgrade`：只构建不重启，升级后把 `flake.lock` 提交回仓库保持工作区干净）。
+系统每周自动 GC（`--delete-older-than 7d`），并按本地 `flake.lock` 构建、切换系统，无自动重启。
+需要升级输入时，手动运行 `nix flake update`，验证并提交锁文件。
 装机后 Noctalia 还有几步一次性设置（调色板、bar 布局），见
 [`docs/manager.md`](docs/manager.md)。
 

@@ -8,7 +8,7 @@
   ...
 }:
 let
-  # 主用户名（选项定义在 users.nix）：trusted-users、autoUpgrade 提交身份等
+  # 主用户名（选项定义在 users.nix）：默认仓库路径和 trusted-users 等
   # 均由此派生，避免用户名散落硬编码
   primaryUser = config.mySystem.primaryUser;
 in
@@ -18,13 +18,13 @@ in
     hardware.enable = lib.mkEnableOption "硬件支持（蓝牙、音频、网络）";
     desktop.enable = lib.mkEnableOption "桌面环境（SDDM、Niri、Plasma）";
     virtualization.enable = lib.mkEnableOption "QEMU/KVM 虚拟化";
-    # 本机 flake 仓库路径（autoUpgrade / git safe.directory 用）。默认假设仓库
+    # 本机 flake 仓库路径（定期重建、git safe.directory 和 Niri 配置共用）。默认假设仓库
     # 在主用户 Projects 目录下（所有主机的既有布局）；机器布局不同时覆盖此项，
     # 不必改共享模块。
     configDir = lib.mkOption {
       type = lib.types.str;
       default = "${config.users.users.${primaryUser}.home}/Projects/nixos-config";
-      description = "本机 flake 仓库路径（autoUpgrade 与 nixos-upgrade 提交 flake.lock 的目标）";
+      description = "本机 flake 仓库路径（用于定期重建与 Niri 配置）";
     };
   };
 
@@ -58,38 +58,21 @@ in
     # WSL2 内核由 Windows 宿主提供，容器内设置此项无功能影响
     boot.kernelPackages = lib.mkIf (!config.boot.isContainer) pkgs.linuxPackages_latest;
 
-    # 保持NixOS系统自动更新
+    # 每周切换到本机工作树和 flake.lock 声明的系统。更新输入由维护者手动完成。
     # 必须显式指向本机 flake：未设 flake 时 nixos-rebuild 回退 classic 路径，
     # 而本机 NIX_PATH 无 nixos-config，每周的 timer 只会反复失败。
     # 各主机 networking.hostName 与 flake 输出属性同名，据此自动选择目标主机。
     system.autoUpgrade = {
       enable = true;
       allowReboot = false;
+      upgrade = false;
       # 每周日中午触发一次，避开凌晨无人期。
       dates = "Sun 12:00";
-      # 关闭「漏跑补执行」：persistent=true（默认）会把错过的周日 12:00 升级在下次
-      # 开机/休眠唤醒的瞬间立刻补跑一次 nixos-rebuild switch（重启
-      # home-manager 等单元），表现为长时间休眠后唤醒特别卡顿。设 false 后
-      # 错过的运行直接跳过，不再在唤醒瞬间补跑。
+      # 跳过定时器停用期间错过的运行（例如关机）；挂起后恢复仍由 OnCalendar 处理。
       persistent = false;
       flake = "${config.mySystem.configDir}#${config.networking.hostName}";
-      # 显式钉死 --refresh：nixpkgs 默认 flags 已含此项，此处重复声明仅为
-      # 防止上游变更默认值后退化为只构建 flake.lock 锁定的旧 nixpkgs
-      flags = [ "--refresh" ];
+      flags = [ "--no-update-lock-file" ];
     };
-
-    # --refresh 每次都重写工作区的 flake.lock，autoUpgrade 不会提交它，工作区
-    # 将永久处于脏状态：Nix 对脏树令 self.rev = null，configurationRevision
-    # 退化为 "dirty"，代际随之无法回溯到 commit。升级成功后以本人身份提交
-    # flake.lock 保持工作区干净。root 的 HOME=/root 无 gitconfig，故用 runuser
-    # 复用用户身份提交（与上面 safe.directory 同一根源）。
-    systemd.services.nixos-upgrade.postStop = ''
-      [ "$SERVICE_RESULT" = "success" ] || exit 0
-      repo="${config.mySystem.configDir}"
-      ${pkgs.git}/bin/git -C "$repo" diff --quiet -- flake.lock && exit 0
-      ${pkgs.util-linux}/bin/runuser -u ${primaryUser} -- \
-        ${pkgs.git}/bin/git -C "$repo" commit -m "chore(autoUpgrade): 刷新 flake.lock" -- flake.lock
-    '';
 
     # 自动将超过一周的垃圾回收，降低磁盘占用
     nix.gc = {

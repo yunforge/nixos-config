@@ -108,8 +108,8 @@ server 角色的明确策略：
   `PermitRootLogin = prohibit-password`；防火墙只放行 22 与 3425（Magpie 网关，
   在 core 的 `allowedTCPPorts` 里）。
 - 不启用桌面 / 硬件 / 虚拟化；代理默认关闭，需要时在主机文件里开。
-- 自动升级与回滚沿用 core 的全局策略（autoUpgrade 走 flake、`allowReboot = false`
-  靠 `configurationLimit = 10` 的代际回滚，GC 7 天）。
+- 定期重建与回滚沿用 core 的全局策略（按本地 `flake.lock` 切换、`allowReboot = false`，
+  启动菜单最多保留 10 个代际，GC 7 天）。
 
 ### MacBook（darwin）
 

@@ -9,8 +9,7 @@
 # proxy 模块静态注入的 127.0.0.1 退化为 mirrored 模式的默认值：
 # EnvironmentFile 的条目优先级高于 Environment=，NAT 模式下被探测结果覆盖。
 # 代理地址不可达时 http_proxy 语义是“只用代理且直接失败”，nix 不会回退直连，
-# 只能转源码构建——autoUpgrade 每周滚 flake.lock 会因此触发巨量本地编译，
-# 所以 nix-daemon 与 nixos-upgrade 必须拿到正确地址。
+# 这会阻断下载或导致转为本地构建，所以 nix-daemon 与 nixos-upgrade 都需要正确地址。
 {
   lib,
   config,
@@ -71,7 +70,7 @@ in
       serviceConfig.EnvironmentFile = "-" + envFile;
     };
 
-    # autoUpgrade 的 --refresh 由该服务以 root 身份执行，拉取 flake 输入
+    # 定期重建由该服务以 root 身份执行，下载锁定的 flake 输入
     # 走的是客户端进程而非守护进程，需要单独注入代理环境
     systemd.services.nixos-upgrade = {
       after = [ "clash-proxy-env.service" ];
