@@ -26,10 +26,10 @@ let
     port=${toString cfg.port}
     host=127.0.0.1
 
-    # bash 的 /dev/tcp 不依赖外部命令；必须经 timeout 包一层 bash -c，
-    # 否则重定向由当前 shell 打开，连接挂起时 timeout 尚未 exec，超时失效
+    # 让 timeout 启动 Bash 后再打开 /dev/tcp，直接复用脚本解释器的绝对路径，
+    # 因为服务的 PATH 不包含 bash。
     probe() {
-      timeout 1 bash -c "exec 3<>/dev/tcp/$1/$port" 2>/dev/null
+      timeout 1 ${pkgs.runtimeShell} -c "exec 3<>/dev/tcp/$1/$port" 2>/dev/null
     }
 
     if ! probe "$host"; then
